@@ -38,7 +38,7 @@ export const flowConfig: JourneyFlowConfig = {
   useSessionFormData: false,
   eventId: MAKE_A_CLAIM_EVENT_ID,
   sections: makeAClaimSections,
-  nonSectionStepOrder: ['eligible', 'task-list', 'remove-defendant'],
+  nonSectionStepOrder: ['eligible', 'task-list', 'remove-defendant', 'remove-claimant'],
   hubStepName: 'task-list',
   steps: {
     'claimant-name': { showCondition: (req: Request) => isIndividual(req) },
@@ -85,6 +85,7 @@ export const flowConfig: JourneyFlowConfig = {
     'additional-claimant-phone': { showCondition: () => false },
     'additional-claimant-text-message': { showCondition: () => false },
     'remove-defendant': { showCondition: () => false },
+    'remove-claimant': { showCondition: () => false },
   },
 };
 

@@ -80,7 +80,7 @@ describe('claimantDashboard route', () => {
     expect(response.render).not.toHaveBeenCalled();
   });
 
-  it('renders the address, case number and links to the claim form and documents, without a general application before the fee is paid', async () => {
+  it('renders the address, case number and links to the claim form and documents, and a task to pay the unpaid fee', async () => {
     (findClaimantClaim as jest.Mock).mockResolvedValue({
       caseReference: CASE,
       state: 'PENDING_CASE_ISSUED',
@@ -102,6 +102,10 @@ describe('claimantDashboard route', () => {
     const tasks = view[1].taskGroups.flatMap((group: { tasks: unknown[] }) => group.tasks);
     expect(tasks).toEqual([
       expect.objectContaining({
+        title: { text: 'claimantDashboard:tasks.payClaimFee' },
+        href: `/case/${CASE}/pay-claim-fee`,
+      }),
+      expect.objectContaining({
         title: { text: 'claimantDashboard:tasks.viewClaimForm' },
         href: `/case/${CASE}/view-documents`,
       }),
@@ -112,7 +116,7 @@ describe('claimantDashboard route', () => {
     ]);
   });
 
-  it('adds the general application once the fee is paid', async () => {
+  it('offers no payment and no general application once the fee is paid', async () => {
     (findClaimantClaim as jest.Mock).mockResolvedValue({ caseReference: CASE, state: 'CASE_ISSUED' });
     (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
       data: { citizenPossessionClaim: { submission: { paymentStatus: 'PAID' } } },
@@ -122,8 +126,10 @@ describe('claimantDashboard route', () => {
     await handler()(req(), response, next);
 
     const groups = (response.render as jest.Mock).mock.calls[0][1].taskGroups;
-    expect(groups.map((group: { groupId: string }) => group.groupId)).toEqual(['claim', 'documents', 'applications']);
-    expect(groups[2].tasks[0].href).toBe(`/case/${CASE}/make-an-application/choose-an-application`);
+    expect(groups.map((group: { groupId: string }) => group.groupId)).toEqual(['claim', 'documents']);
+    const tasks = groups.flatMap((group: { tasks: unknown[] }) => group.tasks);
+    expect(JSON.stringify(tasks)).not.toContain('payClaimFee');
+    expect(JSON.stringify(tasks)).not.toContain('make-an-application');
   });
 
   it('shows no claim panel for a state the court has moved past', async () => {

@@ -12,6 +12,7 @@ const ALL_SECTION_CYAS: readonly string[] = Object.values(SECTION_CYAS).flat();
 /** Pages outside the task list's sections whose saves change the answers a check your answers page shows. */
 const CHANGES_SHOWN_ON: Readonly<Record<string, SectionCya>> = {
   'remove-defendant': 'defendant-cya',
+  'remove-claimant': 'claimant-cya',
 };
 
 export function isSectionCya(stepName: string): stepName is SectionCya {

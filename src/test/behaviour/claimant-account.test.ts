@@ -35,11 +35,41 @@ describe('your property possession account', () => {
 
   it('lists a submitted claim linking to its dashboard', async () => {
     app = await bootMakeAClaim();
-    givenClaim(SUBMISSION, 'CASE_ISSUED');
+    givenClaim(PAID, 'CASE_ISSUED');
 
     const page = await pageOf('/claims');
 
     expect(linkNamed(page, 'Submitted claim')?.getAttribute('href')).toBe(`/case/${CASE_REFERENCE}/claimant-dashboard`);
+  });
+
+  it('says a submitted claim whose fee is not paid is unpaid, and links to its dashboard', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(SUBMISSION, 'PENDING_CASE_ISSUED');
+
+    const page = await pageOf('/claims');
+
+    expect(linkNamed(page, 'Claim fee not paid')?.getAttribute('href')).toBe(
+      `/case/${CASE_REFERENCE}/claimant-dashboard`
+    );
+
+    givenClaim(PAID, 'CASE_ISSUED');
+    expect(linkNamed(await pageOf('/claims'), 'Submitted claim')).toBeDefined();
+  });
+
+  it('still shows the claims against the citizen and the make a claim button when the claims made cannot be listed', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({});
+    ccd.claimsAgainst = [{ caseReference: '1111222233334444', claimantName: 'Acme Ltd', propertyPostcode: 'SW1A 1AA' }];
+    ccd.asClaimantFails = true;
+
+    const response = await app.get('/claims');
+    const page = new JSDOM(response.text).window.document;
+
+    expect(response.status).toBe(200);
+    expect(page.querySelector('main')?.textContent).toContain('We cannot show the claims you’ve made at the moment.');
+    expect(page.querySelector('main')?.textContent).not.toContain('You have not made any claims.');
+    expect(linkNamed(page, 'Make a housing possession claim')?.getAttribute('href')).toBe('/make-a-claim');
+    expect(linkNamed(page, 'View claim')?.getAttribute('href')).toBe('/case/1111222233334444/dashboard');
   });
 
   it('offers to make a claim, whether or not the claimant has made any', async () => {
@@ -93,7 +123,7 @@ describe('claimant dashboard', () => {
     expect(page.body.textContent).toContain('Contact us for help');
   });
 
-  it('offers a general application only once the claim fee is paid', async () => {
+  it('never offers the claimant a general application, which the case does not allow them', async () => {
     app = await bootMakeAClaim();
     const name = 'Ask the court to make an order (make a general application)';
 
@@ -101,9 +131,21 @@ describe('claimant dashboard', () => {
     expect(linkNamed(await pageOf(`/case/${CASE_REFERENCE}/claimant-dashboard`), name)).toBeUndefined();
 
     givenClaim(PAID, 'CASE_ISSUED');
-    expect(linkNamed(await pageOf(`/case/${CASE_REFERENCE}/claimant-dashboard`), name)?.getAttribute('href')).toBe(
-      `/case/${CASE_REFERENCE}/make-an-application/choose-an-application`
-    );
+    const page = await pageOf(`/case/${CASE_REFERENCE}/claimant-dashboard`);
+    expect(linkNamed(page, name)).toBeUndefined();
+    expect(page.body.textContent).not.toContain('Applications');
+  });
+
+  it('links an unpaid submitted claim to its fee payment, and stops once it is paid', async () => {
+    app = await bootMakeAClaim();
+
+    givenClaim(SUBMISSION, 'PENDING_CASE_ISSUED');
+    expect(
+      linkNamed(await pageOf(`/case/${CASE_REFERENCE}/claimant-dashboard`), 'Pay the claim fee')?.getAttribute('href')
+    ).toBe(`/case/${CASE_REFERENCE}/pay-claim-fee`);
+
+    givenClaim(PAID, 'CASE_ISSUED');
+    expect(linkNamed(await pageOf(`/case/${CASE_REFERENCE}/claimant-dashboard`), 'Pay the claim fee')).toBeUndefined();
   });
 
   it('sends a draft claim to its task list', async () => {

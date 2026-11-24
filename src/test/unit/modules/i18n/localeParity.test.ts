@@ -41,6 +41,8 @@ const UNTRANSLATED_ALLOWLIST = new Set([
   'claimList.json::claimsMade.submittedClaim',
   'claimList.json::claimsMade.noClaims',
   'claimList.json::claimsMade.makeAClaim',
+  'claimList.json::claimsMade.unpaidClaim',
+  'claimList.json::claimsMade.unavailable',
 
   // HDPI-8858 - waiting on translations for these pages
   'footer/cookies.json::pageTitle',
@@ -466,6 +468,7 @@ const AWAITING_TRANSLATION = new Set<string>([
   'makeAClaim/equalityAndDiversity.json',
   'makeAClaim/languageUsed.json',
   'makeAClaim/removeDefendant.json',
+  'makeAClaim/removeClaimant.json',
   'makeAClaim/checkYourAnswers.json',
   'claimantDashboard.json',
 ]);

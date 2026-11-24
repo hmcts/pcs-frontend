@@ -8,17 +8,16 @@
   },
   "groups": {
     "claim": "cyThe claim",
-    "documents": "cyDocuments",
-    "applications": "cyApplications"
+    "documents": "cyDocuments"
   },
   "tasks": {
     "viewClaimForm": "cyView the claim form",
     "viewDocuments": "cyView documents",
-    "makeGeneralApplication": "cyAsk the court to make an order (make a general application)"
+    "payClaimFee": "cyPay the claim fee"
   },
   "tags": {
     "available": "cyAvailable",
-    "optional": "cyOptional"
+    "notPaid": "cyNot paid"
   },
   "helpAndSupport": "cyHelp and support",
   "links": {

@@ -394,7 +394,6 @@
     "paymentReference": "Your payment reference number is <strong>{{paymentReference}}</strong>",
     "generalApplicationAndSupport": [
       "If you need to submit a general application as part of this claim, you must do it within 24 hours.",
-      "You can submit a general application by selecting ‘Ask the court to make an order (make a general application)’ on your case overview.",
       "If you need <a class=\"govuk-link\" href=\"https://www.gov.uk/guidance/what-to-expect-coming-to-a-court-or-tribunal\" target=\"_blank\" rel=\"noopener noreferrer\">support to use HMCTS services (opens in a new tab)</a>, either before or during a hearing, you must let us know as soon as possible."
     ],
     "paymentSummaryHeading": "Payment summary",

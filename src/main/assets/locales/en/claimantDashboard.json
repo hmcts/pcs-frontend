@@ -8,17 +8,16 @@
   },
   "groups": {
     "claim": "The claim",
-    "documents": "Documents",
-    "applications": "Applications"
+    "documents": "Documents"
   },
   "tasks": {
     "viewClaimForm": "View the claim form",
     "viewDocuments": "View documents",
-    "makeGeneralApplication": "Ask the court to make an order (make a general application)"
+    "payClaimFee": "Pay the claim fee"
   },
   "tags": {
     "available": "Available",
-    "optional": "Optional"
+    "notPaid": "Not paid"
   },
   "helpAndSupport": "Help and support",
   "links": {

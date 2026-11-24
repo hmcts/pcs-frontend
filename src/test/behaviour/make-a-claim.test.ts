@@ -652,8 +652,11 @@ describe('every page renders', () => {
       },
     });
     const { stepRegistry } = await import('../../main/steps/make-a-claim/stepRegistry');
-    // No ground needs a reason in this claim, so the reason page sends the claimant to the grounds instead.
-    const redirected: Record<string, string> = { 'ground-reason': claimPath('other-grounds') };
+    // No ground needs a reason and there is no additional claimant in this claim, so those pages send the claimant on.
+    const redirected: Record<string, string> = {
+      'ground-reason': claimPath('other-grounds'),
+      'remove-claimant': claimPath('claimant-cya'),
+    };
     const failures: string[] = [];
     for (const name of Object.keys(stepRegistry)) {
       const response = await app.get(
@@ -1078,6 +1081,68 @@ describe('answering questions', () => {
     expect(document.querySelectorAll('textarea[name$="otherGroundsDetails"]')).toHaveLength(2);
   });
 
+  describe('when the claimant has rent arrears grounds and other grounds', () => {
+    const withOtherGrounds = {
+      ...COMPLETE_CLAIM,
+      grounds: { hasRentArrearsGrounds: 'YES', rentArrearsGrounds: ['GROUND_8'], hasOtherGrounds: 'YES' },
+    };
+
+    it('completes the tenancy section when only rent arrears grounds are ticked on the other grounds page', async () => {
+      app = await bootMakeAClaim();
+      givenClaim(withOtherGrounds);
+
+      const saved = await app.post(claimPath('other-grounds'), {
+        mandatoryGrounds: ['GROUND_8'],
+        discretionaryGrounds: ['GROUND_10'],
+      });
+
+      expect(saved.status).toBe(303);
+      expect(saved.location).toBe(`${claimPath('tenancy-cya')}?nav=1`);
+      expect(storedClaim().grounds).toMatchObject({
+        rentArrearsGrounds: ['GROUND_8', 'GROUND_10'],
+        hasOtherGrounds: 'YES',
+      });
+      expect(storedClaim().grounds.otherGrounds ?? []).toEqual([]);
+      await app.post(claimPath('tenancy-cya'), { action: 'continue' });
+      const tasks = text((await app.get(claimPath('task-list'))).text);
+      expect(tasks).toContain('About the tenancy and your grounds for possession Done');
+      expect(tasks).toContain('Check your answers and submit In progress');
+      const submitted = await app.post(claimPath('check-your-answers'), {
+        statementOfTruth: ['contempt', 'belief'],
+        statementOfTruthFullName: 'Billy Wright',
+        statementOfTruthPosition: '',
+      });
+      expect(submitted.location).toBe(`/case/${CASE_REFERENCE}/pay-claim-fee`);
+    });
+  });
+
+  it('shows Others ticked only in the group the claimant ticked it in', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({
+      ...ANSWERED_CLAIM,
+      grounds: { hasRentArrearsGrounds: 'NO', hasOtherGrounds: 'YES' },
+    });
+    const ticked = async () => {
+      const document = new JSDOM((await app.get(claimPath('other-grounds'))).text).window.document;
+      return ['mandatoryGrounds', 'discretionaryGrounds'].map(
+        group => document.querySelector<HTMLInputElement>(`input[name="${group}"][value="OTHER"]`)?.checked
+      );
+    };
+
+    await app.post(claimPath('other-grounds'), {
+      discretionaryGrounds: ['OTHER'],
+      'discretionaryGrounds.otherGroundsDetails': 'Nuisance',
+    });
+    expect(await ticked()).toEqual([false, true]);
+
+    await app.post(claimPath('other-grounds'), {
+      mandatoryGrounds: ['OTHER'],
+      'mandatoryGrounds.otherGroundsDetails': 'Nuisance',
+    });
+    expect(await ticked()).toEqual([true, false]);
+    expect(storedClaim().grounds.otherGrounds).toEqual(['OTHER']);
+  });
+
   it('asks about a later defendant’s name without the hint', async () => {
     app = await bootMakeAClaim();
     givenClaim(ANSWERED_CLAIM);
@@ -1364,6 +1429,21 @@ describe('submitting the claim', () => {
     expect(confirmation).toContain('Payment summary Payment for Claim fee Total amount £404.00');
     expect(confirmation).toContain('What happens next');
     expect(confirmation).toContain('Close and return to case overview');
+  });
+
+  it('does not tell the claimant to make a general application from the case overview', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(COMPLETE_CLAIM);
+    await app.post(claimPath('check-your-answers'), {
+      statementOfTruth: ['contempt', 'belief'],
+      statementOfTruthFullName: 'Billy Wright',
+      statementOfTruthPosition: '',
+    });
+
+    const confirmation = text((await app.get(`/case/${CASE_REFERENCE}/claim-submitted?status=success`)).text);
+
+    expect(confirmation).not.toContain('Ask the court to make an order');
+    expect(confirmation).not.toContain('on your case overview');
   });
 
   it('titles the claim submitted page by what the claimant has paid', async () => {

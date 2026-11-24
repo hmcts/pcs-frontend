@@ -32,7 +32,9 @@
 
         <h2 class="govuk-heading-m">{{ t('claimList:claimsMade.heading') }}</h2>
 
-        {% if claimsMadeRows.length %}
+        {% if claimsMadeUnavailable %}
+          <p class="govuk-body">{{ t('claimList:claimsMade.unavailable') }}</p>
+        {% elif claimsMadeRows.length %}
           {{ govukTable({
             head: [
               { text: t('claimList:claimsMade.claimState') },

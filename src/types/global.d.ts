@@ -50,6 +50,8 @@ interface CustomSessionData extends SessionData {
   rentStatementPeriods?: Record<string, { statementStart: string; statementEnd: string }>;
   // The last card payment started for each private landlord claim's fee, keyed by case reference.
   claimFeePayments?: Record<string, string>;
+  // The groups of the other grounds page "Others" was last ticked in, keyed by case reference.
+  otherGroundsGroups?: Record<string, string[]>;
   destroy(callback: (err?: Error) => void): void;
   clientContext?: ClientContextHeaders;
 }

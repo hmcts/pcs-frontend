@@ -19,6 +19,8 @@
     "draftClaim": "cyDraft claim",
     "submittedClaim": "cySubmitted claim",
     "noClaims": "cyYou have not made any claims.",
-    "makeAClaim": "cyMake a housing possession claim"
+    "makeAClaim": "cyMake a housing possession claim",
+    "unpaidClaim": "cyClaim fee not paid",
+    "unavailable": "cyWe cannot show the claims you’ve made at the moment. Try again later."
   }
 }

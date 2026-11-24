@@ -1,0 +1,7 @@
+{
+  "pageTitle": "Remove a claimant",
+  "question": "Are you sure you want to remove {{claimantName}} from the claim?",
+  "errors": {
+    "confirmRemove": "Select whether you want to remove this claimant"
+  }
+}

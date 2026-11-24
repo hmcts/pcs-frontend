@@ -222,6 +222,66 @@ describe('additional claimants', () => {
     expect(storedClaim().additionalClaimants).toBeUndefined();
   });
 
+  describe('removing an additional claimant', () => {
+    const twoClaimants = {
+      eligibility: ELIGIBILITY,
+      claimant: { ...CLAIMANT, multipleClaimants: 'YES' },
+      additionalClaimants: [
+        { id: 'one', ...ANSWERED_CLAIMANT },
+        { id: 'two', value: { ...ANSWERED_CLAIMANT.value, firstName: 'Al', lastName: 'Jones' } },
+      ],
+    };
+    const removeLinks = async (page: string) =>
+      [...new JSDOM((await app.get(claimPath(page))).text).window.document.querySelectorAll('a')]
+        .filter(link => link.textContent?.startsWith('Remove'))
+        .map(link => link.getAttribute('href'));
+
+    it('has a Remove link on each additional claimant’s card on the summaries', async () => {
+      app = await bootMakeAClaim();
+      givenClaim(twoClaimants);
+      expect(await removeLinks('claimant-cya')).toEqual([
+        `${claimPath('remove-claimant')}?id=one&returnTo=claimant-cya`,
+        `${claimPath('remove-claimant')}?id=two&returnTo=claimant-cya`,
+      ]);
+    });
+
+    it('asks before removing, then returns to the summary', async () => {
+      app = await bootMakeAClaim();
+      givenClaim(twoClaimants);
+      expect(text((await app.get(`${claimPath('remove-claimant')}?id=two`)).text)).toContain(
+        'Are you sure you want to remove Al Jones from the claim?'
+      );
+      expect((await app.post(`${claimPath('remove-claimant')}?id=two`, {})).status).toBe(400);
+      expect(storedClaim().additionalClaimants).toHaveLength(2);
+      expect(
+        (await app.post(`${claimPath('remove-claimant')}?id=two&returnTo=claimant-cya`, { confirmRemove: 'no' }))
+          .location
+      ).toBe(claimPath('claimant-cya'));
+      expect(storedClaim().additionalClaimants).toHaveLength(2);
+      expect(
+        (await app.post(`${claimPath('remove-claimant')}?id=two&returnTo=claimant-cya`, { confirmRemove: 'yes' }))
+          .location
+      ).toBe(claimPath('claimant-cya'));
+      expect(storedClaim().additionalClaimants.map((claimant: { id: string }) => claimant.id)).toEqual(['one']);
+      expect(storedClaim().claimant.multipleClaimants).toBe('YES');
+    });
+
+    it('answers no to multiple claimants when the last is removed', async () => {
+      app = await bootMakeAClaim();
+      givenClaim({ ...twoClaimants, additionalClaimants: [twoClaimants.additionalClaimants[0]] });
+      await app.post(`${claimPath('remove-claimant')}?id=one`, { confirmRemove: 'yes' });
+      expect(storedClaim().claimant.multipleClaimants).toBe('NO');
+      expect(storedClaim().additionalClaimants).toBeUndefined();
+      expect(text((await app.get(claimPath('claimant-cya'))).text)).not.toContain('Additional claimant');
+    });
+
+    it('sends a stale link back to the summary', async () => {
+      app = await bootMakeAClaim();
+      givenClaim(twoClaimants);
+      expect((await app.get(`${claimPath('remove-claimant')}?id=gone`)).location).toBe(claimPath('claimant-cya'));
+    });
+  });
+
   it('says what to answer when a page is left empty', async () => {
     app = await bootMakeAClaim();
     givenClaim({ eligibility: ELIGIBILITY, claimant: { ...CLAIMANT, multipleClaimants: 'YES' } });

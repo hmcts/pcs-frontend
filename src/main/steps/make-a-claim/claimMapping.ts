@@ -76,6 +76,23 @@ function otherGroundsDetailsOf(body: FormBody): string | undefined {
   return details.length ? details.join('\n') : undefined;
 }
 
+const OTHERS_DEFAULT_GROUP = 'mandatoryGrounds';
+
+/**
+ * pcs-api keeps "Others" once, whichever group it was ticked in, so the groups it was ticked in are remembered for
+ * the session to show it only where the claimant chose it.
+ */
+function rememberOthersGroups(req: Request, body: FormBody): void {
+  const caseReference = req.params?.caseReference as string | undefined;
+  if (!caseReference || !req.session) {
+    return;
+  }
+  const groups = (['mandatoryGrounds', 'discretionaryGrounds'] as const).filter(
+    group => checkedValues(body[group], [OTHER_GROUND] as const).length > 0
+  );
+  req.session.otherGroundsGroups = { ...req.session.otherGroundsGroups, [caseReference]: groups };
+}
+
 /**
  * How each make a claim page reads its answers from the saved claim and writes them back. Every translation
  * between the form and pcs-api's `citizenPossessionClaim` happens here.
@@ -697,22 +714,26 @@ export const claimMappings: Record<string, StepMapping> = {
   'other-grounds-claim': yesNoStep('grounds', 'hasOtherGrounds', claim => claim.grounds?.hasOtherGrounds),
 
   'other-grounds': {
-    toForm: claim => {
+    toForm: (claim, req) => {
+      const othersGroups = req.session?.otherGroundsGroups?.[req.params?.caseReference as string] ?? [
+        OTHERS_DEFAULT_GROUP,
+      ];
       const selected = [
         ...(claim.grounds?.otherGrounds ?? []),
         ...(claim.grounds?.hasRentArrearsGrounds === 'YES' ? (claim.grounds.rentArrearsGrounds ?? []) : []),
       ];
       const details = claim.grounds?.otherGroundsDetails;
-      const inGroup = (grounds: readonly string[]) =>
-        selected.filter(ground => ground === OTHER_GROUND || grounds.includes(ground));
+      const inGroup = (group: string, grounds: readonly string[]) =>
+        selected.filter(ground => (ground === OTHER_GROUND ? othersGroups.includes(group) : grounds.includes(ground)));
       return {
-        mandatoryGrounds: inGroup(MANDATORY_GROUNDS_LISTED),
+        mandatoryGrounds: inGroup('mandatoryGrounds', MANDATORY_GROUNDS_LISTED),
         'mandatoryGrounds.otherGroundsDetails': details,
-        discretionaryGrounds: inGroup(DISCRETIONARY_GROUNDS_LISTED),
+        discretionaryGrounds: inGroup('discretionaryGrounds', DISCRETIONARY_GROUNDS_LISTED),
         'discretionaryGrounds.otherGroundsDetails': details,
       };
     },
-    fromForm: (claim, body) =>
+    fromForm: (claim, body, req) => {
+      rememberOthersGroups(req, body);
       setNested(claim, 'grounds', grounds => {
         const ticked = [
           ...checkedValues(body.mandatoryGrounds, [...MANDATORY_GROUNDS_LISTED, OTHER_GROUND] as const),
@@ -731,8 +752,11 @@ export const claimMappings: Record<string, StepMapping> = {
         grounds.groundReasons = (grounds.groundReasons ?? []).filter(
           item => item.value.ground && grounds.otherGrounds?.includes(item.value.ground as OtherGround)
         );
-      }),
-    isAnswered: claim => Boolean(claim.grounds?.otherGrounds?.length),
+      });
+    },
+    isAnswered: claim =>
+      Boolean(claim.grounds?.otherGrounds?.length) ||
+      (claim.grounds?.hasRentArrearsGrounds === 'YES' && Boolean(claim.grounds.rentArrearsGrounds?.length)),
   },
 
   'wales-grounds': {
@@ -1096,6 +1120,15 @@ export const claimMappings: Record<string, StepMapping> = {
     },
   },
 
+  'remove-claimant': {
+    fromForm: (claim, body, req) => {
+      const index = itemIndexOf(req, claim.additionalClaimants, 'index');
+      if (body.confirmRemove === 'yes' && index !== undefined) {
+        removeAdditionalClaimant(claim, index);
+      }
+    },
+  },
+
   'check-your-answers': {
     toForm: claim => ({
       statementOfTruth: claim.submission?.statementOfTruthAgreed === 'YES' ? ['contempt', 'belief'] : [],
@@ -1210,5 +1243,16 @@ export function itemIndexOf(
 export function removeDefendant(claim: CitizenPossessionClaim, index: number): void {
   if (index > 0) {
     claim.defendants = (claim.defendants ?? []).filter((_, i) => i !== index);
+  }
+}
+
+/** Removes an additional claimant; once none is left the claimant has no other claimants, which they are asked. */
+export function removeAdditionalClaimant(claim: CitizenPossessionClaim, index: number): void {
+  claim.additionalClaimants = (claim.additionalClaimants ?? []).filter((_, i) => i !== index);
+  if (!claim.additionalClaimants.length) {
+    delete claim.additionalClaimants;
+    setNested(claim, 'claimant', claimant => {
+      claimant.multipleClaimants = 'NO';
+    });
   }
 }

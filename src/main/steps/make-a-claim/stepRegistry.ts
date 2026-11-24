@@ -54,6 +54,7 @@ import { step as otherGroundsClaim } from './other-grounds-claim';
 import { step as otherInformation } from './other-information';
 import { step as otherReasons } from './other-reasons';
 import { step as recoverySteps } from './recovery-steps';
+import { step as removeClaimant } from './remove-claimant';
 import { step as removeDefendant } from './remove-defendant';
 import { step as rentAmount } from './rent-amount';
 import { step as rentArrears } from './rent-arrears';
@@ -82,7 +83,6 @@ import { step as uploadTenancyAgreement } from './upload-tenancy-agreement';
 import { step as walesGrounds } from './wales-grounds';
 import { step as yourDetails } from './your-details';
 import { step as yourSupport } from './your-support';
-
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
@@ -170,5 +170,6 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'check-your-answers': checkYourAnswers,
   eligible,
   'task-list': taskList,
+  'remove-claimant': removeClaimant,
   'remove-defendant': removeDefendant,
 };

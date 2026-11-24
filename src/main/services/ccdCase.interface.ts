@@ -500,6 +500,8 @@ export interface ClaimantClaimSummary {
   caseReference?: string;
   /** The CCD case state; AWAITING_SUBMISSION_TO_HMCTS while the claim is a draft. */
   state?: string;
+  /** The claim fee's payment status; absent until a fee has been requested. */
+  paymentStatus?: string | null;
   propertyAddress?: {
     addressLine1?: string;
     addressLine2?: string;

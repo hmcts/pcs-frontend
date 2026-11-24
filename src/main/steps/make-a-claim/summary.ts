@@ -17,6 +17,7 @@ import { getTranslationFunction } from '@modules/steps';
 import { getStepUrl } from '@modules/steps/flow';
 import type { CcdCaseAddress } from '@services/ccdCase.interface';
 import {
+  type CitizenAdditionalClaimant,
   type CitizenDefendant,
   type ClaimDocuments,
   NOTICE_METHODS,
@@ -149,6 +150,20 @@ export function aboutYouCard(req: Request): SummaryCard {
   return { id: 'aboutYou', title: t('makeAClaim:summary.cards.aboutYou'), rows };
 }
 
+/** The name of an additional claimant, or their place in the list when they have none yet. */
+export function additionalClaimantDisplayName(
+  claimant: CitizenAdditionalClaimant | undefined,
+  index: number,
+  req: Request
+): string {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const name =
+    claimant?.individualOrOrganisation === 'ORGANISATION'
+      ? claimant.organisationName
+      : [claimant?.firstName, claimant?.lastName].filter(Boolean).join(' ');
+  return name || t('makeAClaim:summary.cards.additionalClaimant', { number: index + 1 });
+}
+
 /** One card for each claimant added after the first, with the answers asked for them. */
 export function additionalClaimantCards(req: Request): SummaryCard[] {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
@@ -160,6 +175,11 @@ export function additionalClaimantCards(req: Request): SummaryCard[] {
       'additionalClaimantType',
       valueOf(t, 'individualOrOrganisation', claimant.individualOrOrganisation),
       query
+    );
+    builder.withAction(
+      `${getStepUrl('remove-claimant', flowConfig, req.res?.locals.validatedCase?.id)}?${item.id ? `id=${item.id}` : `index=${index}`}`,
+      t('makeAClaim:summary.remove'),
+      additionalClaimantDisplayName(claimant, index, req)
     );
     if (claimant.individualOrOrganisation === 'INDIVIDUAL') {
       builder.add(

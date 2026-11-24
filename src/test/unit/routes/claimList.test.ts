@@ -202,7 +202,7 @@ describe('claimList route', () => {
   describe('claimant account', () => {
     const CLAIMS_MADE = [
       { caseReference: '2222333344445555', state: 'AWAITING_SUBMISSION_TO_HMCTS' },
-      { caseReference: '1111222233334444', state: 'CASE_ISSUED' },
+      { caseReference: '1111222233334444', state: 'CASE_ISSUED', paymentStatus: 'PAID' },
     ];
 
     beforeEach(() => {
@@ -271,9 +271,25 @@ describe('claimList route', () => {
       expect(getClaimantClaims).not.toHaveBeenCalled();
     });
 
-    it('propagates a failure listing the claims made', async () => {
+    it('still renders the claims against the citizen and the make a claim button when the claims made cannot be listed', async () => {
+      (getClaimantClaims as jest.Mock).mockRejectedValue(new Error('API failure'));
+      (getCitizenClaims as jest.Mock).mockResolvedValue([
+        { caseReference: '9876543210987654', claimantName: 'Jane Smith', propertyPostcode: 'EC1A 1BB' },
+      ]);
+
+      const view = await renderPage();
+
+      expect(next).not.toHaveBeenCalled();
+      expect(view.tableRows).toHaveLength(1);
+      expect(view.claimantAccount).toBe(true);
+      expect(view.claimsMadeUnavailable).toBe(true);
+      expect(view.claimsMadeRows).toEqual([]);
+      expect(view.makeAClaimUrl).toBe('/make-a-claim');
+    });
+
+    it('keeps failing the page when the claims against the citizen cannot be listed', async () => {
       const error = new Error('API failure');
-      (getClaimantClaims as jest.Mock).mockRejectedValue(error);
+      (getCitizenClaims as jest.Mock).mockRejectedValue(error);
       const app = buildApp();
       claimListRoutes(app);
       const res = buildRes();
@@ -283,5 +299,25 @@ describe('claimList route', () => {
       expect(next).toHaveBeenCalledWith(error);
       expect(res.render).not.toHaveBeenCalled();
     });
+
+    it.each([['NOT_PAID'], [null], [undefined]])(
+      'says a submitted claim whose payment status is %s is unpaid',
+      async paymentStatus => {
+        (getClaimantClaims as jest.Mock).mockResolvedValue([
+          { caseReference: '1111222233334444', state: 'PENDING_CASE_ISSUED', paymentStatus },
+        ]);
+
+        const view = await renderPage();
+
+        expect(view.claimsMadeRows).toEqual([
+          [
+            {
+              html: '<a href="/case/1111222233334444/claimant-dashboard" class="govuk-link">claimList:claimsMade.unpaidClaim</a>',
+            },
+            { text: '1111222233334444' },
+          ],
+        ]);
+      }
+    );
   });
 });

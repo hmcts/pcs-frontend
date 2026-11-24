@@ -35,6 +35,8 @@ export const ccd = {
   searchFails: false,
   /** The claims made against the signed-in citizen, as pcs-api lists them. */
   claimsAgainst: [] as Record<string, unknown>[],
+  /** Whether pcs-api fails listing the claims the citizen made. */
+  asClaimantFails: false,
   /** Whether the stored case is one the signed-in citizen created as claimant. */
   storedCaseIsTheirs: true,
   /** What Your Support (cui-ra) was asked, and what it returns for a payload id. */
@@ -67,6 +69,9 @@ function ccdStub(): Express {
     res.json(ccd.claimsAgainst);
   });
   stub.get('/cases/citizen-claims/as-claimant', (_req: Request, res: Response) => {
+    if (ccd.asClaimantFails) {
+      return res.status(500).json({ message: 'Unavailable' });
+    }
     const address = ccd.stored?.citizenPossessionClaim?.propertyAddress as Record<string, string> | undefined;
     res.json(
       ccd.stored && ccd.storedCaseIsTheirs
@@ -74,6 +79,9 @@ function ccdStub(): Express {
             {
               caseReference: CASE_REFERENCE,
               state: ccd.stored.state,
+              paymentStatus:
+                (ccd.stored.citizenPossessionClaim?.submission as Record<string, string> | undefined)?.paymentStatus ??
+                null,
               propertyAddress: address && {
                 addressLine1: address.AddressLine1,
                 postTown: address.PostTown,
@@ -234,6 +242,7 @@ export async function bootMakeAClaim(
   ccd.searchFails = false;
   ccd.claimsAgainst = [];
   ccd.storedCaseIsTheirs = true;
+  ccd.asClaimantFails = false;
   ccd.cuiRaRequests = [];
   ccd.cuiRaPayload = undefined;
   ccd.pcqStatus = 'UP';

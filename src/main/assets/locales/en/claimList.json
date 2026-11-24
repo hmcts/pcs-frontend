@@ -19,6 +19,8 @@
     "draftClaim": "Draft claim",
     "submittedClaim": "Submitted claim",
     "noClaims": "You have not made any claims.",
-    "makeAClaim": "Make a housing possession claim"
+    "makeAClaim": "Make a housing possession claim",
+    "unpaidClaim": "Claim fee not paid",
+    "unavailable": "We cannot show the claims you’ve made at the moment. Try again later."
   }
 }

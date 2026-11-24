@@ -1,8 +1,8 @@
 import type { Application, NextFunction, Request, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
-import { MAKE_GENERAL_APPLICATION_ROUTE, VIEW_DOCUMENTS_ROUTE } from '../constants/caseRoutes';
-import { CLAIMANT_DASHBOARD_ROUTE, makeAClaimPath } from '../constants/makeAClaimRoutes';
+import { VIEW_DOCUMENTS_ROUTE } from '../constants/caseRoutes';
+import { CLAIMANT_DASHBOARD_ROUTE, PAY_CLAIM_FEE_ROUTE, makeAClaimPath } from '../constants/makeAClaimRoutes';
 import { oidcMiddleware } from '../middleware/oidc';
 import { taskListPath } from '../steps/make-a-claim/flow.config';
 
@@ -60,6 +60,15 @@ export default function claimantDashboardRoutes(app: Application): void {
           groupId: 'claim',
           title: t('claimantDashboard:groups.claim'),
           tasks: [
+            ...(feePaid
+              ? []
+              : [
+                  {
+                    title: { text: t('claimantDashboard:tasks.payClaimFee') },
+                    href: makeAClaimPath(PAY_CLAIM_FEE_ROUTE, caseReference),
+                    status: { tag: { text: t('claimantDashboard:tags.notPaid'), classes: 'govuk-tag--red' } },
+                  },
+                ]),
             {
               title: { text: t('claimantDashboard:tasks.viewClaimForm') },
               href: viewDocumentsUrl,
@@ -78,21 +87,6 @@ export default function claimantDashboardRoutes(app: Application): void {
             },
           ],
         },
-        ...(feePaid
-          ? [
-              {
-                groupId: 'applications',
-                title: t('claimantDashboard:groups.applications'),
-                tasks: [
-                  {
-                    title: { text: t('claimantDashboard:tasks.makeGeneralApplication') },
-                    href: makeAClaimPath(MAKE_GENERAL_APPLICATION_ROUTE, caseReference),
-                    status: { tag: { text: t('claimantDashboard:tags.optional'), classes: 'govuk-tag--blue' } },
-                  },
-                ],
-              },
-            ]
-          : []),
       ];
 
       return res.render('claimant-dashboard', {

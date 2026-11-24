@@ -4,6 +4,7 @@ import {
   type CitizenPossessionClaim,
   groundsNeedingReasons,
 } from '../../../../main/services/citizenPossessionClaim.interface';
+import { normaliseClaim } from '../../../../main/steps/make-a-claim/claimDraft';
 import {
   additionalClaimantAnswered,
   claimMappings,
@@ -26,6 +27,7 @@ function request(
 ): Request {
   return {
     query,
+    params: { caseReference: caseId },
     session: { user: { email: 'landlord@example.test' } },
     res: {
       locals: {
@@ -126,6 +128,32 @@ describe('additional claimants', () => {
     expect(
       answered({ claimant: { multipleClaimants: 'YES' }, additionalClaimants: [{ value: { firstName: 'Jo' } }] })
     ).toBe(false);
+  });
+});
+
+describe('removing an additional claimant', () => {
+  const claim: CitizenPossessionClaim = {
+    claimant: { multipleClaimants: 'YES' },
+    additionalClaimants: [
+      { id: 'one', value: ANSWERED_ADDITIONAL },
+      { id: 'two', value: { ...ANSWERED_ADDITIONAL, firstName: 'Al' } },
+    ],
+  };
+  const remove = (answer: string, saved: CitizenPossessionClaim, id: string) =>
+    roundTrip('remove-claimant', { confirmRemove: answer }, saved, request({ id })).saved;
+
+  it('removes the claimant named by id only when confirmed, and repeating it changes nothing', () => {
+    expect(remove('no', claim, 'one')).toEqual(claim);
+    const once = remove('yes', claim, 'one');
+    expect(once.additionalClaimants?.map(item => item.id)).toEqual(['two']);
+    expect(once.claimant?.multipleClaimants).toBe('YES');
+    expect(remove('yes', once, 'one')).toEqual(once);
+  });
+
+  it('answers no to multiple claimants once the last is removed, so the list is dropped', () => {
+    const last = remove('yes', remove('yes', claim, 'one'), 'two');
+    expect(last.claimant?.multipleClaimants).toBe('NO');
+    expect(normaliseClaim(last).additionalClaimants).toBeUndefined();
   });
 });
 
@@ -360,8 +388,21 @@ describe('claim mappings', () => {
     expect(form).toEqual({
       mandatoryGrounds: ['GROUND_1A', 'OTHER'],
       'mandatoryGrounds.otherGroundsDetails': 'Subletting',
-      discretionaryGrounds: ['GROUND_14', 'OTHER'],
+      discretionaryGrounds: ['GROUND_14'],
       'discretionaryGrounds.otherGroundsDetails': 'Subletting',
+    });
+  });
+
+  it('shows Others in the group it was ticked in, the first group when that is not known', () => {
+    const body = { discretionaryGrounds: ['OTHER'], 'discretionaryGrounds.otherGroundsDetails': 'Pets' };
+    expect(roundTrip('other-grounds', body).form).toMatchObject({
+      mandatoryGrounds: [],
+      discretionaryGrounds: ['OTHER'],
+    });
+    const { saved } = roundTrip('other-grounds', body);
+    expect(claimMappings['other-grounds'].toForm?.(saved, request())).toMatchObject({
+      mandatoryGrounds: ['OTHER'],
+      discretionaryGrounds: [],
     });
   });
 
