@@ -6,11 +6,13 @@
   The details are folded away, as the judge has the file, but for the application the judge's task asked them to
   decide, which is open and which the order must decide. Any other may be left as it is.
 
-  Granting reveals a button that puts the applicant's wording in the order preview as the judge's own clauses, after
-  the clauses the decision generated, to amend or delete. Listing it for a hearing on notice asks when, as the adjournment tab
-  does, and leaves the application open. For an application to suspend enforcement, granting it suspends
-  enforcement on the conditions a suspended possession order has. Inline radios can't reveal a question, so what follows a
-  decision is on its own rows, shown while it is chosen (initApplicationDecisions in make-order.ts).
+  Each decision but freeform puts its own wording in the order, which says what was decided: there is no bare
+  "granted". Taking the applicant's wording, offered only when they gave a draft order, makes it the application's
+  clauses in plain text, which the judge edits in the order preview as any other. Suspending enforcement, offered on an
+  application to suspend it, does so on the conditions a suspended possession order has. Listing it for a hearing asks
+  when, as the adjournment tab does, and leaves the application open, as not dealing with it does; any other decision
+  closes it. Inline radios can't reveal a question, so what follows a decision is on its own rows, shown while it is
+  chosen (initApplicationDecisions in make-order.ts).
 #}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
@@ -63,10 +65,10 @@
       attributes: { id: application.prefix + "-requested" }
     }) }}
   {% else %}
-    <p class="govuk-body">The applicant did not say what order they want. Read the application documents.</p>
+    <p class="govuk-body">The applicant gave no draft order. Read the application documents.</p>
   {% endif %}
   {% if application.explanationHtml %}
-    <h4 class="govuk-heading-s">Why they want it</h4>
+    <h4 class="govuk-heading-s">What they asked the court for and why</h4>
     <div class="govuk-body" id="{{ application.prefix }}-explanation">{{ application.explanationHtml | safe }}</div>
   {% endif %}
 {% endmacro %}
@@ -82,11 +84,14 @@
     Striking out is a decision on the papers, so an order made at a hearing offers none, and an application to
     suspend enforcement is never struck out (judicial feedback, November 2026).
   #}
-  {% set items = [
-    { value: "none", text: "Not dealt with" },
-    { value: "grant", text: "Granted" },
-    { value: "dismiss", text: "Dismissed" }
-  ] %}
+  {% set items = [{ value: "none", text: "Not dealt with" }] %}
+  {% if application.applicantWording %}
+    {% set items = items.concat([{ value: "applicant-wording", text: "Applicant’s wording" }]) %}
+  {% endif %}
+  {% if application.enforcementSuspension %}
+    {% set items = items.concat([{ value: "suspend", text: "Suspended on conditions" }]) %}
+  {% endif %}
+  {% set items = items.concat([{ value: "dismiss", text: "Dismissed" }]) %}
   {% if not application.enforcementSuspension %}
     {% set items = items.concat([{
       value: "strike-out",
@@ -97,7 +102,7 @@
   {% endif %}
   {% set items = items.concat([
     { value: "list", text: "Listed for a hearing" },
-    { value: "other", text: "Something else" }
+    { value: "freeform", text: "Freeform" }
   ]) %}
   {{ compact.radios(name, {
     legend: "What do you decide about application " + application.reference + "?",
@@ -106,17 +111,8 @@
     items: items
   }) }}
 
-  {% if application.requestedWordingHtml %}
-    {# Revealed by granting; the wording goes in only when the judge asks. #}
-    <div data-decision-shows="grant" {%- if not draftChecked(name, "grant") %} hidden{% endif %}>
-      <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-3" data-insert-requested-wording>
-        Insert applicant’s wording
-      </button>
-    </div>
-  {% endif %}
-
   {% if application.enforcementSuspension %}
-    <div data-decision-shows="grant" {%- if not draftChecked(name, "grant") %} hidden{% endif %}>
+    <div data-decision-shows="suspend" {%- if not draftChecked(name, "suspend") %} hidden{% endif %}>
       {{ conditions.paymentConditions(prefix + "-suspension", "Enforcement suspended on condition of") }}
     </div>
   {% endif %}
@@ -165,10 +161,10 @@
   <section class="pcs-application" aria-labelledby="{{ prefix }}-heading"
            data-application
            data-application-prefix="{{ prefix }}"
-           data-application-reference="{{ application.reference }}"
-           data-application-wording-html="{{ application.requestedWordingHtml }}">
+           data-application-reference="{{ application.reference }}">
     <h3 class="govuk-heading-m govuk-!-margin-bottom-1" id="{{ prefix }}-heading">
       {{ application.reference }}: {{ application.type }}{% if application.somethingElseDetails %} – {{ application.somethingElseDetails }}{% endif %}
+      {% if application.listed %}<strong class="govuk-tag govuk-tag--blue govuk-!-margin-left-2">Listed for hearing</strong>{% endif %}
     </h3>
     <p class="govuk-body-s govuk-!-margin-bottom-2">
       {{ application.applicant }}, {{ application.submittedOnDisplay }}

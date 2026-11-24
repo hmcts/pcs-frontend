@@ -130,7 +130,8 @@ const APPLICATIONS = [
     somethingElseDetails: 'Relief from sanctions',
     applicant: 'Alex Example (Defendant 1)',
     submittedOn: '2026-10-19',
-    whatOrderWanted: 'The defendant has relief from sanctions.\nNo order as to costs.',
+    whatOrderWanted: 'I missed the deadline through illness.',
+    draftOrderWording: '<p>The defendant has relief from sanctions.</p><p>No order as to costs.</p>',
     documents: [],
   },
   {
@@ -198,8 +199,7 @@ describe('confirm order review', () => {
         await judgesOrder({
           applications: APPLICATIONS,
           decide: () => {
-            check('app-gen-app-1-decision', 'grant');
-            control<HTMLButtonElement>('[data-application-reference="GA1"] [data-insert-requested-wording]').click();
+            check('app-gen-app-1-decision', 'applicant-wording');
             check('app-gen-app-2-decision', 'dismiss');
           },
         }),
@@ -207,12 +207,9 @@ describe('confirm order review', () => {
       );
       const page = await openReview(app);
 
-      // The judge's order as submitted, with the wording they inserted marked as theirs.
+      // The judge's order as submitted, with the applicant's wording it takes.
       const preview = document.querySelector('[data-order-preview]')!;
-      expect(preview.textContent).toContain("The defendant's application dated 19 October 2026 is granted.");
-      expect(preview.querySelector('.docweave-clause--inserted')?.textContent).toContain(
-        'The defendant has relief from sanctions.'
-      );
+      expect(preview.textContent).toContain('The defendant has relief from sanctions.');
       expect(preview.textContent).toContain("The claimant's application dated 21 October 2026 is dismissed.");
       expect(preview.textContent).not.toContain('possession');
 
@@ -220,12 +217,11 @@ describe('confirm order review', () => {
       expect(control('input[name="claim-order"]').checked).toBe(false);
       expect(control<HTMLElement>('[data-claim-order]').hidden).toBe(true);
       expect(control('#order-type').value).toBe('NO_ORDER_ON_CLAIM');
-      expect(control('[name="app-gen-app-1-decision"][value="grant"]').checked).toBe(true);
+      expect(control('[name="app-gen-app-1-decision"][value="applicant-wording"]').checked).toBe(true);
       expect(control('[name="app-gen-app-2-decision"][value="dismiss"]').checked).toBe(true);
       const lines = page.documentText().split('\n');
       expect(lines.slice(lines.indexOf('IT IS ORDERED THAT:'))).toEqual([
         'IT IS ORDERED THAT:',
-        "The defendant's application dated 19 October 2026 is granted.",
         'The defendant has relief from sanctions.',
         'No order as to costs.',
         "The claimant's application dated 21 October 2026 is dismissed.",
@@ -1033,7 +1029,7 @@ describe('confirm order review', () => {
           applications: MIXED,
           staffMessage: 'Serve the defendant by hand',
           decide: () => {
-            check('app-gen-app-1-decision', 'grant');
+            check('app-gen-app-1-decision', 'freeform');
             check('app-gen-app-2-decision', 'dismiss');
             check('order-notice', 'without-notice');
             typeDate('without-notice-by', judgeDate.day, judgeDate.month, judgeDate.year);
@@ -1062,7 +1058,7 @@ describe('confirm order review', () => {
         ['Apply-by date entered', asDate(staffDate), `The Judge entered: ${asDate(judgeDate)}`],
         [
           'Applications this order decides',
-          'GA1: Something else – Granted – Without notice requested',
+          'GA1: Something else – Freeform – Without notice requested',
           'GA2: Adjourn the hearing – Dismissed – Without notice not requested',
         ],
         ['Message from the Judge', 'Serve the defendant by hand'],

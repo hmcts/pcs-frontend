@@ -375,13 +375,23 @@ function validateAttendance(formData: Record<string, unknown>, parties: readonly
   return issues;
 }
 
-export const APPLICATION_DECISIONS = ['none', 'grant', 'dismiss', 'strike-out', 'list', 'other'] as const;
+export const APPLICATION_DECISIONS = [
+  'none',
+  'applicant-wording',
+  'suspend',
+  'dismiss',
+  'strike-out',
+  'list',
+  'freeform',
+] as const;
 
 /** An open application the order can decide, whose answers start with `app-<id>`. */
 export interface ApplicationToDecide {
   id: string;
   reference: string;
   enforcementSuspension?: boolean;
+  /** Whether the applicant gave a draft order, which the order can take as its wording. */
+  applicantWording?: boolean;
   /** The application the judge's task asked them to decide, which the order may not leave as it is. */
   required?: boolean;
 }
@@ -393,7 +403,7 @@ export function applicationPrefix(application: { id: string }): string {
 
 /**
  * What the judge decides about each application, and what follows the decision: when the hearing is if they list
- * it, and for an application to suspend enforcement, the conditions if they grant it. The order may leave any
+ * it, and for an application to suspend enforcement, the conditions if they suspend it. The order may leave any
  * application as it is but the one the judge's task asked them to decide.
  */
 function validateApplications(
@@ -408,6 +418,9 @@ function validateApplications(
     const allowed =
       (APPLICATION_DECISIONS as readonly string[]).includes(decision) &&
       !(application.required && decision === 'none') &&
+      // Only an applicant who gave a draft order has wording to take, and only enforcement is suspended on conditions.
+      !(decision === 'applicant-wording' && !application.applicantWording) &&
+      !(decision === 'suspend' && !application.enforcementSuspension) &&
       // Striking out is a decision on the papers, and never one on an application to suspend enforcement.
       !(decision === 'strike-out' && (!withoutHearing || application.enforcementSuspension));
     add(allowed, `${prefix}-decision`, `Select what you decide about application ${application.reference}`);
@@ -415,7 +428,7 @@ function validateApplications(
     if (decision === 'list' && (value(formData, `${prefix}-list-at`) || 'new') === 'new') {
       issues.push(...validateListing(formData, `${prefix}-list`, 'Enter a valid hearing date'));
     }
-    if (application.enforcementSuspension && decision === 'grant') {
+    if (decision === 'suspend') {
       issues.push(...validatePaymentConditions(formData, `${prefix}-suspension`));
     }
   }

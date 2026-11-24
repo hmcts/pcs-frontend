@@ -58,7 +58,7 @@ describe("make an order: the judge's one draft on a case", () => {
     let page = await openPage((await app.get(FROM_APPLICATION)).text);
     expect(madeAt()).toBe('without-hearing');
     expect(document.querySelector('#discard-draft')).toBeNull();
-    check('app-gen-app-1-decision', 'grant');
+    check('app-gen-app-1-decision', 'dismiss');
     check('order-notice', 'without-notice');
     const due = futureDate(25);
     typeDate('without-notice-by', due.day, due.month, due.year);
@@ -79,7 +79,7 @@ describe("make an order: the judge's one draft on a case", () => {
       expect(madeAt()).toBe('2');
       expect(orderId()).not.toBe('');
       expect(control('[name="hearing-2-current-rent"]').value).toBe('800');
-      expect(control('[name="app-gen-app-1-decision"][value="grant"]').checked).toBe(true);
+      expect(control('[name="app-gen-app-1-decision"][value="dismiss"]').checked).toBe(true);
       expect(control('[name="order-notice"][value="without-notice"]').checked).toBe(true);
       expect(control('[name="without-notice-by-day"]').value).toBe(due.day);
       expect(page.documentText()).toContain(OWN_WORDING);

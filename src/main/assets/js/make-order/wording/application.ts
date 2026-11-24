@@ -1,6 +1,6 @@
 import { type DocBuilder, type OrderedListBuilder } from '@hmcts-cft/docweave';
 
-import { type OrderApplication, type OrderData } from '../data';
+import { type DraftClause, type OrderApplication, type OrderData } from '../data';
 
 import { sentenceCase } from './common';
 import { addListing } from './listing';
@@ -30,31 +30,40 @@ export function describeApplication(data: OrderData, application: OrderApplicati
   return `the ${ordinal}${kind}'s application${dated}`;
 }
 
-/** The generated clauses after which the "Insert applicant's wording" button puts the applicant's wording. */
-export function wordingAnchors(prefix: string): string[] {
-  return [`item:${prefix}-decision`, `item:${prefix}-listing`];
+/** The applicant's draft order as numbered clauses, any list in one of them nested under it. */
+function addDraftClauses(list: OrderedListBuilder, id: string, clauses: readonly DraftClause[]): void {
+  clauses.forEach(({ text, children }, index) => {
+    const itemId = `${id}-${index + 1}`;
+    list.item(
+      itemId,
+      text,
+      children.length
+        ? item => item.orderedList(`${itemId}-list`, nested => addDraftClauses(nested, itemId, children))
+        : undefined
+    );
+  });
 }
 
 /**
- * The clauses the decision on an application generates, each naming the application. The
- * applicant's wording is never generated: the judge inserts it with a button if they want it. Listing it for a
- * new hearing says when, as an adjournment does, and whether the other parties are given notice; listing it at one of
- * the case's hearings says which. For an application to suspend enforcement, granting it sets the
- * suspension's conditions as a suspended possession order does.
+ * The clauses the decision on an application generates; none says it is granted, as the order says what it grants.
+ * Taking the applicant's wording makes their draft order the application's clauses, which the judge edits as any
+ * other; a freeform decision generates none, for the judge's own wording. Listing it for a new hearing says when, as an adjournment does, and
+ * whether the other parties are given notice; listing it at one of the case's hearings says which. Suspending
+ * enforcement sets the suspension's conditions as a suspended possession order does.
  */
 function addApplicationClauses(list: OrderedListBuilder, data: OrderData, application: OrderApplication): void {
   const { decision, prefix } = application;
   const suspension = application.enforcementSuspension ? ' to suspend enforcement' : '';
   const described = sentenceCase(describeApplication(data, application)) + suspension;
-  if (decision === 'grant' && application.enforcementSuspension) {
+  if (decision === 'applicant-wording') {
+    addDraftClauses(list, `${prefix}-draft`, application.draftOrder);
+  } else if (decision === 'suspend') {
     addPaymentConditions(
       list,
       data,
       `${prefix}-suspension`,
       'Enforcement of the possession order is suspended on condition that'
     );
-  } else if (decision === 'grant') {
-    list.item(`${prefix}-decision`, `${described} is granted.`);
   } else if (decision === 'dismiss') {
     list.item(`${prefix}-decision`, `${described} is dismissed.`);
   } else if (decision === 'strike-out') {

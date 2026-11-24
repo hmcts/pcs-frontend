@@ -1,10 +1,9 @@
-import { type DocEditorController, type DocWeaveDocument, createDocEditor } from '@hmcts-cft/docweave';
+import { type DocWeaveDocument, createDocEditor } from '@hmcts-cft/docweave';
 
 import { WITHOUT_HEARING, parseMoney, workingDayOnOrAfter } from '../../utils/makeOrderFormat';
 import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation';
 
 import { chosenMadeAt, readOrderContext, readOrderData } from './make-order/data';
-import { wordingAnchors } from './make-order/wording/application';
 import { SAME_TERMS_COSTS } from './make-order/wording/common';
 import { buildOrder } from './make-order/wording/order';
 
@@ -261,28 +260,6 @@ export function initApplicationDecisions(form: HTMLFormElement): void {
   });
 }
 
-/**
- * Puts the applicant's wording in the order as the judge's own, to change or delete as they would their own, when
- * the judge asks for it with the application's button, never automatically. It goes in
- * as the application's row shows it, after the clauses the decision generated, or at the end of the order when
- * the decision generated none.
- */
-function insertRequestedWording(editor: DocEditorController, row: HTMLElement): void {
-  const html = row.dataset.applicationWordingHtml;
-  if (!html) {
-    return;
-  }
-  for (const anchor of wordingAnchors(row.dataset.applicationPrefix ?? '')) {
-    try {
-      editor.insertHtml(html, { at: { after: anchor } });
-      return;
-    } catch {
-      // Not a clause this decision generated: try the next.
-    }
-  }
-  editor.insertHtml(html, { at: 'end' });
-}
-
 export function initMakeOrder(): void {
   const form = document.querySelector<HTMLFormElement>('#make-order-form');
   if (!form) {
@@ -364,14 +341,6 @@ export function initMakeOrder(): void {
       return;
     }
     followTab();
-  });
-  form.querySelectorAll<HTMLButtonElement>('[data-insert-requested-wording]').forEach(insert => {
-    insert.addEventListener('click', () => {
-      const row = insert.closest<HTMLElement>('[data-application]');
-      if (row) {
-        insertRequestedWording(editor, row);
-      }
-    });
   });
   // Possession orders are only made at a hearing. GOV.UK tabs step through their list with the arrow keys, so
   // without one their tabs are taken out of it, and an order on one of them becomes a free form order.

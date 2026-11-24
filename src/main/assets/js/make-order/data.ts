@@ -15,14 +15,60 @@ export interface AttendanceEntry {
   representativeName: string;
 }
 
+/** A paragraph or list item of an applicant's draft order, as plain text, with any list nested in it. */
+export interface DraftClause {
+  text: string;
+  children: readonly DraftClause[];
+}
+
+const LISTS = new Set(['OL', 'UL']);
+
+/** The text of an element without the lists nested in it, its lines apart. */
+function lines(element: Element): string[] {
+  let text = '';
+  element.childNodes.forEach(node => {
+    if (node.nodeName === 'BR') {
+      text += '\n';
+    } else if (!LISTS.has(node.nodeName)) {
+      text += node.nodeName === '#text' ? node.textContent : lines(node as Element).join('\n');
+    }
+  });
+  return text
+    .split('\n')
+    .map(line => line.replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+}
+
+/**
+ * An applicant's draft order as plain clauses: each line of a paragraph one, and each list item one with the list
+ * nested in it; their emphasis is not kept.
+ */
+export function draftClauses(html: string): DraftClause[] {
+  const template = document.createElement('template');
+  template.innerHTML = html;
+  const blocks = (parent: Element | DocumentFragment): DraftClause[] =>
+    [...parent.children].flatMap(element => {
+      if (LISTS.has(element.tagName)) {
+        return [...element.children].map(item => ({
+          text: lines(item).join(' '),
+          children: [...item.children].filter(child => LISTS.has(child.tagName)).flatMap(list => blocks(list)),
+        }));
+      }
+      return lines(element).map(text => ({ text, children: [] }));
+    });
+  return blocks(template.content);
+}
+
 /** An open application the order can decide, with what the judge decides about it. */
 export interface OrderApplication {
   /** What its answers on the form start with: `app-<id>`. */
   prefix: string;
   applicant: string;
   submittedOn: string;
-  /** An application to suspend enforcement, which granting suspends on conditions. */
+  /** An application to suspend enforcement, which an order can suspend on conditions. */
   enforcementSuspension: boolean;
+  /** The applicant's draft order as plain clauses, which the order takes as its wording if the judge chooses. */
+  draftOrder: readonly DraftClause[];
   /** What the judge decides about it: "none" while they leave it as it is. */
   decision: string;
   /** When the case's hearing the judge lists it to be heard at is, if they list it at one rather than a new one. */
@@ -106,6 +152,7 @@ export function readOrderData(form: HTMLFormElement): OrderData {
   return {
     applications: context.applications.map(application => ({
       ...application,
+      draftOrder: draftClauses(application.draftOrderHtml),
       decision: answers[`${application.prefix}-decision`]?.[0] ?? 'none',
       listedAt: hearings.get(answers[`${application.prefix}-list-at`]?.[0] ?? ''),
       listWithoutNotice: answers[`${application.prefix}-list-without-notice`]?.includes('yes') ?? false,

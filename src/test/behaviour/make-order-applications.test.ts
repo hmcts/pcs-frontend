@@ -36,7 +36,9 @@ const ADJOURN = {
   within14Days: 'YES',
   otherPartiesAgreed: 'NO',
   withoutNotice: 'NO',
-  whatOrderWanted: '1. The hearing on 14 October is adjourned.\n2. Costs in the case.',
+  whatOrderWanted: 'I am in hospital that week.',
+  draftOrderWording: '<ol><li>The hearing on 14 October is adjourned.</li><li>Costs in the case.</li></ol>',
+  listed: false,
   documents: [{ id: '3f2a6c1e-0000-4000-8000-000000000001', fileName: 'hospital-letter.pdf' }],
 };
 
@@ -49,16 +51,11 @@ const WARRANT = {
   applicant: 'Alex Example (Defendant 1)',
   submittedOn: '2026-10-09',
   whatOrderWanted: null,
+  listed: false,
   documents: [],
 };
 
-const GRANTED = "The defendant's application dated 1 October 2026 is granted.";
-const WORDING = '1. The hearing on 14 October is adjourned.\n2. Costs in the case.';
-
-/** Puts the applicant's wording in the order, as the judge does with the application's button. */
-function insertWording(reference = 'GA1'): void {
-  control<HTMLButtonElement>(`[data-application-reference="${reference}"] [data-insert-requested-wording]`).click();
-}
+const WORDING = ['The hearing on 14 October is adjourned.', 'Costs in the case.'];
 
 /** The order's lines from "IT IS ORDERED THAT:" on. */
 function ordered(text: string): string[] {
@@ -119,12 +116,23 @@ describe('make an order: deciding applications', () => {
       expect(control('[name="app-gen-app-2-decision"][value="none"]').checked).toBe(true);
     });
 
+    it('says which applications an earlier order listed for a hearing, still to be decided', async () => {
+      await app.close();
+      app = await bootApp({ applications: [ADJOURN, { ...WARRANT, listed: true }] });
+      await openPage((await app.get(PAGE)).text);
+      const tags = [...document.querySelectorAll<HTMLElement>('[data-application]')].map(
+        row => row.querySelector('h3 .govuk-tag')?.textContent?.trim() ?? null
+      );
+      expect(tags).toEqual([null, 'Listed for hearing']);
+      expect(control('[name="app-gen-app-2-decision"][value="none"]').checked).toBe(true);
+    });
+
     it('offers no striking out at a hearing, and refuses it', async () => {
       const page = await openPage((await app.get(PAGE)).text);
       const decisions = [...document.querySelectorAll<HTMLInputElement>(`[name="${P}-decision"]:enabled`)].map(
         input => input.value
       );
-      expect(decisions).toEqual(['none', 'grant', 'dismiss', 'list', 'other']);
+      expect(decisions).toEqual(['none', 'applicant-wording', 'dismiss', 'list', 'freeform']);
       expect(
         control(`[name="${P}-decision"][value="strike-out"]`).closest<HTMLElement>('.govuk-radios__item')!.hidden
       ).toBe(true);
@@ -169,19 +177,17 @@ describe('make an order: deciding applications', () => {
       expect(submitted.order.formData['app-gen-app-2-decision']).toBe('dismiss');
     });
 
-    it("keeps the applicant's wording the judge inserted as they order on the claim and stop again", async () => {
+    it("keeps the applicant's wording the order takes as the judge orders on the claim and stops again", async () => {
       const page = await openPage((await app.get(PAGE)).text);
       recordAttendance();
-      check(`${P}-decision`, 'grant');
-      insertWording();
+      check(`${P}-decision`, 'applicant-wording');
       check('claim-order', 'yes');
       selectTab('tab-adjournment');
       check('adj-type', 'generally');
       expect(ordered(page.documentText())).toEqual([
         'IT IS ORDERED THAT:',
         'The claim is adjourned generally with liberty to restore by application by any party on notice to all other parties.',
-        GRANTED,
-        ...WORDING.split('\n'),
+        ...WORDING,
       ]);
       expect(control('#order-type').value).toBe('ADJOURNMENT');
 
@@ -222,7 +228,7 @@ describe('make an order: deciding applications', () => {
         `/case/${CASE_REFERENCE}/view-documents/3f2a6c1e-0000-4000-8000-000000000001`
       );
       expect(control(`#${P}-requested`).innerHTML.trim()).toBe(
-        '<p>1. The hearing on 14 October is adjourned.<br>2. Costs in the case.</p>'
+        '<ol><li>The hearing on 14 October is adjourned.</li><li>Costs in the case.</li></ol>'
       );
 
       check(`${P}-decision`, 'dismiss');
@@ -253,118 +259,83 @@ describe('make an order: deciding applications', () => {
       ]);
     });
 
-    it("grants it in a clause naming it, puts the applicant's lines after it only on request, then the costs", async () => {
+    it("takes the applicant's draft order as the application's clauses, before the costs", async () => {
       const page = await openPage((await app.get(TASK_PAGE)).text);
-      const button = control<HTMLButtonElement>('[data-application-reference="GA1"] [data-insert-requested-wording]');
-      expect(button.closest<HTMLElement>('[hidden]')).not.toBeNull();
-      check(`${P}-decision`, 'grant');
-      expect(button.closest<HTMLElement>('[hidden]')).toBeNull();
-      expect(page.documentText()).not.toContain('The hearing on 14 October is adjourned.');
-      insertWording();
+      check(`${P}-decision`, 'applicant-wording');
       check('costs', 'yes');
       check('costs-choice', 'def-pay-cl-fixed');
       type('costs-def-pay-cl-fixed-amount', '150');
 
       expect(ordered(page.documentText())).toEqual([
         'IT IS ORDERED THAT:',
-        GRANTED,
-        ...WORDING.split('\n'),
+        ...WORDING,
         "The defendant shall pay the claimant's costs of the application in the fixed sum of £150.00.",
       ]);
-      // The applicant's lines are one clause after the granted one, as they wrote them, then the costs.
       expect(clauseLists()).toEqual([2, 1]);
     });
 
-    it("shows the applicant's draft order as they formatted it, apart from why they want it, and inserts it as such", async () => {
+    it("shows the applicant's draft order as they formatted it, apart from why they want it, and takes it as plain text", async () => {
       await app.close();
       app = await bootApp({
         application: {
           ...ADJOURN,
           whatOrderWanted: 'I am in hospital that week.',
           draftOrderWording:
-            '<ol><li>The hearing on 14 October is <strong>adjourned</strong>.</li><li>Costs in the case.</li></ol>' +
+            '<p>Upon reading the papers:<br>by consent</p>' +
+            '<ol><li>The hearing on 14 October is <strong>adjourned</strong>.</li>' +
+            '<li>The defendant shall:<ol><li>file a defence;</li><li>pay the costs.</li></ol></li></ol>' +
             '<img src="x" onerror="alert(1)"><script>alert(2)</script>',
         },
       });
       const page = await openPage((await app.get(TASK_PAGE)).text);
       const requested = control<HTMLElement>(`#${P}-requested`);
-      expect(requested.querySelectorAll('ol > li')).toHaveLength(2);
+      expect(requested.querySelectorAll('ol > li')).toHaveLength(4);
       expect(requested.querySelector('strong')?.textContent).toBe('adjourned');
       // Nothing that would run or load.
       expect(requested.querySelector('img, script')).toBeNull();
       expect(control(`#${P}-explanation`).textContent?.trim()).toBe('I am in hospital that week.');
 
-      check(`${P}-decision`, 'grant');
-      insertWording();
+      check(`${P}-decision`, 'applicant-wording');
       expect(ordered(page.documentText())).toEqual([
         'IT IS ORDERED THAT:',
-        GRANTED,
+        'Upon reading the papers:',
+        'by consent',
         'The hearing on 14 October is adjourned.',
-        'Costs in the case.',
+        'The defendant shall:',
+        'file a defence;',
+        'pay the costs.',
       ]);
-      // Their numbered paragraphs are clauses after the granted one, with their emphasis.
-      expect(clauseLists()).toEqual([3]);
-      expect(control<HTMLTextAreaElement>('#order-document').value).toContain(
-        '{"type":"text","marks":[{"type":"strong"}],"text":"adjourned"}'
-      );
+      // Each line and item a clause, the nested list nested, without their emphasis.
+      expect(clauseLists()).toEqual([4]);
+      expect(control<HTMLTextAreaElement>('#order-document').value).not.toContain('"marks"');
       expect(page.documentText()).not.toContain('I am in hospital');
     });
 
-    it('offers no wording to insert when the applicant asked for no order', async () => {
+    it("offers no applicant's wording when the applicant gave no draft order, and refuses it", async () => {
       await app.close();
-      app = await bootApp({ application: { ...ADJOURN, whatOrderWanted: null } });
+      app = await bootApp({ application: { ...ADJOURN, draftOrderWording: null } });
       const page = await openPage((await app.get(TASK_PAGE)).text);
-      expect(document.querySelector('[data-insert-requested-wording]')).toBeNull();
-      check(`${P}-decision`, 'grant');
-      expect(ordered(page.orderText())).toEqual(['IT IS ORDERED THAT:', GRANTED]);
+      expect(document.querySelector(`[name="${P}-decision"][value="applicant-wording"]`)).toBeNull();
+      expect(control(`#${P}-explanation`).textContent?.trim()).toBe('I am in hospital that week.');
+      check(`${P}-decision`, 'freeform');
+      expect(ordered(page.orderText())).toEqual(['IT IS ORDERED THAT:']);
+      const body = page.body('SUBMIT_FOR_REVIEW');
+      body.set(`${P}-decision`, 'applicant-wording');
+      const rejected = await app.post(TASK_PAGE, body);
+      expect(rejected.status).toBe(400);
+      expect(rejected.text).toContain('Select what you decide about application GA1');
     });
 
-    it('keeps the wording the judge inserted when the decision changes', async () => {
+    it("takes the applicant's wording out when the judge decides otherwise", async () => {
       const page = await openPage((await app.get(TASK_PAGE)).text);
-      check(`${P}-decision`, 'grant');
-      insertWording();
+      check(`${P}-decision`, 'applicant-wording');
       check(`${P}-decision`, 'dismiss');
-      expect(page.documentText()).toContain("The defendant's application dated 1 October 2026 is dismissed.");
-      expect(page.documentText()).not.toContain('is granted.');
-      check(`${P}-decision`, 'grant');
-      expect(page.documentText().match(/The hearing on 14 October is adjourned\./g)).toHaveLength(1);
-      expect(page.documentText()).not.toContain('is dismissed.');
-    });
-
-    it("keeps the judge's deletion of the wording when they reopen the order, until they insert it again", async () => {
-      await openPage((await app.get(TASK_PAGE)).text);
-      check(`${P}-decision`, 'grant');
-      insertWording();
-      // The judge deletes the applicant's clause: the inserted one, with no id.
-      const snapshot = JSON.parse(control<HTMLTextAreaElement>('#order-document').value);
-      const dropInserted = (node: { attrs?: { id?: string | null }; content?: unknown[] }): void => {
-        node.content = node.content?.filter(
-          child =>
-            !(
-              (child as { attrs?: { id?: string | null } }).attrs?.id === undefined &&
-              JSON.stringify(child).includes('Costs in the case')
-            )
-        );
-        node.content?.forEach(child => dropInserted(child as typeof node));
-      };
-      dropInserted(snapshot.current);
-      await app.close();
-      app = await bootApp({
-        application: ADJOURN,
-        order: {
-          id: 'order-saved',
-          version: 4,
-          orderType: 'NO_ORDER_ON_CLAIM',
-          formData: { [`${P}-decision`]: 'grant' },
-          docweaveSnapshot: snapshot,
-        },
-      });
-
-      const reopened = await openPage((await app.get(`${TASK_PAGE}&orderId=order-saved`)).text);
-      expect(reopened.documentText()).toContain(GRANTED);
-      expect(reopened.documentText()).not.toContain('Costs in the case.');
-      insertWording();
-      expect(reopened.documentText().match(/Costs in the case\./g)).toHaveLength(1);
+      expect(ordered(page.documentText())).toEqual([
+        'IT IS ORDERED THAT:',
+        "The defendant's application dated 1 October 2026 is dismissed.",
+      ]);
+      check(`${P}-decision`, 'applicant-wording');
+      expect(ordered(page.documentText())).toEqual(['IT IS ORDERED THAT:', ...WORDING]);
     });
 
     it('lists the application for a hearing on notice, asking when as an adjournment does', async () => {
@@ -453,11 +424,11 @@ describe('make an order: deciding applications', () => {
       });
     });
 
-    it('grants it on the conditions a suspended possession order has, which it needs', async () => {
+    it('suspends it on the conditions a suspended possession order has, which it needs', async () => {
       const page = await openPage((await app.get(WARRANT_PAGE)).text);
-      const conditions = control<HTMLElement>('[data-decision-shows="grant"]');
+      const conditions = control<HTMLElement>('[data-decision-shows="suspend"]');
       expect(conditions.hidden).toBe(true);
-      check(`${W}-decision`, 'grant');
+      check(`${W}-decision`, 'suspend');
       expect(conditions.hidden).toBe(false);
       const rejected = await app.post(WARRANT_PAGE, page.body('SUBMIT_FOR_REVIEW'));
       expect(rejected.text).toContain('Enter valid arrears');
@@ -483,7 +454,7 @@ describe('make an order: deciding applications', () => {
       const decisions = [...document.querySelectorAll<HTMLInputElement>(`[name="${W}-decision"]`)].map(
         input => input.value
       );
-      expect(decisions).toEqual(['none', 'grant', 'dismiss', 'list', 'other']);
+      expect(decisions).toEqual(['none', 'suspend', 'dismiss', 'list', 'freeform']);
       const body = page.body('SUBMIT_FOR_REVIEW');
       body.set(`${W}-decision`, 'strike-out');
       const rejected = await app.post(WARRANT_PAGE, body);

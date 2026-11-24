@@ -99,7 +99,7 @@ describe('make an order: choosing when it is made', () => {
     const page = await openPage((await app.get(taskPage)).text);
     expect(control('[name="made-at"][value="without-hearing"]').checked).toBe(true);
     expect(offered('[data-attendance-row]')).toBe(false);
-    check('app-gen-app-1-decision', 'grant');
+    check('app-gen-app-1-decision', 'freeform');
 
     check('made-at', '2');
 
@@ -112,12 +112,11 @@ describe('make an order: choosing when it is made', () => {
     expect(
       [...document.querySelectorAll<HTMLElement>('[data-application]')].map(row => row.dataset.applicationReference)
     ).toEqual(['GA1', 'GA2']);
-    expect(control('[name="app-gen-app-1-decision"][value="grant"]').checked).toBe(true);
+    expect(control('[name="app-gen-app-1-decision"][value="freeform"]').checked).toBe(true);
     expect(page.openingText()).toContain('on 20 November 2026');
     expect(page.orderText()).not.toContain('without a hearing');
     recordAttendance();
     check('app-gen-app-2-decision', 'dismiss');
-    expect(page.orderText()).toContain("The defendant's application dated 1 October 2026 is granted.");
     expect(page.orderText()).toContain("The defendant's application dated 5 October 2026 is dismissed.");
 
     expect((await app.post(taskPage, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
@@ -125,8 +124,8 @@ describe('make an order: choosing when it is made', () => {
     expect(sent.taskId).toBe('task-9');
     expect(sent.hearing.id).toBe(2);
     expect(sent.order.applicationDecisions).toEqual([
-      { genAppId: 'gen-app-1', decision: 'GRANT' },
-      { genAppId: 'gen-app-2', decision: 'DISMISS' },
+      { genAppId: 'gen-app-1', decision: 'DISPOSED' },
+      { genAppId: 'gen-app-2', decision: 'DISPOSED' },
     ]);
   });
 

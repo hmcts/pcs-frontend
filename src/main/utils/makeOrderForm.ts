@@ -94,18 +94,14 @@ const draftOrderHtml = (html: string): string =>
 const lines = (text: string): string => `<p>${escapeHtml(text).replace(/\r?\n/g, '<br>')}</p>`;
 
 /**
- * The order the applicant asked for, which the judge can put in the order: their draft order as the rich text they
- * wrote it in, with their explanation of it apart; or, for an application made before they could give a draft, what
- * they wrote of the order they want, as its lines.
+ * The order the applicant asked for: their draft order as the rich text they wrote it in, which the order can take as
+ * its wording, and apart from it what they asked the court for and why, as its lines. A paper application has neither.
  */
 function requestedWording({ draftOrderWording, whatOrderWanted }: OrderApplication) {
-  if (draftOrderWording) {
-    return {
-      requestedWordingHtml: draftOrderHtml(draftOrderWording),
-      explanationHtml: whatOrderWanted ? lines(whatOrderWanted) : '',
-    };
-  }
-  return { requestedWordingHtml: whatOrderWanted ? lines(whatOrderWanted) : '', explanationHtml: '' };
+  return {
+    requestedWordingHtml: draftOrderWording ? draftOrderHtml(draftOrderWording) : '',
+    explanationHtml: whatOrderWanted ? lines(whatOrderWanted) : '',
+  };
 }
 
 /**
@@ -352,6 +348,7 @@ export function applicationsToDecide({
   const applications = caseContext.applications.map(application => ({
     ...application,
     required: application.id === taskGenAppId,
+    applicantWording: Boolean(application.draftOrderWording),
   }));
   return [...applications.filter(a => a.required), ...applications.filter(a => !a.required)];
 }
@@ -384,7 +381,14 @@ export interface OrderContext {
   /** Every party, for the wording of an order made without anyone's attendance to name them. */
   parties: { id: string; name: string; kind: AttendanceParty['type'] }[];
   /** The applications the order can decide, in the order the page shows them. */
-  applications: { prefix: string; applicant: string; submittedOn: string; enforcementSuspension: boolean }[];
+  applications: {
+    prefix: string;
+    applicant: string;
+    submittedOn: string;
+    enforcementSuspension: boolean;
+    /** The applicant's draft order, cleaned, which the order takes as its wording if the judge chooses; or "". */
+    draftOrderHtml: string;
+  }[];
   /** The case's hearings still to come that an application can be listed at, but for the one the order is made at. */
   upcomingHearings: { id: string; text: string }[];
   /** The coming year's bank holidays, as ISO days, which a quick date that must be a working day moves off. */
@@ -405,6 +409,7 @@ export function orderContext(start: OrderStart, now = DateTime.now()): OrderCont
       applicant: application.applicant,
       submittedOn: displayDate(application.submittedOn),
       enforcementSuspension: application.enforcementSuspension,
+      draftOrderHtml: requestedWording(application).requestedWordingHtml,
     })),
     upcomingHearings: upcomingHearings(start),
     bankHolidays: start.bankHolidays,

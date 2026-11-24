@@ -6,7 +6,8 @@ import type { FormData } from '@utils/orderCase';
  * This is the only place that reads the make order form's field names to say so; pcs-api never reads them.
  */
 
-export type GenAppDecision = 'GRANT' | 'DISMISS' | 'STRIKE_OUT' | 'LIST' | 'OTHER';
+/** Whether an order disposes of an application, which closes it, or lists it for a hearing, which leaves it open. */
+export type GenAppDecision = 'DISPOSED' | 'LISTED';
 
 export interface ApplicationDecision {
   genAppId: string;
@@ -27,14 +28,6 @@ export interface ClaimOutcome {
   warrantOnNotice?: boolean;
 }
 
-const DECISIONS: Record<string, GenAppDecision> = {
-  grant: 'GRANT',
-  dismiss: 'DISMISS',
-  'strike-out': 'STRIKE_OUT',
-  list: 'LIST',
-  other: 'OTHER',
-};
-
 const DECISION_FIELD = /^app-(.+)-decision$/;
 
 /** A posted field's first value, trimmed. */
@@ -52,12 +45,18 @@ function isoDate(formData: FormData, prefix: string): string | undefined {
   return /^\d{4}$/.test(parts[2]) ? parseDate(parts[0], parts[1], parts[2])?.toISOString().slice(0, 10) : undefined;
 }
 
-/** What the order decides about each application it covers; "Not dealt with" decides nothing. */
+/**
+ * The applications the order disposes of or lists for a hearing. "Not dealt with" leaves one as it is; anything else
+ * but listing disposes of it, whatever the order's wording says was decided.
+ */
 export function applicationDecisions(formData: FormData = {}): ApplicationDecision[] {
   return Object.entries(formData).flatMap(([field, value]) => {
     const genAppId = DECISION_FIELD.exec(field)?.[1];
-    const decision = DECISIONS[first(value)];
-    return genAppId && decision ? [{ genAppId, decision }] : [];
+    const answer = first(value);
+    if (!genAppId || !answer || answer === 'none') {
+      return [];
+    }
+    return [{ genAppId, decision: answer === 'list' ? 'LISTED' : 'DISPOSED' }];
   });
 }
 

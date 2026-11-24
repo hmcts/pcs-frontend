@@ -1,23 +1,25 @@
 import { applicationDecisions, claimOutcome } from '@utils/orderOutcome';
 
 describe('orderOutcome', () => {
-  it('names what the order decides about each application, leaving out those it does not deal with', () => {
+  it('disposes of each application the order deals with but for one it lists, leaving out those it does not', () => {
     expect(
       applicationDecisions({
-        'app-a-decision': 'grant',
+        'app-a-decision': 'applicant-wording',
         'app-b-decision': 'none',
         'app-c-decision': 'strike-out',
         'app-d-decision': 'list',
-        'app-e-decision': 'other',
+        'app-e-decision': 'freeform',
         'app-f-decision': 'dismiss',
+        'app-g-decision': 'suspend',
         'outright-possession': 'forthwith',
       })
     ).toEqual([
-      { genAppId: 'a', decision: 'GRANT' },
-      { genAppId: 'c', decision: 'STRIKE_OUT' },
-      { genAppId: 'd', decision: 'LIST' },
-      { genAppId: 'e', decision: 'OTHER' },
-      { genAppId: 'f', decision: 'DISMISS' },
+      { genAppId: 'a', decision: 'DISPOSED' },
+      { genAppId: 'c', decision: 'DISPOSED' },
+      { genAppId: 'd', decision: 'LISTED' },
+      { genAppId: 'e', decision: 'DISPOSED' },
+      { genAppId: 'f', decision: 'DISPOSED' },
+      { genAppId: 'g', decision: 'DISPOSED' },
     ]);
   });
 

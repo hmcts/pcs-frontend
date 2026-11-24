@@ -5,7 +5,7 @@ import { NOTICE_DATE_PREFIXES, formatDate, parseDate } from '@utils/makeOrderFor
 import { type MoneyJudgmentsAnswers, judgmentsFromOrder, moneyJudgmentsRequest } from '@utils/moneyJudgments';
 import type { FormData, OrderStart } from '@utils/orderCase';
 import { type OrderDetailsAnswers, orderDetailsRequest } from '@utils/orderDetails';
-import { type GenAppDecision, applicationDecisions, claimOutcome, first } from '@utils/orderOutcome';
+import { applicationDecisions, claimOutcome, first } from '@utils/orderOutcome';
 
 export const REVIEW_REASONS = [
   { value: 'UNLESS_ORDER', text: 'Unless order' },
@@ -280,12 +280,14 @@ const NOTICE_STATEMENTS: Record<string, string> = {
   none: 'Neither',
 };
 
-const DECISION_LABELS: Record<GenAppDecision, string> = {
-  GRANT: 'Granted',
-  DISMISS: 'Dismissed',
-  STRIKE_OUT: 'Struck out',
-  LIST: 'Listed for a hearing',
-  OTHER: 'Something else',
+// The make order form's decision on an application, as the judge's form words it.
+const DECISION_LABELS: Record<string, string> = {
+  'applicant-wording': 'Applicant’s wording',
+  suspend: 'Enforcement suspended on conditions',
+  dismiss: 'Dismissed',
+  'strike-out': 'Struck out',
+  list: 'Listed for a hearing',
+  freeform: 'Freeform',
 };
 
 function statementSelected(formData: FormData): string {
@@ -340,11 +342,12 @@ export function issueSummary(review: OrderReviewSession): { key: string; lines: 
   }
 
   const applications = new Map(review.caseContext.applications.map(application => [application.id, application]));
-  const decided = applicationDecisions(current).flatMap(({ genAppId, decision }) => {
+  const decided = applicationDecisions(current).flatMap(({ genAppId }) => {
     const application = applications.get(genAppId);
     return application
       ? [
-          `${application.reference}: ${application.type} – ${DECISION_LABELS[decision]} – ` +
+          `${application.reference}: ${application.type} – ` +
+            `${DECISION_LABELS[first(current[`app-${genAppId}-decision`])]} – ` +
             noticeRequestLabel(application.withoutNotice),
         ]
       : [];

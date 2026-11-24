@@ -31,7 +31,8 @@ const APPLICATION = {
   applicant: 'Alex Example (Defendant 1)',
   submittedOn: '2026-10-01',
   withoutNotice: 'YES',
-  whatOrderWanted: 'The hearing is adjourned.',
+  whatOrderWanted: 'I am in hospital.',
+  draftOrderWording: '<p>The hearing is adjourned.</p>',
   documents: [],
 };
 
@@ -130,11 +131,10 @@ describe("make an order: made on the court's own initiative or without notice", 
     expect(sent.order.formData).toMatchObject({ 'order-notice': 'own-initiative', 'own-initiative-by-day': due.day });
   });
 
-  it("keeps the judge's own wording on an order deciding an application without notice, which court staff review", async () => {
+  it("keeps the applicant's wording on an order deciding an application without notice, which court staff review", async () => {
     app = await bootApp({ application: APPLICATION });
     const page = await openPage((await app.get(`${PAGE}?genAppId=gen-app-1`)).text);
-    check('app-gen-app-1-decision', 'grant');
-    control<HTMLButtonElement>('[data-insert-requested-wording]').click();
+    check('app-gen-app-1-decision', 'applicant-wording');
     expect(page.documentText()).toContain('The hearing is adjourned.');
 
     check('order-notice', 'without-notice');
@@ -200,7 +200,7 @@ describe("make an order: made on the court's own initiative or without notice", 
     const page = await openPage((await app.get(`${PAGE}?genAppId=gen-app-1`)).text);
 
     // Deciding an application whose applicant asked for it without notice leaves the statement to the judge.
-    check('app-gen-app-1-decision', 'grant');
+    check('app-gen-app-1-decision', 'dismiss');
     expect(control('[name="order-notice"][value="none"]').checked).toBe(true);
     expect(page.orderText()).not.toContain('set aside');
 
