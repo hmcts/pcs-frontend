@@ -58,13 +58,11 @@ describe('normaliseClaim', () => {
         },
         notice: { noticeServed: 'NO', noticeType: 'OTHER', noNoticeReason: 'Abandoned' },
         rentArrears: { rentAmount: '1' },
-        circumstances: { underlesseeExists: 'NO', underlesseeName: 'X' },
       })
     ).toEqual({
       claimant: { individualOrOrganisation: 'ORGANISATION', organisationName: 'Lets Ltd', contactByPhone: 'NO' },
       grounds: { hasRentArrearsGrounds: 'NO', otherGrounds: ['GROUND_1'] },
       notice: { noticeServed: 'NO', noNoticeReason: 'Abandoned' },
-      circumstances: { underlesseeExists: 'NO' },
     });
   });
 
@@ -126,13 +124,12 @@ describe('normaliseClaim', () => {
     ).toEqual({ rentFrequency: 'OTHER' });
   });
 
-  it('drops grounds and an underlessee the claimant said no to, or never said yes to', () => {
+  it('drops grounds the claimant said no to', () => {
     expect(
       normaliseClaim({
         grounds: { hasRentArrearsGrounds: 'NO', rentArrearsGrounds: ['GROUND_8'], otherGrounds: ['GROUND_1'] },
-        circumstances: { underlesseeName: 'X', underlesseeAddress: { AddressLine1: '1' } },
       })
-    ).toEqual({ grounds: { hasRentArrearsGrounds: 'NO', otherGrounds: ['GROUND_1'] }, circumstances: {} });
+    ).toEqual({ grounds: { hasRentArrearsGrounds: 'NO', otherGrounds: ['GROUND_1'] } });
   });
 
   it('says there are additional defendants exactly when there is more than one', () => {
@@ -167,8 +164,8 @@ describe('restoreUnreadable', () => {
   });
 
   it('drops an unreadable answer that had nothing saved', () => {
-    expect(restoreUnreadable({}, { notice: { noticeDate: UNREADABLE } })).toEqual({
-      notice: { noticeDate: undefined },
+    expect(restoreUnreadable({}, { notice: { postedDate: UNREADABLE } })).toEqual({
+      notice: { postedDate: undefined },
     });
   });
 

@@ -30,7 +30,6 @@ import { step as multipleClaimants } from './multiple-claimants';
 import { step as multipleClaimantsIneligible } from './multiple-claimants-ineligible';
 import { step as noticeAvailable } from './notice-available';
 import { step as noticeCya } from './notice-cya';
-import { step as noticeDate } from './notice-date';
 import { step as noticeDetails } from './notice-details';
 import { step as noticeMethod } from './notice-method';
 import { step as noticeServed } from './notice-served';
@@ -43,7 +42,6 @@ import { step as otherReasons } from './other-reasons';
 import { step as recoverySteps } from './recovery-steps';
 import { step as removeDefendant } from './remove-defendant';
 import { step as removeLedgerEntry } from './remove-ledger-entry';
-import { step as removeRentPayment } from './remove-rent-payment';
 import { step as rentAmount } from './rent-amount';
 import { step as rentArrears } from './rent-arrears';
 import { step as rentArrearsClaim } from './rent-arrears-claim';
@@ -60,9 +58,6 @@ import { step as tenancyCya } from './tenancy-cya';
 import { step as tenancyDetails } from './tenancy-details';
 import { step as tenancyStartDate } from './tenancy-start-date';
 import { step as tenancyType } from './tenancy-type';
-import { step as underlessee } from './underlessee';
-import { step as underlesseeAddress } from './underlessee-address';
-import { step as underlesseeName } from './underlessee-name';
 import { step as uploadNotice } from './upload-notice';
 import { step as uploadOtherDocuments } from './upload-other-documents';
 import { step as uploadRentStatement } from './upload-rent-statement';
@@ -73,7 +68,6 @@ import { step as yourSupport } from './your-support';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const stepRegistry: Record<string, StepDefinition> = {
-  eligible,
   'your-details': yourDetails,
   'individual-or-organisation': individualOrOrganisation,
   'claimant-name': claimantName,
@@ -103,7 +97,6 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'notice-details': noticeDetails,
   'notice-served': noticeServed,
   'notice-type': noticeType,
-  'notice-date': noticeDate,
   'notice-method': noticeMethod,
   'notice-available': noticeAvailable,
   'upload-notice': uploadNotice,
@@ -127,9 +120,6 @@ export const stepRegistry: Record<string, StepDefinition> = {
   circumstances,
   'defendant-circumstances': defendantCircumstances,
   'claimant-circumstances': claimantCircumstances,
-  underlessee,
-  'underlessee-name': underlesseeName,
-  'underlessee-address': underlesseeAddress,
   'situation-cya': situationCya,
   'other-information': otherInformation,
   'upload-other-documents': uploadOtherDocuments,
@@ -139,9 +129,9 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'equality-and-diversity': equalityAndDiversity,
   'language-used': languageUsed,
   'check-your-answers': checkYourAnswers,
+  eligible,
   'task-list': taskList,
   'remove-defendant': removeDefendant,
   'remove-ledger-entry': removeLedgerEntry,
-  'remove-rent-payment': removeRentPayment,
   'multiple-claimants-ineligible': multipleClaimantsIneligible,
 };

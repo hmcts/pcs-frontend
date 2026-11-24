@@ -80,8 +80,7 @@ describe('the claim journey', () => {
       'ledger-summary',
     ],
     ['ledger-summary', { rentArrears: { proofType: 'LEDGER' } }, 'money-judgment'],
-    ['underlessee', { circumstances: { underlesseeExists: 'YES' } }, 'underlessee-name'],
-    ['underlessee', { circumstances: { underlesseeExists: 'NO' } }, 'situation-cya'],
+    ['claimant-circumstances', {}, 'situation-cya'],
     ['language-used', {}, 'check-your-answers'],
   ] as [string, CitizenPossessionClaim, string][])('goes from %s with %j to %s', async (step, claim, expected) => {
     await expect(next(claim, step)).resolves.toBe(expected);
@@ -113,8 +112,8 @@ describe('the claim journey', () => {
   });
 });
 
-describe('the tenancy summary', () => {
-  it('carries on to the notice questions in the same section', async () => {
-    await expect(next({}, 'tenancy-cya')).resolves.toBe('notice-details');
+describe('the notice questions', () => {
+  it('ask for the date the notice was served only under each method', async () => {
+    await expect(next({ notice: { noticeServed: 'YES' } }, 'notice-type')).resolves.toBe('notice-method');
   });
 });

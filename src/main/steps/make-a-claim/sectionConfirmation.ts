@@ -13,7 +13,6 @@ const ALL_SECTION_CYAS: readonly string[] = Object.values(SECTION_CYAS).flat();
 const CHANGES_SHOWN_ON: Readonly<Record<string, SectionCya>> = {
   'remove-defendant': 'defendant-cya',
   'remove-ledger-entry': 'arrears-cya',
-  'remove-rent-payment': 'arrears-cya',
 };
 
 export function isSectionCya(stepName: string): stepName is SectionCya {

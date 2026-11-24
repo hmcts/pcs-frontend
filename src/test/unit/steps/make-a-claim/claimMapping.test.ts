@@ -8,7 +8,6 @@ import {
   removeDefendant,
   removeLedgerEntry,
   rentChangeExceedsLimit,
-  rentPaymentToRemoveOf,
   rentStatementRange,
 } from '../../../../main/steps/make-a-claim/claimMapping';
 import { UNREADABLE } from '../../../../main/steps/make-a-claim/formValues';
@@ -546,13 +545,6 @@ describe('claim mappings', () => {
       expect(paymentDueDateLimitOf(request({ period: '2026-06-01' }), claim)).toBeUndefined();
       expect(paymentDueDateLimitOf(request({ period: '2026-07-01' }), claim)).toBe('2026-07-01');
     });
-
-    it('removes a payment that has no date', () => {
-      expect(rentPaymentToRemoveOf(request({ row: '1', datePaid: '', amountPaid: '5000' }), claim)).toBe(1);
-      expect(rentPaymentToRemoveOf(request({ row: '1', datePaid: '2026-06-02', amountPaid: '5000' }), claim)).toBe(
-        undefined
-      );
-    });
   });
 
   it('adds no ledger entry for a transaction page saved for later empty', () => {
@@ -638,6 +630,53 @@ describe('claim mappings', () => {
     expect(roundTrip('rent-statement-payment', body, claim, request({ period: '1999-01-01' })).saved).toEqual(claim);
   });
 
+  it('removes a payment from its change page only when the claimant says yes', () => {
+    const claim: CitizenPossessionClaim = {
+      rentArrears: {
+        rentHistoryTable: [
+          { value: { periodStart: '2026-06-01', dateDue: '2026-06-01', amountDue: '100000', amountPaid: '5000' } },
+          { value: { periodStart: '2026-06-01', datePaid: '2026-06-20', amountPaid: '2500' } },
+        ],
+      },
+    };
+    const body = { datePaid: { day: '5', month: '6', year: '2026' }, amountPaid: '50' };
+    expect(
+      roundTrip('rent-statement-payment', { ...body, removePayment: 'yes' }, claim, request({ row: '0' })).saved
+        .rentArrears?.rentHistoryTable
+    ).toEqual([
+      {
+        value: {
+          periodStart: '2026-06-01',
+          dateDue: '2026-06-01',
+          amountDue: '100000',
+          datePaid: '2026-06-20',
+          amountPaid: '2500',
+        },
+      },
+    ]);
+    expect(
+      roundTrip('rent-statement-payment', { removePayment: 'yes' }, claim, request({ row: '1' })).saved.rentArrears
+        ?.rentHistoryTable
+    ).toEqual([claim.rentArrears!.rentHistoryTable![0]]);
+    expect(
+      roundTrip('rent-statement-payment', { ...body, removePayment: 'no' }, claim, request({ row: '1' })).saved
+        .rentArrears?.rentHistoryTable?.[1].value
+    ).toEqual({ periodStart: '2026-06-01', datePaid: '2026-06-05', amountPaid: '5000' });
+  });
+
+  it('removes nothing when a payment page adding to a period is sent the remove answer', () => {
+    const claim: CitizenPossessionClaim = {
+      rentArrears: {
+        rentHistoryTable: [
+          { value: { periodStart: '2026-06-01', dateDue: '2026-06-01', amountDue: '100000', amountPaid: '5000' } },
+        ],
+      },
+    };
+    const body = { datePaid: { day: '5', month: '6', year: '2026' }, amountPaid: '50', removePayment: 'yes' };
+    const { saved } = roundTrip('rent-statement-payment', body, claim, request({ period: '2026-06-01' }));
+    expect(saved.rentArrears?.rentHistoryTable).toHaveLength(2);
+  });
+
   it('keeps an optional answer the claimant left blank as answered', () => {
     const { saved, answered } = roundTrip('recovery-steps', { recoverySteps: '   ' });
     expect(saved.rentArrears?.recoverySteps).toBe('');
@@ -670,7 +709,6 @@ describe('claim mappings', () => {
     ['rent-arrears-claim', 'hasRentArrearsGrounds', 'grounds'],
     ['other-grounds-claim', 'hasOtherGrounds', 'grounds'],
     ['money-judgment', 'moneyJudgmentWanted', 'rentArrears'],
-    ['underlessee', 'underlesseeExists', 'circumstances'],
     ['general-application', 'generalApplicationIntent', 'otherInformation'],
   ] as const)('saves the %s yes or no answer', (step, field, group) => {
     const { saved, form, answered } = roundTrip(step, { [field]: 'no' });

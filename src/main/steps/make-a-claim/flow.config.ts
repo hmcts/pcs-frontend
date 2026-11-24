@@ -9,7 +9,6 @@ import {
   hasNoticeCopy,
   hasRentArrearsGrounds,
   hasTenancyAgreement,
-  hasUnderlessee,
   isIndividual,
   isOrganisation,
   ledgerIsEmpty,
@@ -36,11 +35,11 @@ export const flowConfig: JourneyFlowConfig = {
   eventId: MAKE_A_CLAIM_EVENT_ID,
   sections: makeAClaimSections,
   nonSectionStepOrder: [
+    'eligible',
     'task-list',
     'multiple-claimants-ineligible',
     'remove-defendant',
     'remove-ledger-entry',
-    'remove-rent-payment',
   ],
   hubStepName: 'task-list',
   steps: {
@@ -52,7 +51,6 @@ export const flowConfig: JourneyFlowConfig = {
     'other-grounds': { showCondition: (req: Request) => asksOtherGrounds(req) },
     'ground-reason': { showCondition: (req: Request) => needsGroundReasons(req) },
     'notice-type': { showCondition: (req: Request) => noticeServed(req) },
-    'notice-date': { showCondition: (req: Request) => noticeServed(req) },
     'notice-method': { showCondition: (req: Request) => noticeServed(req) },
     'notice-available': { showCondition: (req: Request) => noticeServed(req) },
     'upload-notice': { showCondition: (req: Request) => hasNoticeCopy(req) },
@@ -64,12 +62,9 @@ export const flowConfig: JourneyFlowConfig = {
     'statement-period': { showCondition: (req: Request) => usesTable(req) },
     'rent-statement': { showCondition: (req: Request) => usesTable(req) },
     'rent-statement-payment': { showCondition: () => false },
-    'underlessee-name': { showCondition: (req: Request) => hasUnderlessee(req) },
-    'underlessee-address': { showCondition: (req: Request) => hasUnderlessee(req) },
     'multiple-claimants-ineligible': { showCondition: () => false, preventBack: true },
     'remove-defendant': { showCondition: () => false },
     'remove-ledger-entry': { showCondition: () => false },
-    'remove-rent-payment': { showCondition: () => false },
   },
 };
 

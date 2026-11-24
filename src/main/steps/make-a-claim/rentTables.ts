@@ -1,4 +1,3 @@
-import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 
 import { readClaim } from './claimDraft';
@@ -66,17 +65,8 @@ export function ledgerTable(req: Request, withActions: boolean): Record<string, 
 export function rentStatementTable(req: Request, withActions: boolean): Record<string, unknown> {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const paymentUrl = getStepUrl('rent-statement-payment', flowConfig, req.res?.locals.validatedCase?.id);
-  const removeUrl = getStepUrl('remove-rent-payment', flowConfig, req.res?.locals.validatedCase?.id);
   const rows = readClaim(req).rentArrears?.rentHistoryTable;
   const lines = rentTableWithArrears(rows);
-  const removeQuery = (rowIndex: number) => {
-    const row = rows?.[rowIndex]?.value;
-    return new URLSearchParams({
-      row: String(rowIndex),
-      datePaid: row?.datePaid ?? '',
-      amountPaid: row?.amountPaid ?? '',
-    }).toString();
-  };
   return {
     caption: t('makeAClaim:rentTable.caption'),
     captionClasses: 'govuk-visually-hidden',
@@ -100,11 +90,6 @@ export function rentStatementTable(req: Request, withActions: boolean): Record<s
               actionLink(
                 `${paymentUrl}?row=${line.rowIndex}`,
                 t('makeAClaim:rentTable.change'),
-                `${t('makeAClaim:rentTable.paymentFor')} ${due}`
-              ),
-              actionLink(
-                `${removeUrl}?${escapeHtml(removeQuery(line.rowIndex))}`,
-                t('makeAClaim:rentTable.remove'),
                 `${t('makeAClaim:rentTable.paymentFor')} ${due}`
               ),
             ]

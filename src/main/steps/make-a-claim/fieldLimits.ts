@@ -37,7 +37,6 @@ export const FIELD_LIMITS = {
   recoverySteps: REASON,
   defendantCircumstances: CIRCUMSTANCES,
   claimantCircumstances: CIRCUMSTANCES,
-  underlesseeName: NAME,
   otherReasonsDetail: OTHER_REASONS,
   statementOfTruthFullName: STATEMENT_OF_TRUTH,
   statementOfTruthPosition: STATEMENT_OF_TRUTH,

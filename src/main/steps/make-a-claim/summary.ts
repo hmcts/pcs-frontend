@@ -240,7 +240,6 @@ export function noticeCard(req: Request): SummaryCard {
         ? [valueOf(t, 'noticeType', 'OTHER') ?? '', notice.noticeTypeOther ?? '']
         : valueOf(t, 'noticeType', notice.noticeType)
     )
-    .add('notice-date', 'noticeDate', formatClaimDate(notice.noticeDate, req))
     .add('notice-method', 'noticeMethods', methods)
     .add(
       'notice-available',
@@ -296,9 +295,6 @@ export function circumstancesCard(req: Request): SummaryCard {
   const rows = new CardBuilder(req, t)
     .add('defendant-circumstances', 'defendantCircumstances', circumstances.defendantCircumstances)
     .add('claimant-circumstances', 'claimantCircumstances', circumstances.claimantCircumstances)
-    .add('underlessee', 'underlesseeExists', yesNo(t, circumstances.underlesseeExists))
-    .add('underlessee-name', 'underlesseeName', circumstances.underlesseeName)
-    .add('underlessee-address', 'underlesseeAddress', address(circumstances.underlesseeAddress))
     .build();
   return { id: 'circumstances', title: t('makeAClaim:summary.cards.circumstances'), rows };
 }

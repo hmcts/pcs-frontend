@@ -55,7 +55,7 @@ function keepOnlyProof(rentArrears: NonNullable<CitizenPossessionClaim['rentArre
  */
 export function normaliseClaim(claim: CitizenPossessionClaim): CitizenPossessionClaim {
   const normalised = cloneDeep(claim);
-  const { claimant, tenancy, grounds, notice, circumstances, otherInformation } = normalised;
+  const { claimant, tenancy, grounds, notice, otherInformation } = normalised;
 
   if (claimant?.individualOrOrganisation === 'INDIVIDUAL') {
     delete claimant.organisationName;
@@ -143,10 +143,6 @@ export function normaliseClaim(claim: CitizenPossessionClaim): CitizenPossession
   }
   if (normalised.defendants?.length) {
     normalised.additionalDefendants = normalised.defendants.length > 1 ? 'YES' : 'NO';
-  }
-  if (circumstances && circumstances.underlesseeExists !== 'YES') {
-    delete circumstances.underlesseeName;
-    delete circumstances.underlesseeAddress;
   }
   if (otherInformation?.hasOtherReasons === 'NO') {
     delete otherInformation.otherReasonsDetail;

@@ -32,7 +32,6 @@ import {
   mergeRentPeriods,
   removeRentTablePayment,
   rentPeriodsWithinLimit,
-  rowHoldsPayment,
   statementRangeOf,
 } from './rentHistory';
 
@@ -283,10 +282,6 @@ function documentsAnswered(documents: unknown[] | undefined): boolean {
 }
 
 export const claimMappings: Record<string, StepMapping> = {
-  eligible: {
-    isAnswered: claim => claim.eligibility?.isTrespass === 'NO' && claim.eligibility?.whoIsClaiming === 'MYSELF',
-  },
-
   'individual-or-organisation': {
     toForm: claim => ({ individualOrOrganisation: claim.claimant?.individualOrOrganisation }),
     fromForm: (claim, body) =>
@@ -547,15 +542,6 @@ export const claimMappings: Record<string, StepMapping> = {
     isAnswered: claim => claim.notice?.noticeType !== undefined,
   },
 
-  'notice-date': {
-    toForm: claim => ({ noticeDate: toDateParts(claim.notice?.noticeDate) }),
-    fromForm: (claim, body) =>
-      setNested(claim, 'notice', notice => {
-        notice.noticeDate = readDate(body, 'noticeDate');
-      }),
-    isAnswered: claim => claim.notice?.noticeDate !== undefined,
-  },
-
   'notice-method': {
     toForm: claim => {
       const notice = claim.notice ?? {};
@@ -737,6 +723,15 @@ export const claimMappings: Record<string, StepMapping> = {
       return row ? { datePaid: toDateParts(row.datePaid), amountPaid: penceToPounds(row.amountPaid) } : {};
     },
     fromForm: (claim, body, req) => {
+      const rowIndex = rentStatementRowOf(req, claim);
+      if (rowIndex !== undefined && body.removePayment === 'yes') {
+        if (claim.rentArrears?.rentHistoryTable?.[rowIndex]?.value.amountPaid) {
+          setNested(claim, 'rentArrears', rentArrears => {
+            rentArrears.rentHistoryTable = removeRentTablePayment(rentArrears.rentHistoryTable ?? [], rowIndex);
+          });
+        }
+        return;
+      }
       const datePaid = dateFromBody(body, 'datePaid');
       const amountPaid = strictPoundsToPence(body.amountPaid);
       if (!datePaid || !amountPaid) {
@@ -744,7 +739,6 @@ export const claimMappings: Record<string, StepMapping> = {
       }
       setNested(claim, 'rentArrears', rentArrears => {
         const rows = rentArrears.rentHistoryTable ?? [];
-        const rowIndex = rentStatementRowOf(req, claim);
         if (rowIndex !== undefined) {
           rentArrears.rentHistoryTable = rows.map((row, i) =>
             i === rowIndex ? { ...row, value: { ...row.value, datePaid, amountPaid } } : row
@@ -786,26 +780,6 @@ export const claimMappings: Record<string, StepMapping> = {
         circumstances.claimantCircumstances = optionalText(body.claimantCircumstances, body);
       }),
     isAnswered: claim => claim.circumstances?.claimantCircumstances !== undefined,
-  },
-
-  underlessee: yesNoStep('circumstances', 'underlesseeExists', claim => claim.circumstances?.underlesseeExists),
-
-  'underlessee-name': {
-    toForm: claim => ({ underlesseeName: claim.circumstances?.underlesseeName }),
-    fromForm: (claim, body) =>
-      setNested(claim, 'circumstances', circumstances => {
-        circumstances.underlesseeName = text(body.underlesseeName);
-      }),
-    isAnswered: claim => Boolean(claim.circumstances?.underlesseeName),
-  },
-
-  'underlessee-address': {
-    toForm: claim => addressToForm(claim.circumstances?.underlesseeAddress, 'underlessee'),
-    fromForm: (claim, body) =>
-      setNested(claim, 'circumstances', circumstances => {
-        circumstances.underlesseeAddress = addressFromBody(body, 'underlessee');
-      }),
-    isAnswered: claim => Boolean(claim.circumstances?.underlesseeAddress?.AddressLine1),
   },
 
   'upload-other-documents': {
@@ -853,17 +827,6 @@ export const claimMappings: Record<string, StepMapping> = {
       const index = itemIndexOf(req, claim.defendants, 'index');
       if (body.confirmRemove === 'yes' && index !== undefined) {
         removeDefendant(claim, index);
-      }
-    },
-  },
-
-  'remove-rent-payment': {
-    fromForm: (claim, body, req) => {
-      const index = rentPaymentToRemoveOf(req, claim);
-      if (body.confirmRemove === 'yes' && index !== undefined) {
-        setNested(claim, 'rentArrears', rentArrears => {
-          rentArrears.rentHistoryTable = removeRentTablePayment(rentArrears.rentHistoryTable ?? [], index);
-        });
       }
     },
   },
@@ -936,19 +899,6 @@ export function paymentDueDateLimitOf(req: Request, claim: CitizenPossessionClai
     .map(row => row.value.periodStart ?? '')
     .sort()[0];
   return period && period.periodStart !== firstPeriod ? period.dateDue : undefined;
-}
-
-/** The payment a remove link names: ?row=n, with the date and amount it was made for, while the row still holds it. */
-export function rentPaymentToRemoveOf(req: Request, claim: CitizenPossessionClaim): number | undefined {
-  const index = rentStatementRowOf(req, claim);
-  const first = (value: unknown) => (Array.isArray(value) ? value[0] : value);
-  const payment = { datePaid: first(req.query?.datePaid), amountPaid: first(req.query?.amountPaid) };
-  return index !== undefined &&
-    typeof payment.datePaid === 'string' &&
-    typeof payment.amountPaid === 'string' &&
-    rowHoldsPayment(claim.rentArrears?.rentHistoryTable?.[index]?.value, payment)
-    ? index
-    : undefined;
 }
 
 /** The ground a reason page is about: ?ground=, or the first that needs a reason. */

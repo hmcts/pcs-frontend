@@ -141,11 +141,8 @@ export const GROUND_1A_AND_14: OtherGroundReasons = [
   },
 ];
 
-export async function completeTenancyGroundsAndNotice(
-  page: Page,
-  otherGrounds: OtherGroundReasons = []
-): Promise<void> {
-  await openTask(page, 'About the tenancy, your grounds and notice served');
+export async function completeTenancyAndGrounds(page: Page, otherGrounds: OtherGroundReasons = []): Promise<void> {
+  await openTask(page, 'About the tenancy and your grounds for possession');
   await continueOn(page);
   await answer(page, 'Assured or assured periodic tenancy');
   await fillDate(page, 'tenancyStartDate', '15', '1', '2018');
@@ -176,12 +173,15 @@ export async function completeTenancyGroundsAndNotice(
   }
   await expect(page.getByRole('heading', { level: 1, name: 'Check your answers' })).toBeVisible();
   await saveAndContinue(page);
+  await expectTaskStatus(page, 'About the tenancy and your grounds for possession', 'Done');
+}
 
+/** The served date is asked only under the method the notice was served by. */
+export async function completeNotice(page: Page): Promise<void> {
+  await openTask(page, 'About the notice you served');
   await continueOn(page);
   await answer(page, 'Yes');
   await answer(page, 'Notice seeking possession');
-  await fillDate(page, 'noticeDate', '9', '6', '2026');
-  await saveAndContinue(page);
   await page.getByRole('checkbox', { name: 'By personally handing it to or leaving it with someone' }).check();
   await page.getByLabel('Who was the notice left with?').fill('Brian Springford');
   await fillDate(page, 'noticeMethods.handedDate', '9', '6', '2026');
@@ -190,7 +190,7 @@ export async function completeTenancyGroundsAndNotice(
   await performAction('uploadFile', 'NoticeServiceJurisdiction.docx');
   await saveAndContinue(page);
   await saveAndContinue(page);
-  await expectTaskStatus(page, 'About the tenancy, your grounds and notice served', 'Done');
+  await expectTaskStatus(page, 'About the notice you served', 'Done');
 }
 
 async function startRentArrears(page: Page): Promise<void> {
@@ -262,6 +262,20 @@ export async function completeRentArrearsWithTable(page: Page): Promise<void> {
   await page.getByLabel('Amount paid').fill('120');
   await saveAndContinue(page);
   await expect(page.getByText('Total arrears: £2,880.00')).toBeVisible();
+
+  await page.getByRole('link', { name: 'Change payment for rent due on 1 June 2026' }).click();
+  await page
+    .getByRole('group', { name: 'Do you want to remove this payment from the rent statement?' })
+    .getByRole('radio', { name: 'Yes' })
+    .check();
+  await saveAndContinue(page);
+  await expect(page.getByText('Total arrears: £3,000.00')).toBeVisible();
+
+  await page.getByRole('link', { name: 'Add a payment payment for rent due on 1 June 2026' }).click();
+  await fillDate(page, 'datePaid', '5', '6', '2026');
+  await page.getByLabel('Amount paid').fill('120');
+  await saveAndContinue(page);
+  await expect(page.getByText('Total arrears: £2,880.00')).toBeVisible();
   await saveAndContinue(page);
   await finishRentArrears(page);
 }
@@ -271,16 +285,20 @@ export async function completeCircumstances(page: Page): Promise<void> {
   await continueOn(page);
   await saveAndContinue(page);
   await saveAndContinue(page);
-  await answer(page, 'No');
   await saveAndContinue(page);
   await expectTaskStatus(page, 'Circumstances', 'Done');
 }
 
-/** Other information runs straight on to checking the answers, as the prototype does. */
-export async function completeOtherInformation(page: Page): Promise<void> {
-  await openTask(page, 'Upload files and other information');
-  await continueOn(page);
+export async function completeUploadDocuments(page: Page): Promise<void> {
+  await openTask(page, 'Upload documents');
   await saveAndContinue(page);
+  await expectTaskStatus(page, 'Upload documents', 'Done');
+}
+
+/** The check your answers task asks its final questions, then runs straight on to checking the answers. */
+export async function answerFinalQuestions(page: Page): Promise<void> {
+  await openTask(page, 'Check your answers and submit');
+  await continueOn(page);
   await answer(page, 'No');
   await answer(page, 'No');
   await continueOn(page);

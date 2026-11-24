@@ -1,3 +1,5 @@
+import type { Request } from 'express';
+
 import { claimDocumentStorage, documentsField } from './claimDocuments';
 import { createMakeAClaimStep } from './formStep';
 
@@ -13,7 +15,8 @@ export function createUploadStep(
   stepDir: string,
   get: (claim: CitizenPossessionClaim) => ClaimDocuments | undefined,
   set: (claim: CitizenPossessionClaim, documents: ClaimDocuments) => void,
-  required: boolean
+  required: boolean,
+  resolveRedirectAfterPost?: (req: Request) => Promise<string | undefined>
 ): StepDefinition {
   const documentStorage = claimDocumentStorage(stepName, get, set);
   return createMakeAClaimStep({
@@ -23,5 +26,6 @@ export function createUploadStep(
     documentStorage,
     fields: [documentsField(required)],
     getInitialFormData: async req => ({ documents: toDisplayDocuments(await documentStorage.read(req)) }),
+    ...(resolveRedirectAfterPost ? { resolveRedirectAfterPost } : {}),
   });
 }

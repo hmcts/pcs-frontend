@@ -231,19 +231,6 @@ export function addRentTablePayment(
   return [...updated, { value: { periodStart, ...payment } }];
 }
 
-/** Whether a rent statement row still holds the payment a link to it was made for. */
-export function rowHoldsPayment(
-  row: RentTableRow | undefined,
-  payment: { datePaid?: string; amountPaid?: string }
-): boolean {
-  const dateOf = (datePaid: string | undefined) => datePaid || undefined;
-  return (
-    Boolean(row?.amountPaid) &&
-    dateOf(row?.datePaid) === dateOf(payment.datePaid) &&
-    row?.amountPaid === payment.amountPaid
-  );
-}
-
 /**
  * Removes the payment on a rent statement row. A period keeps its own row, so its payment is cleared and the
  * period's next payment, if it has another, moves up onto it; an additional payment's row goes.

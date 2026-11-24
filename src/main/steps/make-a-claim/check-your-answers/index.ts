@@ -36,7 +36,8 @@ const logger = Logger.getLogger('makeAClaimCheckYourAnswers');
 /**
  * Where to send a claimant who opens check your answers before it is available: the first question not yet
  * answered in the first section that is not done, else the first of its summaries not yet confirmed, which then
- * returns here, or else that section's first page. A page sent back with submit errors, such as a claim changed in
+ * returns here, or else that section's first page. Once it is available, a final question of its own task not yet
+ * answered, such as the language used, is asked first. A page sent back with submit errors, such as a claim changed in
  * another tab, is still shown, so the claimant is told what happened.
  */
 async function firstUnfinishedQuestion(req: Request): Promise<string | undefined> {
@@ -44,8 +45,18 @@ async function firstUnfinishedQuestion(req: Request): Promise<string | undefined
     return undefined;
   }
   const statuses = await getAllSectionStatuses(flowConfig, stepRegistry, req, makeAClaimSectionConfirmation);
+  const unansweredIn = (stepNames: readonly string[]) =>
+    stepNames.find(stepName => {
+      const step = stepRegistry[stepName];
+      return step?.isAnswered !== undefined && isStepVisible(stepName, flowConfig, req) && !safeIsAnswered(step, req);
+    });
   if (statuses.get(CHECK_AND_SUBMIT) !== 'NOT_AVAILABLE_YET') {
-    return undefined;
+    const finalQuestion = unansweredIn(
+      makeAClaimSections
+        .find(candidate => candidate.id === CHECK_AND_SUBMIT)
+        ?.steps.filter(stepName => stepName !== 'check-your-answers') ?? []
+    );
+    return finalQuestion ? unansweredStepUrl(req, finalQuestion) : undefined;
   }
   const caseReference = caseReferenceOf(req);
   const section = makeAClaimSections.find(
@@ -55,10 +66,7 @@ async function firstUnfinishedQuestion(req: Request): Promise<string | undefined
   if (!section) {
     return taskListPath(caseReference);
   }
-  const unanswered = section.steps.find(stepName => {
-    const step = stepRegistry[stepName];
-    return step?.isAnswered !== undefined && isStepVisible(stepName, flowConfig, req) && !safeIsAnswered(step, req);
-  });
+  const unanswered = unansweredIn(section.steps);
   if (unanswered) {
     return unansweredStepUrl(req, unanswered);
   }

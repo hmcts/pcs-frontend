@@ -5,14 +5,16 @@ import {
   GROUND_1A_AND_14,
   WELSH_PROPERTY,
   answer,
+  answerFinalQuestions,
   becomeEligible,
   completeAboutYou,
   completeCircumstances,
   completeDefendants,
-  completeOtherInformation,
+  completeNotice,
   completeRentArrearsWithLedger,
   completeRentArrearsWithTable,
-  completeTenancyGroundsAndNotice,
+  completeTenancyAndGrounds,
+  completeUploadDocuments,
   continueOn,
   createLandlord,
   declineClaimFeeCard,
@@ -44,10 +46,12 @@ test.describe('Private landlord makes a possession claim @privateLandlord', () =
     await continueOn(page);
     await completeAboutYou(page);
     await completeDefendants(page);
-    await completeTenancyGroundsAndNotice(page, GROUND_1A_AND_14);
+    await completeTenancyAndGrounds(page, GROUND_1A_AND_14);
+    await completeNotice(page);
     await completeRentArrearsWithLedger(page);
     await completeCircumstances(page);
-    await completeOtherInformation(page);
+    await completeUploadDocuments(page);
+    await answerFinalQuestions(page);
     await submitClaim(page);
     await payClaimFee(page);
   });
@@ -58,10 +62,12 @@ test.describe('Private landlord makes a possession claim @privateLandlord', () =
     await continueOn(page);
     await completeAboutYou(page);
     await completeDefendants(page);
-    await completeTenancyGroundsAndNotice(page);
+    await completeTenancyAndGrounds(page);
+    await completeNotice(page);
     await completeRentArrearsWithTable(page);
     await completeCircumstances(page);
-    await completeOtherInformation(page);
+    await completeUploadDocuments(page);
+    await answerFinalQuestions(page);
     await submitClaim(page);
     await payClaimFee(page);
   });
@@ -79,10 +85,12 @@ test.describe('Private landlord claim fee card declined @privateLandlord', () =>
     await continueOn(page);
     await completeAboutYou(page);
     await completeDefendants(page);
-    await completeTenancyGroundsAndNotice(page);
+    await completeTenancyAndGrounds(page);
+    await completeNotice(page);
     await completeRentArrearsWithLedger(page);
     await completeCircumstances(page);
-    await completeOtherInformation(page);
+    await completeUploadDocuments(page);
+    await answerFinalQuestions(page);
     await submitClaim(page);
     await declineClaimFeeCard(page);
   });

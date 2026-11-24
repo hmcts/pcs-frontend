@@ -193,7 +193,6 @@ export interface CitizenPossessionClaim {
     noNoticeReason?: string;
     noticeType?: NoticeType;
     noticeTypeOther?: string;
-    noticeDate?: string;
     noticeMethods?: NoticeMethod[];
     postedDate?: string;
     deliveredDate?: string;
@@ -227,9 +226,6 @@ export interface CitizenPossessionClaim {
   circumstances?: {
     defendantCircumstances?: string;
     claimantCircumstances?: string;
-    underlesseeExists?: YesNo;
-    underlesseeName?: string;
-    underlesseeAddress?: CcdCaseAddress;
   };
   otherInformation?: {
     otherDocuments?: ClaimDocuments;

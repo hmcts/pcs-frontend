@@ -110,19 +110,18 @@
   },
   "taskList": {
     "groups": {
-      "beforeYouStart": "cyBefore you start",
       "yourClaim": "cyYour claim",
-      "otherInformation": "cyOther information",
+      "provideEvidence": "cyProvide evidence",
       "reviewAndSubmit": "cyReview and submit"
     },
     "sections": {
-      "eligibility": "cyCheck you’re eligible to use this service",
       "aboutYou": "cyAbout you and your contact preferences",
       "defendants": "cyAbout the defendants",
-      "tenancyGroundsAndNotice": "cyAbout the tenancy, your grounds and notice served",
+      "tenancyAndGrounds": "cyAbout the tenancy and your grounds for possession",
+      "notice": "cyAbout the notice you served",
       "rentArrears": "cyProof of rent arrears",
       "circumstances": "cyCircumstances",
-      "otherInformation": "cyUpload files and other information",
+      "uploadDocuments": "cyUpload documents",
       "checkAndSubmit": "cyCheck your answers and submit"
     },
     "status": {
@@ -174,7 +173,6 @@
       "propertyAddress": "cyAddress of the property",
       "noticeServed": "cyHave you served notice?",
       "noticeType": "cyType of notice",
-      "noticeDate": "cyWhen the notice was served",
       "noticeMethods": "cyHow the notice was served",
       "noticeAvailable": "cyCan you upload a copy of the notice?",
       "noticeDocuments": "cyNotice",
@@ -189,9 +187,6 @@
       "recoverySteps": "cySteps taken to recover the arrears",
       "defendantCircumstances": "cyThe defendants’ circumstances",
       "claimantCircumstances": "cyYour circumstances",
-      "underlesseeExists": "cyIs there a sub-tenant or mortgage lender?",
-      "underlesseeName": "cySub-tenant or mortgage lender’s name",
-      "underlesseeAddress": "cySub-tenant or mortgage lender’s address",
       "otherDocuments": "cyOther files",
       "hasOtherReasons": "cyOther information about your reasons for possession",
       "generalApplicationIntent": "cyDo you need to make a general application before a hearing is scheduled?",
@@ -226,8 +221,7 @@
     "change": "cyChange",
     "addPayment": "cyAdd a payment",
     "paymentFor": "cypayment for rent due on",
-    "additionalPayment": "cyAdditional payment",
-    "remove": "cyRemove"
+    "additionalPayment": "cyAdditional payment"
   },
   "submitErrors": {
     "required": "cyAnswer the question on ‘{{page}}’",
@@ -256,17 +250,14 @@
       "rent-frequency": "cyHow often should the rent be paid?",
       "recovery-steps": "cyWhat steps have you already taken to recover the arrears?",
       "ledger-transaction": "cyEnter a rent statement transaction",
-      "underlessee-address": "cyWhat is the sub-tenant or mortgage lender’s postal address?",
       "ground-reason": "cyWhy are you making a claim on this ground?",
       "current-arrears": "cyWhat are the rent arrears today?",
       "notice-served": "cyHave you served notice?",
       "notice-type": "cyWhich type of notice did you serve?",
-      "notice-date": "cyWhen was the notice served?",
       "notice-available": "cyCan you upload a copy of the notice you served?",
       "notice-method": "cyHow did you serve notice?",
       "defendant-circumstances": "cyThe defendants’ circumstances",
       "claimant-circumstances": "cyYour circumstances",
-      "underlessee-name": "cyWhat is the sub-tenant or mortgage lender’s name?",
       "language-used": "cyWhich language did you use to complete this claim?",
       "other-reasons": "cyOther information about your reasons for possession",
       "check-your-answers": "cyStatement of truth",

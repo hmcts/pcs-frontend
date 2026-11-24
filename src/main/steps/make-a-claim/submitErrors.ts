@@ -39,7 +39,6 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
   [/^rentArrears\.rentHistoryLedger\[\d+\](\.[A-Za-z]+)?$/, 'ledger-transaction'],
   [/^notice\.(noticeServed|noNoticeReason)$/, 'notice-served'],
   [/^notice\.(noticeType|noticeTypeOther)$/, 'notice-type'],
-  [/^notice\.noticeDate$/, 'notice-date'],
   [/^notice\.noticeUnavailableReason$/, 'notice-available'],
   [/^notice\.noticeDocuments(\[\d+\])?$/, 'upload-notice'],
   [
@@ -48,8 +47,6 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
   ],
   [/^circumstances\.defendantCircumstances$/, 'defendant-circumstances'],
   [/^circumstances\.claimantCircumstances$/, 'claimant-circumstances'],
-  [/^circumstances\.underlesseeName$/, 'underlessee-name'],
-  [/^circumstances\.underlesseeAddress(\.[A-Za-z0-9]+)?$/, 'underlessee-address'],
   [/^otherInformation\.languageUsed$/, 'language-used'],
   [/^otherInformation\.otherReasonsDetail$/, 'other-reasons'],
   [/^otherInformation\.otherDocuments(\[\d+\])?$/, 'upload-other-documents'],

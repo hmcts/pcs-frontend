@@ -56,7 +56,6 @@ const ANSWERED_CLAIM = {
   notice: {
     noticeServed: 'YES',
     noticeType: 'NOTICE_SEEKING_POSSESSION',
-    noticeDate: '2026-06-09',
     noticeMethods: ['PERSONALLY_HANDED'],
     handedToName: 'Brad Dolan',
     handedDate: '2026-06-09',
@@ -69,7 +68,7 @@ const ANSWERED_CLAIM = {
     currentArrears: '300000',
     currentArrearsDate: '2026-11-06',
   },
-  circumstances: { defendantCircumstances: '', claimantCircumstances: '', underlesseeExists: 'NO' },
+  circumstances: { defendantCircumstances: '', claimantCircumstances: '' },
   otherInformation: {
     otherDocuments: [],
     hasOtherReasons: 'NO',
@@ -392,13 +391,15 @@ describe('before a claim exists', () => {
 });
 
 describe('the task list', () => {
-  it('shows each section with its status, and the rent arrears section only for a rent arrears claim', async () => {
+  it('groups the tasks as the design does, with the rent arrears task only for a rent arrears claim', async () => {
     app = await bootMakeAClaim();
     givenClaim({ eligibility: ANSWERED_CLAIM.eligibility, grounds: { hasRentArrearsGrounds: 'NO' } });
     const page = text((await app.get(claimPath('task-list'))).text);
-    expect(page).toContain('Check you’re eligible to use this service Done');
-    expect(page).toContain('About you and your contact preferences Available');
-    expect(page).toContain('Check your answers and submit Not available yet');
+    expect(page).not.toContain('Check you’re eligible');
+    expect(page).not.toContain('Other information');
+    expect(page).toMatch(
+      /Your claim.*About you and your contact preferences Available.*About the defendants Available.*About the tenancy and your grounds for possession In progress.*About the notice you served Available.*Circumstances Available.*Provide evidence.*Upload documents Available.*Review and submit.*Check your answers and submit Not available yet/
+    );
     expect(page).not.toContain('Proof of rent arrears');
   });
 
@@ -407,17 +408,41 @@ describe('the task list', () => {
     givenClaim(ANSWERED_CLAIM);
     const page = text((await app.get(claimPath('task-list'))).text);
     expect(page).toContain('Proof of rent arrears In progress');
-    givenClaim({
-      ...ANSWERED_CLAIM,
-      rentArrears: {
-        ...ANSWERED_CLAIM.rentArrears,
-        proofType: 'UPLOAD_STATEMENT',
-        rentStatementDocuments: STATEMENT_DOCUMENTS,
-        moneyJudgmentWanted: 'NO',
-        recoverySteps: '',
-      },
-    });
+    expect(page).toContain('Upload documents Done');
+    givenClaim({ ...COMPLETE_CLAIM, otherInformation: { otherDocuments: [] } });
     expect(text((await app.get(claimPath('task-list'))).text)).toContain('Check your answers and submit Available');
+    givenClaim(COMPLETE_CLAIM);
+    expect(text((await app.get(claimPath('task-list'))).text)).toContain('Check your answers and submit In progress');
+  });
+
+  it('keeps check your answers closed until the documents task is done', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({
+      ...COMPLETE_CLAIM,
+      otherInformation: { ...COMPLETE_CLAIM.otherInformation, otherDocuments: undefined },
+    });
+    expect(text((await app.get(claimPath('task-list'))).text)).toContain(
+      'Check your answers and submit Not available yet'
+    );
+    expect((await app.get(claimPath('check-your-answers'))).location).toBe(claimPath('upload-other-documents'));
+  });
+
+  it('starts the check your answers task with the final questions, and asks one left unanswered first', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ ...COMPLETE_CLAIM, otherInformation: { otherDocuments: [] } });
+    const page = new JSDOM((await app.get(claimPath('task-list'))).text).window.document;
+    const link = [...page.querySelectorAll('a')].find(a => a.textContent?.includes('Check your answers and submit'));
+    expect(link?.getAttribute('href')).toBe(claimPath('other-information'));
+    expect((await app.get(claimPath('check-your-answers'))).location).toBe(claimPath('other-reasons'));
+  });
+
+  it('returns to the task list from the documents task and from the tenancy summary', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(COMPLETE_CLAIM);
+    expect((await app.post(claimPath('upload-other-documents'), { action: 'continue' })).location).toBe(
+      claimPath('task-list')
+    );
+    expect((await app.post(claimPath('tenancy-cya'), { action: 'continue' })).location).toBe(claimPath('task-list'));
   });
 });
 
@@ -997,7 +1022,6 @@ describe('review fixes', () => {
     });
     const pages: [string, Record<string, string | string[]>][] = [
       ['tenancy-start-date', parts('tenancyStartDate')],
-      ['notice-date', parts('noticeDate')],
       [
         'ledger-transaction',
         { ...parts('transactionDate'), transactionTypes: 'RENT_CHARGE', 'transactionTypes.amountCharged': '10' },
@@ -1109,8 +1133,8 @@ describe('build observation fixes', () => {
       ],
     },
   };
-  const removePaymentPath = (row: number, datePaid: string, amountPaid: string) =>
-    `${claimPath('remove-rent-payment')}?row=${row}&datePaid=${datePaid}&amountPaid=${amountPaid}`;
+  const changePaymentPath = (row: number) => `${claimPath('rent-statement-payment')}?row=${row}`;
+  const PAYMENT = { 'datePaid-day': '7', 'datePaid-month': '6', 'datePaid-year': '2026', amountPaid: '70' };
 
   it('prefixes the page title with "Error: " only when the page shows errors', async () => {
     app = await bootMakeAClaim();
@@ -1302,29 +1326,45 @@ describe('build observation fixes', () => {
     expect(history[0].textContent).toContain('transaction 1');
   });
 
-  it('removes a payment from the rent statement after asking, once only', async () => {
+  it('removes a payment from its change page after asking, once only', async () => {
     app = await bootMakeAClaim({ email: 'pl-table-0004@example.test' });
     givenClaim(TABLE_CLAIM);
     const statement = await page(claimPath('rent-statement'));
-    const removeLinks = [...statement.querySelectorAll('a')].filter(link => link.textContent?.startsWith('Remove'));
-    expect(removeLinks.map(link => link.getAttribute('href'))).toEqual([
-      removePaymentPath(0, '2026-06-05', '5000'),
-      removePaymentPath(1, '2026-06-15', '20000'),
-    ]);
-    expect(text((await app.get(removePaymentPath(0, '2026-06-05', '5000'))).text)).toContain(
-      'Are you sure you want to remove the payment of £50.00 made on 5 June 2026?'
-    );
-    expect((await app.post(removePaymentPath(0, '2026-06-05', '5000'), { confirmRemove: 'yes' })).location).toBe(
-      claimPath('rent-statement')
-    );
+    expect([...statement.querySelectorAll('a')].filter(link => link.textContent?.startsWith('Remove'))).toEqual([]);
+    const change = await page(changePaymentPath(0));
+    expect(change.querySelector('h1')?.textContent).toContain('Change a payment');
+    expect(text(change.body.innerHTML)).toContain('Do you want to remove this payment from the rent statement? Yes No');
+    const shown = change.querySelector<HTMLInputElement>('input[name="draftVersion"]')?.value ?? '';
+
+    const unanswered = await app.post(changePaymentPath(0), { ...PAYMENT, draftVersion: shown });
+    expect(unanswered.status).toBe(400);
+    expect(text(unanswered.text)).toContain('Select whether you want to remove this payment from the rent statement');
+
+    const removed = await app.post(changePaymentPath(0), { removePayment: 'yes', draftVersion: shown });
+    expect(removed.location).toBe(claimPath('rent-statement'));
     const rows = storedClaim().rentArrears.rentHistoryTable;
     expect(rows).toHaveLength(2);
     expect(storedClaim().confirmedSections).not.toContain('arrears-cya');
     expect(rows[0].value).toMatchObject({ dateDue: '2026-06-01', datePaid: '2026-06-15', amountPaid: '20000' });
 
-    const repeated = await app.post(removePaymentPath(0, '2026-06-05', '5000'), { confirmRemove: 'yes' });
-    expect(repeated.location).toBe(claimPath('rent-statement'));
-    expect(storedClaim().rentArrears.rentHistoryTable).toHaveLength(2);
+    const repeated = await app.post(changePaymentPath(0), { removePayment: 'yes', draftVersion: shown });
+    expect(repeated.location).toContain(claimPath('check-your-answers'));
+    expect(storedClaim().rentArrears.rentHistoryTable).toEqual(rows);
+  });
+
+  it('changes a payment when the claimant does not remove it, and asks nothing about removing when adding one', async () => {
+    app = await bootMakeAClaim({ email: 'pl-table-0006@example.test' });
+    givenClaim(TABLE_CLAIM);
+    expect((await app.post(changePaymentPath(0), { ...PAYMENT, removePayment: 'no' })).location).toBe(
+      claimPath('rent-statement')
+    );
+    expect(storedClaim().rentArrears.rentHistoryTable[0].value).toMatchObject({
+      datePaid: '2026-06-07',
+      amountPaid: '7000',
+    });
+    const add = await page(`${claimPath('rent-statement-payment')}?period=2026-07-01`);
+    expect(add.querySelector('h1')?.textContent).toContain('Add a payment');
+    expect(add.querySelector('input[name="removePayment"]')).toBeNull();
   });
 
   it('sends a payment page for a period not in the statement back to the statement with an error', async () => {
@@ -1437,6 +1477,7 @@ describe('build observation fixes', () => {
       'datePaid-month': '5',
       'datePaid-year': '2026',
       amountPaid: '50',
+      removePayment: 'no',
     });
     expect(saved.location).toBe(claimPath('rent-statement'));
     expect(storedClaim().rentArrears.rentHistoryTable[0].value).toMatchObject({ datePaid: '2026-05-20' });
@@ -1453,12 +1494,7 @@ describe('build observation fixes', () => {
         ],
       },
     });
-    const statement = await page(claimPath('rent-statement'));
-    const remove = [...statement.querySelectorAll('a')].find(link => link.textContent?.startsWith('Remove'));
-    expect(remove?.getAttribute('href')).toBe(removePaymentPath(0, '', '5000'));
-    expect((await app.post(removePaymentPath(0, '', '5000'), { confirmRemove: 'yes' })).location).toBe(
-      claimPath('rent-statement')
-    );
+    expect((await app.post(changePaymentPath(0), { removePayment: 'yes' })).location).toBe(claimPath('rent-statement'));
     expect(storedClaim().rentArrears.rentHistoryTable[0].value.amountPaid).toBeUndefined();
   });
 
@@ -1510,10 +1546,11 @@ describe('confirming each section on its check your answers page', () => {
     const page = await taskList();
     expect(page).toContain('About you and your contact preferences In progress');
     expect(page).toContain('About the defendants In progress');
-    expect(page).toContain('About the tenancy, your grounds and notice served In progress');
+    expect(page).toContain('About the tenancy and your grounds for possession In progress');
+    expect(page).toContain('About the notice you served In progress');
     expect(page).toContain('Proof of rent arrears In progress');
     expect(page).toContain('Circumstances In progress');
-    expect(page).toContain('Upload files and other information Done');
+    expect(page).toContain('Upload documents Done');
     expect(page).toContain('Check your answers and submit Not available yet');
   });
 
@@ -1523,7 +1560,7 @@ describe('confirming each section on its check your answers page', () => {
     expect((await app.post(claimPath('claimant-cya'), {})).location).toBe(claimPath('task-list'));
     expect(storedClaim().confirmedSections).toEqual(expect.arrayContaining(ALL_SECTION_CYAS));
     expect(await taskList()).toContain('About you and your contact preferences Done');
-    expect(await taskList()).toContain('Check your answers and submit Available');
+    expect(await taskList()).toContain('Check your answers and submit In progress');
 
     const saves = ccd.draftSaves.length;
     await app.post(claimPath('claimant-cya'), {});
@@ -1531,13 +1568,14 @@ describe('confirming each section on its check your answers page', () => {
     expect(storedClaim().confirmedSections.filter((cya: string) => cya === 'claimant-cya')).toHaveLength(1);
   });
 
-  it('needs both the tenancy and the notice summaries confirmed for the tenancy, grounds and notice', async () => {
+  it('confirms the tenancy and the notice as separate tasks, each on its own summary', async () => {
     app = await bootMakeAClaim();
     givenClaim(unconfirmed('tenancy-cya', 'notice-cya'));
     await app.post(claimPath('tenancy-cya'), {});
-    expect(await taskList()).toContain('About the tenancy, your grounds and notice served In progress');
+    expect(await taskList()).toContain('About the tenancy and your grounds for possession Done');
+    expect(await taskList()).toContain('About the notice you served In progress');
     await app.post(claimPath('notice-cya'), {});
-    expect(await taskList()).toContain('About the tenancy, your grounds and notice served Done');
+    expect(await taskList()).toContain('About the notice you served Done');
   });
 
   it('does not confirm a summary on Save for later', async () => {

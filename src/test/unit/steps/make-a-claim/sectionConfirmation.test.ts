@@ -29,8 +29,8 @@ describe('cyaShowing', () => {
     ['rent-amount', 'arrears-cya'],
     ['ledger-transaction', 'arrears-cya'],
     ['remove-ledger-entry', 'arrears-cya'],
-    ['remove-rent-payment', 'arrears-cya'],
-    ['underlessee-address', 'situation-cya'],
+    ['rent-statement-payment', 'arrears-cya'],
+    ['claimant-circumstances', 'situation-cya'],
     ['claimant-cya', 'claimant-cya'],
   ])('puts %s on %s', (stepName, cya) => {
     expect(cyaShowing(stepName)).toBe(cya);
@@ -96,26 +96,23 @@ describe('confirmationsAfterSave', () => {
 });
 
 describe('makeAClaimSectionConfirmation', () => {
-  it('has summaries for every section but eligibility, other information and check and submit', () => {
+  it('has summaries for every section but upload documents and check and submit', () => {
     expect(makeAClaimSections.filter(makeAClaimSectionConfirmation.hasCya).map(({ id }) => id)).toEqual([
       'aboutYou',
       'defendants',
-      'tenancyGroundsAndNotice',
+      'tenancyAndGrounds',
+      'notice',
       'rentArrears',
       'circumstances',
     ]);
     expect(makeAClaimSectionConfirmation.confirmationCompletes).toBe(false);
   });
 
-  it('confirms the tenancy, grounds and notice only once both its summaries are confirmed', () => {
-    const tenancy = section('tenancyGroundsAndNotice');
+  it('confirms the tenancy and the notice separately, each on its own summary', () => {
     const tenancyOnly = requestFor({ confirmedSections: ['tenancy-cya'] });
-    expect(makeAClaimSectionConfirmation.isConfirmed(tenancy, tenancyOnly)).toBe(false);
-    expect(unconfirmedCya(tenancy, tenancyOnly)).toBe('notice-cya');
-
-    const both = requestFor({ confirmedSections: ['notice-cya', 'tenancy-cya'] });
-    expect(makeAClaimSectionConfirmation.isConfirmed(tenancy, both)).toBe(true);
-    expect(unconfirmedCya(tenancy, both)).toBeUndefined();
+    expect(makeAClaimSectionConfirmation.isConfirmed(section('tenancyAndGrounds'), tenancyOnly)).toBe(true);
+    expect(makeAClaimSectionConfirmation.isConfirmed(section('notice'), tenancyOnly)).toBe(false);
+    expect(unconfirmedCya(section('notice'), tenancyOnly)).toBe('notice-cya');
   });
 
   it('confirms nothing for a claim without confirmations', () => {

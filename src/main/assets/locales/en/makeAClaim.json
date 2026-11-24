@@ -110,19 +110,18 @@
   },
   "taskList": {
     "groups": {
-      "beforeYouStart": "Before you start",
       "yourClaim": "Your claim",
-      "otherInformation": "Other information",
+      "provideEvidence": "Provide evidence",
       "reviewAndSubmit": "Review and submit"
     },
     "sections": {
-      "eligibility": "Check you’re eligible to use this service",
       "aboutYou": "About you and your contact preferences",
       "defendants": "About the defendants",
-      "tenancyGroundsAndNotice": "About the tenancy, your grounds and notice served",
+      "tenancyAndGrounds": "About the tenancy and your grounds for possession",
+      "notice": "About the notice you served",
       "rentArrears": "Proof of rent arrears",
       "circumstances": "Circumstances",
-      "otherInformation": "Upload files and other information",
+      "uploadDocuments": "Upload documents",
       "checkAndSubmit": "Check your answers and submit"
     },
     "status": {
@@ -174,7 +173,6 @@
       "propertyAddress": "Address of the property",
       "noticeServed": "Have you served notice?",
       "noticeType": "Type of notice",
-      "noticeDate": "When the notice was served",
       "noticeMethods": "How the notice was served",
       "noticeAvailable": "Can you upload a copy of the notice?",
       "noticeDocuments": "Notice",
@@ -189,9 +187,6 @@
       "recoverySteps": "Steps taken to recover the arrears",
       "defendantCircumstances": "The defendants’ circumstances",
       "claimantCircumstances": "Your circumstances",
-      "underlesseeExists": "Is there a sub-tenant or mortgage lender?",
-      "underlesseeName": "Sub-tenant or mortgage lender’s name",
-      "underlesseeAddress": "Sub-tenant or mortgage lender’s address",
       "otherDocuments": "Other files",
       "hasOtherReasons": "Other information about your reasons for possession",
       "generalApplicationIntent": "Do you need to make a general application before a hearing is scheduled?",
@@ -226,8 +221,7 @@
     "change": "Change",
     "addPayment": "Add a payment",
     "paymentFor": "payment for rent due on",
-    "additionalPayment": "Additional payment",
-    "remove": "Remove"
+    "additionalPayment": "Additional payment"
   },
   "submitErrors": {
     "required": "Answer the question on ‘{{page}}’",
@@ -256,17 +250,14 @@
       "rent-frequency": "How often should the rent be paid?",
       "recovery-steps": "What steps have you already taken to recover the arrears?",
       "ledger-transaction": "Enter a rent statement transaction",
-      "underlessee-address": "What is the sub-tenant or mortgage lender’s postal address?",
       "ground-reason": "Why are you making a claim on this ground?",
       "current-arrears": "What are the rent arrears today?",
       "notice-served": "Have you served notice?",
       "notice-type": "Which type of notice did you serve?",
-      "notice-date": "When was the notice served?",
       "notice-available": "Can you upload a copy of the notice you served?",
       "notice-method": "How did you serve notice?",
       "defendant-circumstances": "The defendants’ circumstances",
       "claimant-circumstances": "Your circumstances",
-      "underlessee-name": "What is the sub-tenant or mortgage lender’s name?",
       "language-used": "Which language did you use to complete this claim?",
       "other-reasons": "Other information about your reasons for possession",
       "check-your-answers": "Statement of truth",

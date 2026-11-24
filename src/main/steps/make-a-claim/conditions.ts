@@ -56,8 +56,6 @@ export const canUseTable = (req: Request): boolean => {
   return frequency !== undefined && TABLE_FREQUENCIES.includes(frequency);
 };
 
-export const hasUnderlessee = (req: Request): boolean => readClaim(req).circumstances?.underlesseeExists === 'YES';
-
 /** The ways of proving the arrears this claimant is offered: the rent history design's own, and upload. */
 export function offeredProofTypes(req: Request): ProofType[] {
   if (designOf(req) === 'table') {

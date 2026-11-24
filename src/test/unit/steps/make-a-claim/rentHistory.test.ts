@@ -8,7 +8,6 @@ import {
   removeRentTablePayment,
   rentPeriodsWithinLimit,
   rentTableWithArrears,
-  rowHoldsPayment,
   statementRangeOf,
 } from '../../../../main/steps/make-a-claim/rentHistory';
 
@@ -306,14 +305,6 @@ describe('exceedsRentPeriodLimit', () => {
     const input = { rentAmount: '10000', rentFrequency: 'WEEKLY' as const, statementStart: '2020-01-01' };
     expect(rentPeriodsWithinLimit({ ...input, statementEnd: '2024-12-24' })).toHaveLength(260);
     expect(rentPeriodsWithinLimit({ ...input, statementEnd: '2024-12-25' })).toBeUndefined();
-  });
-});
-
-describe('rowHoldsPayment', () => {
-  it('takes a payment with no date as the same however the missing date is given', () => {
-    expect(rowHoldsPayment({ amountPaid: '500' }, { datePaid: '', amountPaid: '500' })).toBe(true);
-    expect(rowHoldsPayment({ datePaid: '', amountPaid: '500' }, { amountPaid: '500' })).toBe(true);
-    expect(rowHoldsPayment({ amountPaid: '500' }, { datePaid: '2026-06-01', amountPaid: '500' })).toBe(false);
   });
 });
 
