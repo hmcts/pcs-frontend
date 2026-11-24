@@ -366,4 +366,3 @@ export function judgmentSummary(judgment: MoneyJudgmentAnswer, partyName: (id: s
   const names = (ids: string[]) => ids.map(partyName).join(', ') || 'No one chosen';
   return `${names(judgment.debtors)} to pay ${names(judgment.creditors)} £${formatMoney(total)}`;
 }
-
