@@ -34,6 +34,7 @@ describe('make an order: without a hearing or an application', () => {
 
   it('offers every order type, possession too, without anyone attending', async () => {
     const page = await openPage((await app.get(PAGE)).text);
+    check('order-notice', 'none');
 
     expect(document.querySelector('h1')?.textContent).toBe('Make an order');
     expect(offered('[data-attendance-row]')).toBe(false);
@@ -69,6 +70,7 @@ describe('make an order: without a hearing or an application', () => {
 
   it('transfers enforcement of the possession order to the High Court, whatever else the order is', async () => {
     const page = await openPage((await app.get(PAGE)).text);
+    check('order-notice', 'none');
     // Last on the form, after own initiative or without notice, as the judges seldom need it.
     const headings = [...document.querySelectorAll('h2.govuk-heading-l')].map(heading => heading.textContent?.trim());
     expect(headings.slice(-3)).toEqual(['Own initiative or without notice', 'Enforcement', 'Order preview']);
@@ -115,6 +117,7 @@ describe('make an order: without a hearing or an application', () => {
 
   it("limits the costs of enforcing in the High Court to a bailiff's, only with the transfer", async () => {
     const page = await openPage((await app.get(PAGE)).text);
+    check('order-notice', 'none');
     selectTab('tab-strike-out');
     check('strike-subjects', 'claim');
     check('strike-claim-outcome', 'dismissed');
@@ -141,6 +144,7 @@ describe('make an order: without a hearing or an application', () => {
     await app.close();
     app = await bootApp({ hearing: null, applications: [APPLICATION] });
     const page = await openPage((await app.get(PAGE)).text);
+    check('order-notice', 'none');
     check('transfer-enforcement', 'yes');
     check('transfer-enforcement-court', 'kings-bench');
     const transfer =
@@ -160,6 +164,7 @@ describe('make an order: without a hearing or an application', () => {
 
   it('lists a hearing on notice from a free form order, asking when as an adjournment does', async () => {
     const page = await openPage((await app.get(PAGE)).text);
+    check('order-notice', 'none');
     check('list-on-notice', 'yes');
 
     const incomplete = page.body();

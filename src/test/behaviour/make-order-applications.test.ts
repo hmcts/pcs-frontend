@@ -214,6 +214,7 @@ describe('make an order: deciding applications', () => {
       expect(launch.location).toBe(`${PAGE}?taskId=task-1&genAppId=gen-app-1`);
 
       const page = await openPage((await app.get(launch.location!)).text);
+      check('order-notice', 'none');
       expect(document.querySelector('h1')?.textContent).toBe('Make an order');
       expect(startClientContexts()).toEqual([{ genAppId: 'gen-app-1' }]);
       // Made without a hearing: no one attended.
@@ -248,6 +249,7 @@ describe('make an order: deciding applications', () => {
 
     it('needs a decision on the application the task asked about, and a real one on any other', async () => {
       const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
       const body = page.body('SUBMIT_FOR_REVIEW');
       body.set('app-gen-app-2-decision', 'nonsense');
       const rejected = await app.post(TASK_PAGE, body);
@@ -261,6 +263,7 @@ describe('make an order: deciding applications', () => {
 
     it("takes the applicant's draft order as the application's clauses, before the costs", async () => {
       const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
       check(`${P}-decision`, 'applicant-wording');
       check('costs', 'yes');
       check('costs-choice', 'def-pay-cl-fixed');
@@ -288,6 +291,7 @@ describe('make an order: deciding applications', () => {
         },
       });
       const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
       const requested = control<HTMLElement>(`#${P}-requested`);
       expect(requested.querySelectorAll('ol > li')).toHaveLength(4);
       expect(requested.querySelector('strong')?.textContent).toBe('adjourned');
@@ -315,6 +319,7 @@ describe('make an order: deciding applications', () => {
       await app.close();
       app = await bootApp({ application: { ...ADJOURN, draftOrderWording: null } });
       const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
       expect(document.querySelector(`[name="${P}-decision"][value="applicant-wording"]`)).toBeNull();
       expect(control(`#${P}-explanation`).textContent?.trim()).toBe('I am in hospital that week.');
       check(`${P}-decision`, 'freeform');
@@ -328,6 +333,7 @@ describe('make an order: deciding applications', () => {
 
     it("takes the applicant's wording out when the judge decides otherwise", async () => {
       const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
       check(`${P}-decision`, 'applicant-wording');
       check(`${P}-decision`, 'dismiss');
       expect(ordered(page.documentText())).toEqual([
@@ -340,6 +346,7 @@ describe('make an order: deciding applications', () => {
 
     it('lists the application for a hearing on notice, asking when as an adjournment does', async () => {
       const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
       const listing = control<HTMLElement>('[data-application-reference="GA1"] [data-decision-shows="list"]');
       expect(listing.hidden).toBe(true);
       check(`${P}-decision`, 'list');
@@ -376,6 +383,7 @@ describe('make an order: deciding applications', () => {
 
     it('lists it to be heard at a hearing the case already has, which asks nothing more', async () => {
       const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
       check(`${P}-decision`, 'list');
       const choices = [...document.querySelectorAll<HTMLInputElement>(`input[name="${P}-list-at"]`)];
       // A hearing already held is not one to list it at.
@@ -399,6 +407,7 @@ describe('make an order: deciding applications', () => {
 
     it('lists it at a new hearing without notice to the other parties', async () => {
       const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
       check(`${P}-decision`, 'list');
       check(`${P}-list-without-notice`, 'yes');
       typeDate(`${P}-list-hearing-date-next-list`, '2', '11', '2026');

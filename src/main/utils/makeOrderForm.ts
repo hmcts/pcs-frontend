@@ -535,6 +535,15 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     applications: applications.map(application => applicationModel(application, caseContext.caseReference)),
     upcomingHearings: upcomingHearings(start),
     orderContext: orderContext(start),
+    // As the judges agreed: neither at a hearing or on applications to suspend enforcement, which are ordinarily on
+    // notice; without notice on other applications; otherwise the court's own initiative.
+    orderNoticeDefault: hearing
+      ? 'none'
+      : !applications.length
+        ? 'own-initiative'
+        : applications.every(({ enforcementSuspension }) => enforcementSuspension)
+          ? 'none'
+          : 'without-notice',
     // A date to apply by is a working day, as are the page's quick dates for it.
     ownInitiativeApplyBy: daysFromToday(OWN_INITIATIVE_APPLY_BY_DAYS, DateTime.now(), start.bankHolidays),
     hearingRecords: recording.map(choice => hearingModel(choice, choice === hearing)),

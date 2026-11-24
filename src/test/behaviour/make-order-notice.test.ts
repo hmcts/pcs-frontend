@@ -199,10 +199,9 @@ describe("make an order: made on the court's own initiative or without notice", 
     app = await bootApp({ application: APPLICATION });
     const page = await openPage((await app.get(`${PAGE}?genAppId=gen-app-1`)).text);
 
-    // Deciding an application whose applicant asked for it without notice leaves the statement to the judge.
+    // An order on an application without a hearing starts without notice, which the judge may change.
     check('app-gen-app-1-decision', 'dismiss');
-    expect(control('[name="order-notice"][value="none"]').checked).toBe(true);
-    expect(page.orderText()).not.toContain('set aside');
+    expect(control('[name="order-notice"][value="without-notice"]').checked).toBe(true);
 
     check('order-notice', 'own-initiative');
     const due = futureDate(20);
@@ -279,5 +278,23 @@ describe("make an order: made on the court's own initiative or without notice", 
     expect(notIssued.text).toContain(
       'must be today or in the future. If the date needs to change, you can send a query to the Judge to return the order to them'
     );
+  });
+
+  it('starts with the answer the judges agreed for how the order is made', async () => {
+    const opened = async (options: Parameters<typeof bootApp>[0]): Promise<string> => {
+      app = await bootApp(options);
+      await openPage((await app.get(PAGE)).text);
+      const answer = control('[name="order-notice"]:checked').value;
+      await app.close();
+      return answer;
+    };
+    const suspension = { ...APPLICATION, id: 'gen-app-2', type: 'Suspend enforcement', enforcementSuspension: true };
+
+    expect(await opened({ hearing: null })).toBe('own-initiative');
+    expect(await opened({ hearing: null, applications: [APPLICATION] })).toBe('without-notice');
+    expect(await opened({ hearing: null, applications: [suspension] })).toBe('none');
+    app = await bootApp({ applications: [APPLICATION] });
+    await openPage((await app.get(PAGE)).text);
+    expect(control('[name="order-notice"]:checked').value).toBe('none');
   });
 });

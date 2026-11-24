@@ -23,7 +23,7 @@
 {{ compact.radios("order-notice", {
   legend: "Was this order made on the court's own initiative or without notice?",
   classes: "govuk-radios--small",
-  default: "none",
+  default: orderNoticeDefault,
   items: [
     { value: "own-initiative", text: "Order on court's own initiative", conditional: { html: applyBy("own-initiative-by", ownInitiativeApplyBy) } },
     { value: "without-notice", text: "Order without notice", conditional: { html: applyBy("without-notice-by") } },

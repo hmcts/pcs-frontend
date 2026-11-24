@@ -97,6 +97,7 @@ describe('make an order: choosing when it is made', () => {
     app = await bootApp({ application: APPLICATION, applications: [OTHER_APPLICATION], hearings: [LATER_HEARING] });
     const taskPage = `${PAGE}?genAppId=gen-app-1&taskId=task-9`;
     const page = await openPage((await app.get(taskPage)).text);
+    check('order-notice', 'none');
     expect(control('[name="made-at"][value="without-hearing"]').checked).toBe(true);
     expect(offered('[data-attendance-row]')).toBe(false);
     check('app-gen-app-1-decision', 'freeform');
