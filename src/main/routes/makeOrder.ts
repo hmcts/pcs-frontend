@@ -11,21 +11,19 @@ import {
   applicationsToDecide,
   attendanceParties,
   caseFactsFromForm,
+  chosenHearing,
+  hearingRecord,
   hearingRecordChanged,
-  madeAtChoice,
+  madeAt,
   madeAtModel,
-  madeAtValue,
   orderFormModel,
-  withoutHearingRecord,
+  recordPrefix,
+  withoutHearingRecords,
   withoutUnchosenNoticeDates,
 } from '@utils/makeOrderForm';
+import { type MakeOrderValidationIssue, validateHearingRecord, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
-  AT_HEARING_ORDER_TYPES,
-  type MakeOrderValidationIssue,
-  validateHearingRecord,
-  validateMakeOrder,
-} from '@utils/makeOrderValidation';
-import {
+  type FormData,
   type OrderStart,
   caseHeader,
   confirmationHeader,
@@ -48,32 +46,31 @@ interface StartedOrder {
 
 /**
  * What the page's URL names: an order from the orders tab, the application a task asks the judge to decide, or the
- * hearing the judge's link names.
+ * hearing a new order starts at.
  */
 interface Chosen {
   orderId?: string;
   genAppId?: string;
   hearingId?: string;
-  /** The judge's own choice on the page of the hearing the order is made at, or of none. */
-  madeAt?: { hearingId?: number };
 }
 
 /**
  * Starts the judge's working order, or the order they chose on the case's orders tab: one a
  * caseworker returned to them, which pcs-api starts with the caseworker's query. A new order is
  * made for the hearing the judge's link named, if it named one. A task to decide an application
- * starts the judge's order on that application.
+ * starts the judge's order on that application. pcs-api sends every hearing the order can be made at, so the judge
+ * chooses another on the page without starting it again.
  */
 async function startOrderEvent(
   accessToken: string,
   caseReference: string,
-  { orderId, hearingId, genAppId, madeAt }: Chosen = {}
+  { orderId, hearingId, genAppId }: Chosen = {}
 ): Promise<StartedOrder> {
   const started = await ccdCaseService.startCaseEvent(
     accessToken,
     caseReference,
     MAKE_ORDER_EVENT_ID,
-    orderId || hearingId || genAppId || madeAt ? { orderId, hearingId, genAppId, madeAt } : undefined
+    orderId || hearingId || genAppId ? { orderId, hearingId, genAppId } : undefined
   );
   const payload = started.data.sdkEventPayload;
   if (!payload) {
@@ -87,7 +84,6 @@ async function startOrderEvent(
 /** What the judge sent, shown back with the issues that stopped it; the saved order fills any gaps. */
 interface Submission extends OrderFormSubmission {
   validationIssues: MakeOrderValidationIssue[];
-  hearingVersion?: string;
 }
 
 function pageModel(
@@ -107,7 +103,6 @@ function pageModel(
     order,
     // The page's start, which its submissions reuse so CCD takes a repeated one, e.g. a double click, as the same.
     eventToken,
-    hearingVersion: submission?.hearingVersion ?? String(envelope.hearing?.version ?? ''),
     // The task the judge came from, if a caseworker's query brought them here, which pcs-api closes on resubmission.
     taskId: typeof req.query.taskId === 'string' ? req.query.taskId : '',
     ...orderFormModel(envelope, submission),
@@ -126,167 +121,12 @@ function pageModel(
 
 /**
  * The order the orders tab linked to, or the hearing the judge's link named, which the page's URL keeps for as long
- * as the judge works on the order, with the hearing, or none, the judge chose on the page, if given.
+ * as the judge works on the order.
  */
-function chosen(req: Request, madeAt?: unknown): Chosen {
+function chosen(req: Request): Chosen {
   const named = (name: string): string | undefined =>
     typeof req.query[name] === 'string' ? (req.query[name] as string) : undefined;
-  return {
-    orderId: named('orderId'),
-    hearingId: named('hearingId'),
-    genAppId: named('genAppId'),
-    madeAt: madeAtChoice(madeAt),
-  };
-}
-
-/** What the judge had on the page when they chose to change when the order is made. */
-interface MadeAtChange extends OrderFormSubmission {
-  formData: NonNullable<OrderFormSubmission['formData']>;
-  madeAt?: string;
-  shownMadeAt?: string;
-}
-
-/**
- * Shows the judge's page again with what they sent and why pcs-api refused it, never the saved order in its place:
- * where the first of the given choices pcs-api still starts the order, or else where the order was saved, as when the
- * hearing chosen has since been cancelled. A hearing's facts and notes come back only on the hearing they were
- * written for. The order's id and version stay those the judge worked from, so a change made elsewhere since is
- * refused again rather than overwritten; a page with no order of its own, opened before the judge's draft was saved
- * elsewhere, stays without one, and saves nothing over that draft.
- */
-async function showRefused(
-  req: Request,
-  res: Response,
-  error: CallbackRejectedError,
-  sent: MadeAtChange,
-  tryMadeAt: unknown[]
-): Promise<void> {
-  const accessToken = req.session.user!.accessToken;
-  const caseReference = req.params.caseReference as string;
-  let started: StartedOrder | undefined;
-  for (const madeAt of [...tryMadeAt, undefined]) {
-    try {
-      started = await startOrderEvent(accessToken, caseReference, chosen(req, madeAt));
-      break;
-    } catch (refusal) {
-      if (!(refusal instanceof CallbackRejectedError) || madeAt === undefined) {
-        throw refusal;
-      }
-    }
-  }
-  const { envelope, eventToken } = started!;
-  const factsShown = madeAtValue(envelope.hearing) === sent.shownMadeAt;
-  const { orderId, orderVersion, hearingVersion } = req.body;
-  res.status(error.status).render(
-    'make-order',
-    pageModel(
-      req,
-      {
-        eventToken,
-        envelope: { ...envelope, order: { ...envelope.order, id: orderId, version: Number(orderVersion) } },
-      },
-      {
-        orderType: sent.orderType,
-        formData: factsShown ? sent.formData : withoutHearingRecord(sent.formData),
-        orderDocumentJson: sent.orderDocumentJson,
-        hearingVersion: factsShown ? hearingVersion : undefined,
-        validationIssues: error.reasons.map(message => ({ id: 'make-order-form', message })),
-      }
-    )
-  );
-}
-
-/**
- * Shows the page again for the hearing the judge chose, or for none, with everything they have written so far kept
- * and nothing saved: the order's answers and wording, which then follow the choice. A hearing's facts and notes are
- * that hearing's, so the judge saves or undoes changes to them before choosing another; and possession orders are
- * only made at a hearing.
- */
-async function changeMadeAt(
-  req: Request,
-  res: Response,
-  { madeAt, shownMadeAt, orderType, formData, orderDocumentJson }: MadeAtChange
-): Promise<void> {
-  const accessToken = req.session.user!.accessToken;
-  const caseReference = req.params.caseReference as string;
-  const { eventToken, orderId, orderVersion, hearingVersion } = req.body;
-  const order = (started: StartedOrder) => ({ ...started.envelope.order, id: orderId, version: Number(orderVersion) });
-  const sent = { madeAt, shownMadeAt, orderType, formData, orderDocumentJson };
-  let shown: StartedOrder;
-  try {
-    shown = await startOrderEvent(accessToken, caseReference, chosen(req, shownMadeAt));
-  } catch (error) {
-    if (!(error instanceof CallbackRejectedError)) {
-      throw error;
-    }
-    return showRefused(req, res, error, sent, []);
-  }
-  const submission = { orderType, formData, orderDocumentJson, hearingVersion };
-  const refuse = (message: string) =>
-    res.status(400).render(
-      'make-order',
-      pageModel(
-        req,
-        { eventToken, envelope: { ...shown.envelope, order: order(shown) } },
-        {
-          ...submission,
-          validationIssues: [{ id: 'made-at', message }],
-        }
-      )
-    );
-  const choice = madeAtChoice(madeAt);
-  if (!choice) {
-    return refuse('Select whether the order is made at a hearing');
-  }
-  if (madeAt === madeAtValue(shown.envelope.hearing)) {
-    return res.render(
-      'make-order',
-      pageModel(
-        req,
-        { eventToken, envelope: { ...shown.envelope, order: order(shown) } },
-        {
-          ...submission,
-          validationIssues: [],
-        }
-      )
-    );
-  }
-  if (shown.envelope.hearing && hearingRecordChanged(shown.envelope.hearing, formData)) {
-    return refuse(
-      'Save the order as a draft to keep your changes to the case facts and notes for this hearing, or undo them, ' +
-        'before choosing when the order is made'
-    );
-  }
-  if (choice.hearingId === undefined && orderType && AT_HEARING_ORDER_TYPES.includes(orderType)) {
-    return refuse('Possession orders are only made at a hearing. Choose another type of order first');
-  }
-  let changed: StartedOrder;
-  try {
-    changed = await startOrderEvent(accessToken, caseReference, chosen(req, madeAt));
-  } catch (error) {
-    if (!(error instanceof CallbackRejectedError)) {
-      throw error;
-    }
-    return showRefused(req, res, error, sent, [shownMadeAt]);
-  }
-  // Changed with another button than its own, nothing was saved or sent, which the judge is told.
-  const pressedChange = req.body.action === 'CHANGE_MADE_AT';
-  res.status(pressedChange ? 200 : 400).render(
-    'make-order',
-    // The chosen hearing's facts and notes, never those shown for the last one.
-    pageModel(
-      req,
-      { eventToken, envelope: { ...changed.envelope, order: order(changed) } },
-      {
-        orderType,
-        formData: withoutHearingRecord(formData),
-        orderDocumentJson,
-        validationIssues: pressedChange
-          ? []
-          : [{ id: 'made-at', message: 'You changed when the order is made. Check the order, then save or send it' }],
-      }
-    )
-  );
+  return { orderId: named('orderId'), hearingId: named('hearingId'), genAppId: named('genAppId') };
 }
 
 export default function makeOrderRoutes(app: Application): void {
@@ -317,86 +157,86 @@ export default function makeOrderRoutes(app: Application): void {
       orderVersion,
       // The hearing's record goes to pcs-api apart from the order, so a posted one is never the order's.
       hearing: _hearing,
-      hearingVersion = '',
       orderType,
       orderDocument: encodedDocument,
-      'made-at': madeAt,
-      'shown-made-at': shownMadeAt,
+      'made-at': madeAtPosted,
       ...formData
     } = req.body;
     const orderDocument = decodeOrderDocument(encodedDocument);
 
     try {
-      if (!['SAVE_DRAFT', 'SUBMIT_FOR_REVIEW', 'CHANGE_MADE_AT'].includes(action)) {
+      if (!['SAVE_DRAFT', 'SUBMIT_FOR_REVIEW'].includes(action)) {
         throw new HTTPError('This order action is no longer available. Reload the page and try again', 400);
-      }
-      if (action === 'CHANGE_MADE_AT' || (madeAt !== undefined && madeAt !== shownMadeAt)) {
-        return await changeMadeAt(req, res, {
-          madeAt,
-          shownMadeAt,
-          orderType,
-          formData,
-          orderDocumentJson: orderDocument,
-        });
       }
       // The case comes from a new start rather than the page, which would have to post it as JSON the WAF
       // blocks, and could change it. The event token, order id and version stay the page's: CCD takes a
       // repeated submission as the one already made, and pcs-api refuses the change if the order has moved on.
-      const sent = { madeAt, shownMadeAt, orderType, formData, orderDocumentJson: orderDocument };
-      let started: StartedOrder;
-      try {
-        started = await startOrderEvent(accessToken, caseReference, chosen(req, madeAt));
-      } catch (error) {
-        if (!(error instanceof CallbackRejectedError)) {
-          throw error;
-        }
-        return await showRefused(req, res, error, sent, []);
+      const started = await startOrderEvent(accessToken, caseReference, chosen(req));
+      const hearing = chosenHearing(started.envelope, madeAtPosted);
+      /**
+       * Shows the judge's page again as they sent it, with why it went no further and nothing saved: made where they
+       * chose, with the order's id and version those they worked from, so a change made elsewhere since is refused
+       * again rather than overwritten, and a page with no order of its own stays without one.
+       */
+      const showAgain = (
+        status: number,
+        validationIssues: MakeOrderValidationIssue[],
+        sent: FormData = formData,
+        token: string = eventToken
+      ): void => {
+        const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
+        const envelope = { ...(hearing === undefined ? started.envelope : madeAt(started.envelope, hearing)), order };
+        res
+          .status(status)
+          .render(
+            'make-order',
+            pageModel(
+              req,
+              { eventToken: token, envelope },
+              { orderType, formData: sent, orderDocumentJson: orderDocument, validationIssues }
+            )
+          );
+      };
+      if (hearing === undefined) {
+        // Not a hearing the order can be made at, such as one cancelled since the page opened.
+        return showAgain(400, [
+          { id: 'made-at', message: 'Select a hearing the case has, or that the order is made without one' },
+        ]);
       }
-      const currentHearing = started.envelope.hearing;
-      const hearingChanged = !!currentHearing && hearingRecordChanged(currentHearing, formData);
-      if (hearingChanged && hearingVersion !== String(currentHearing.version ?? '')) {
+      const answers = withoutHearingRecords(formData);
+      const record = hearing ? hearingRecord(formData, hearing) : {};
+      const hearingChanged = !!hearing && hearingRecordChanged(hearing, record);
+      if (hearingChanged && record.version !== String(hearing.version ?? '')) {
         // Reload stale facts rather than silently applying the judge's edits to a newer version, keeping the order
         // as the judge left it.
-        const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
-        return res.status(409).render(
-          'make-order',
-          pageModel(
-            req,
-            { eventToken, envelope: { ...started.envelope, order } },
+        return showAgain(
+          409,
+          [
             {
-              orderType,
-              formData: withoutHearingRecord(formData),
-              orderDocumentJson: orderDocument,
-              validationIssues: [
-                {
-                  id: 'make-order-form',
-                  message: 'The hearing facts or notes have changed. Check the reloaded details before saving again.',
-                },
-              ],
-            }
-          )
+              id: 'make-order-form',
+              message: 'The hearing facts or notes have changed. Check the reloaded details before saving again.',
+            },
+          ],
+          answers
         );
       }
-      // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
-      const validationIssues =
-        action === 'SUBMIT_FOR_REVIEW'
+      // Every save records the hearing's facts and note, so checks them; sending checks the whole order too.
+      const validationIssues = [
+        ...(hearing
+          ? validateHearingRecord(record).map(issue => ({ ...issue, id: `${recordPrefix(hearing)}${issue.id}` }))
+          : []),
+        ...(action === 'SUBMIT_FOR_REVIEW'
           ? validateMakeOrder(
               orderType,
-              formData,
-              currentHearing ? attendanceParties(started.envelope) : [],
-              !currentHearing,
+              answers,
+              hearing ? attendanceParties(started.envelope) : [],
+              !hearing,
               applicationsToDecide(started.envelope)
             )
-          : currentHearing
-            ? validateHearingRecord(formData)
-            : [];
+          : []),
+      ];
       if (validationIssues.length) {
-        // Nothing was submitted, so keep the token and versions the answers were made against.
-        const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
-        const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues, hearingVersion };
-        return res
-          .status(400)
-          .render('make-order', pageModel(req, { eventToken, envelope: { ...started.envelope, order } }, submission));
+        return showAgain(400, validationIssues);
       }
       const request = {
         action,
@@ -404,20 +244,17 @@ export default function makeOrderRoutes(app: Application): void {
           id: orderId || null,
           version: Number(orderVersion),
           orderType,
-          formData: withoutHearingRecord(withoutUnchosenNoticeDates(formData)),
-          applicationDecisions: applicationDecisions(formData),
+          formData: withoutUnchosenNoticeDates(answers),
+          applicationDecisions: applicationDecisions(answers),
           docweaveSnapshot: postedSnapshot(orderDocument),
         },
         taskId: taskId || null,
         // Only send facts and a note when they differ; pcs-api checks the version again when saving.
-        hearing: currentHearing
+        hearing: hearing
           ? {
-              id: currentHearing.id,
-              version: currentHearing.version ?? null,
-              ...(hearingChanged && {
-                caseFacts: caseFactsFromForm(formData),
-                note: formData['hearing-notes'] || null,
-              }),
+              id: hearing.id,
+              version: hearing.version ?? null,
+              ...(hearingChanged && { caseFacts: caseFactsFromForm(record), note: record.notes || null }),
             }
           : null,
       };
@@ -429,9 +266,14 @@ export default function makeOrderRoutes(app: Application): void {
         if (!(error instanceof CallbackRejectedError)) {
           throw error;
         }
-        // pcs-api refused the change, e.g. because the draft was saved or sent for review in another tab, or the
-        // hearing chosen was cancelled: show the judge what they sent, and why.
-        return await showRefused(req, res, error, sent, [madeAt]);
+        // pcs-api refused the change, e.g. because the draft was saved or sent for review in another tab: show the
+        // judge what they sent, and why, to send again with this start's token.
+        return showAgain(
+          error.status,
+          error.reasons.map(message => ({ id: 'make-order-form', message })),
+          formData,
+          started.eventToken
+        );
       }
       if (action === 'SUBMIT_FOR_REVIEW') {
         // Kept on the session so the confirmation survives a refresh, which cannot resubmit the order.

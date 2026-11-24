@@ -38,6 +38,7 @@ interface Envelope {
   };
   caseContext: Record<string, unknown>;
   hearing?: Record<string, unknown> | null;
+  otherHearings?: Record<string, unknown>[];
   taskGenAppId?: string;
   judge: string;
   bankHolidays?: string[];
@@ -68,13 +69,14 @@ const blankCase = (): Envelope => ({
 /**
  * Minimal CCD and pcs-api: hands out the stored envelope and applies posted make order events to it, by pcs-api's
  * rules. The judge has one draft on the case, which every link opens where it was saved, whatever hearing the link
- * names; a link's hearing is only where a new order starts. A change must name that order and the version last
+ * names; a link's hearing is only where a new order starts. Every start comes with the case's other hearings, each
+ * with its facts and notes, for the judge to choose on the page. A change must name that order and the version last
  * handed out, so a page opened before the draft was saved elsewhere starts no second one; and sending
  * the draft leaves the judge's next order a new one.
  */
 let envelope = blankCase();
 
-/** The case's hearings by id, as pcs-api starts an order at the one the judge chooses. */
+/** The case's hearings by id, which have not been cancelled, any of which the judge can choose. */
 let hearings = new Map<number, Record<string, unknown>>();
 
 /** The hearing a new order starts at when the link names none, as the test booted the case. */
@@ -83,6 +85,8 @@ let newOrderHearing: Record<string, unknown> | null | undefined;
 const ALREADY_DRAFTING =
   'You already have a draft order on this case, saved since this page was opened. Nothing on this page was saved. ' +
   'Copy anything you want to keep, then reload the page to open your draft';
+
+const NOT_THE_CASES_HEARING = "The hearing is not one of this case's hearings";
 
 /** The tokens CCD has handed out for starting the make order event, in order. */
 let startTokens: string[] = [];
@@ -137,7 +141,7 @@ export function startWithOrder(order: Partial<Envelope['order']>): void {
   envelope.order = { ...envelope.order, ...order };
 }
 
-/** Cancels one of the case's hearings, which pcs-api then refuses to start an order at. */
+/** Cancels one of the case's hearings, which pcs-api then neither offers nor makes a new order at. */
 export function cancelHearing(id: number): void {
   hearings.delete(id);
 }
@@ -198,24 +202,18 @@ function ccdStub(): Express {
       startRefusal = undefined;
       return res.status(422).json({ callbackErrors: [reason] });
     }
-    // The judge's choice of hearing, or of none, on the page, over the one a saved order is made at; the link's
-    // hearing is only a new order's.
+    // A saved order stays where it is made, even at a hearing cancelled since; the link's hearing is only a new
+    // order's.
     const context = startContexts.at(-1) ?? {};
-    const madeAt = context.madeAt as { hearingId?: number } | undefined;
     const linked = context.hearingId === undefined ? envelope.hearing : hearings.get(Number(context.hearingId));
-    const hearing = madeAt
-      ? madeAt.hearingId === undefined
-        ? null
-        : hearings.get(madeAt.hearingId)
-      : envelope.order.id
-        ? envelope.hearing
-        : linked;
+    const hearing = envelope.order.id ? envelope.hearing : linked;
     if (hearing === undefined) {
-      return res.status(422).json({ callbackErrors: ["The hearing is not one of this case's hearings"] });
+      return res.status(422).json({ callbackErrors: [NOT_THE_CASES_HEARING] });
     }
     const started = {
       ...envelope,
       hearing,
+      otherHearings: [...hearings.values()].filter(other => other.id !== hearing?.id),
       // The application the link names is the one the order must decide, opened new or as the saved draft.
       taskGenAppId: (context.genAppId as string | undefined) ?? envelope.taskGenAppId,
     };
@@ -259,6 +257,10 @@ function ccdStub(): Express {
           'The order has been updated by another user. Reload it and try again';
     if (refused) {
       return res.status(422).json({ callbackErrors: [refused] });
+    }
+    // The order stays at its own hearing, or moves to another the case still has.
+    if (posted.hearing && posted.hearing.id !== envelope.hearing?.id && !hearings.has(posted.hearing.id)) {
+      return res.status(422).json({ callbackErrors: [NOT_THE_CASES_HEARING] });
     }
     orderRequests.push(posted);
     answers.set(req.body.event_token, { id: req.params.id, data: {} });
@@ -545,6 +547,15 @@ export function control<T extends HTMLElement = HTMLInputElement>(selector: stri
     throw new Error(`No control matches ${selector}`);
   }
   return element;
+}
+
+/**
+ * Whether the part of the form the control is in is shown and sent, for where the order is made: the page has every
+ * part, and takes out those the judge's choice of hearing does not ask for.
+ */
+export function offered(selector: string): boolean {
+  const part = control(selector).closest<HTMLFieldSetElement>('fieldset[data-made-at]')!;
+  return !part.hidden && !part.disabled;
 }
 
 export function check(name: string, value: string, checked = true): void {

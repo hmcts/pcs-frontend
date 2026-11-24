@@ -151,6 +151,9 @@ export function formatAddress(address: Record<string, string | undefined> = {}):
     .join(', ');
 }
 
+/** What the page's choice of when the order is made posts for an order made without a hearing. */
+export const WITHOUT_HEARING = 'without-hearing';
+
 /** The date a party may apply by, which an order made on the court's own initiative or without notice gives. */
 export const NOTICE_DATE_PREFIXES: Record<string, string> = {
   'own-initiative': 'own-initiative-by',

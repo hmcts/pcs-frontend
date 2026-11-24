@@ -1,9 +1,9 @@
 import { type DocEditorController, type DocWeaveDocument, createDocEditor } from '@hmcts-cft/docweave';
 
-import { parseMoney, workingDayOnOrAfter } from '../../utils/makeOrderFormat';
+import { WITHOUT_HEARING, parseMoney, workingDayOnOrAfter } from '../../utils/makeOrderFormat';
 import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation';
 
-import { readOrderContext, readOrderData } from './make-order/data';
+import { chosenMadeAt, readOrderContext, readOrderData } from './make-order/data';
 import { wordingAnchors } from './make-order/wording/application';
 import { SAME_TERMS_COSTS } from './make-order/wording/common';
 import { buildOrder } from './make-order/wording/order';
@@ -109,19 +109,44 @@ export function initOptionRows(form: HTMLFormElement): void {
   markChosenRequired();
 }
 
+/** Each hearing's case facts fold away on their own. */
 export function initCaseFactsToggle(form: HTMLFormElement): void {
-  const caseFacts = form.querySelector<HTMLElement>('[data-case-facts]');
-  const toggle = caseFacts?.querySelector<HTMLButtonElement>('[data-case-facts-toggle]');
-  const content = document.getElementById(toggle?.getAttribute('aria-controls') ?? '');
-  if (!caseFacts || !toggle || !content) {
-    return;
-  }
-  toggle.addEventListener('click', () => {
-    const collapse = toggle.getAttribute('aria-expanded') === 'true';
-    toggle.setAttribute('aria-expanded', String(!collapse));
-    toggle.textContent = collapse ? 'Show case facts' : 'Hide case facts';
-    content.hidden = collapse;
-    caseFacts.classList.toggle('pcs-case-facts--collapsed', collapse);
+  form.querySelectorAll<HTMLElement>('[data-case-facts]').forEach(caseFacts => {
+    const toggle = caseFacts.querySelector<HTMLButtonElement>('[data-case-facts-toggle]')!;
+    const content = document.getElementById(toggle.getAttribute('aria-controls')!)!;
+    toggle.addEventListener('click', () => {
+      const collapse = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!collapse));
+      toggle.textContent = collapse ? 'Show case facts' : 'Hide case facts';
+      content.hidden = collapse;
+      caseFacts.classList.toggle('pcs-case-facts--collapsed', collapse);
+    });
+  });
+}
+
+/**
+ * Shows the parts of the form the judge's choice of when the order is made asks for, and takes the rest out of it,
+ * so what the form sends and the order says are only that choice's. A part is marked with whose it is: a hearing's
+ * id, "hearing" for any hearing, "without-hearing", or "not-" and a hearing's id for every choice but that hearing.
+ */
+export function showMadeAt(form: HTMLFormElement): void {
+  const madeAt = chosenMadeAt(form);
+  form.querySelectorAll<HTMLFieldSetElement | HTMLInputElement>('[data-made-at]').forEach(part => {
+    const whose = part.dataset.madeAt!;
+    const shown =
+      whose === madeAt ||
+      (whose === 'hearing' && madeAt !== WITHOUT_HEARING) ||
+      (whose.startsWith('not-') && whose !== `not-${madeAt}`);
+    part.disabled = !shown;
+    if (part instanceof HTMLFieldSetElement) {
+      part.hidden = !shown;
+      return;
+    }
+    // One answer to a question, which goes back to the question's first when the choice takes it away.
+    part.closest<HTMLElement>('.govuk-radios__item')!.hidden = !shown;
+    if (!shown && part.checked) {
+      form.querySelector<HTMLInputElement>(`input[name="${part.name}"]:not([data-made-at])`)!.click();
+    }
   });
 }
 
@@ -129,7 +154,12 @@ export function initCaseFactsToggle(form: HTMLFormElement): void {
  * Fills targets with a value worked out from the case facts, while each target is empty or still
  * holds the value last filled in, so the judge's own figure is never overwritten.
  */
-function fillFromCaseFacts(form: HTMLFormElement, sources: string[], targets: string[], derive: () => string): void {
+function fillFromCaseFacts(
+  form: HTMLFormElement,
+  sources: () => string[],
+  targets: string[],
+  derive: () => string
+): void {
   let filled = '';
   const fill = (): void => {
     const next = derive();
@@ -142,7 +172,8 @@ function fillFromCaseFacts(form: HTMLFormElement, sources: string[], targets: st
     filled = next;
   };
   form.addEventListener('input', event => {
-    if (sources.includes((event.target as HTMLInputElement).name)) {
+    // The facts are the chosen hearing's, so another choice of hearing changes them too.
+    if ([...sources(), 'made-at'].includes((event.target as HTMLInputElement).name)) {
       fill();
     }
   });
@@ -152,12 +183,18 @@ function fillFromCaseFacts(form: HTMLFormElement, sources: string[], targets: st
 const DAYS_PER_RENT_PERIOD: Record<string, number> = { WEEKLY: 7, FORTNIGHTLY: 14, MONTHLY: 365 / 12 };
 
 export function initCaseFactDefaults(form: HTMLFormElement): void {
+  // A fact of the hearing the order is made at; an order made without one has none.
+  const fact = (name: string): string => `hearing-${chosenMadeAt(form)}-${name}`;
+  const facts =
+    (...names: string[]) =>
+    (): string[] =>
+      names.map(fact);
   const field = (name: string): string =>
-    form.querySelector<HTMLInputElement | HTMLSelectElement>(`[name="${name}"]`)?.value.trim() ?? '';
-  fillFromCaseFacts(form, ['arrears-today'], ['outright-mj-arrears', 'suspended-arrears'], () =>
+    form.querySelector<HTMLInputElement | HTMLSelectElement>(`[name="${fact(name)}"]`)?.value.trim() ?? '';
+  fillFromCaseFacts(form, facts('arrears-today'), ['outright-mj-arrears', 'suspended-arrears'], () =>
     field('arrears-today')
   );
-  fillFromCaseFacts(form, ['current-rent', 'rent-frequency'], ['outright-use-occupation-rate'], () => {
+  fillFromCaseFacts(form, facts('current-rent', 'rent-frequency'), ['outright-use-occupation-rate'], () => {
     const rent = parseMoney(field('current-rent'));
     const days = DAYS_PER_RENT_PERIOD[field('rent-frequency')];
     return rent === undefined || !days ? '' : (rent / days).toFixed(2);
@@ -251,6 +288,8 @@ export function initMakeOrder(): void {
   if (!form) {
     return;
   }
+  // First, so everything after it reads the form as the choice of when the order is made leaves it.
+  showMadeAt(form);
   initDatePills(form);
   initOptionRows(form);
   initCaseFactsToggle(form);
@@ -334,38 +373,55 @@ export function initMakeOrder(): void {
       }
     });
   });
+  // Possession orders are only made at a hearing. GOV.UK tabs step through their list with the arrow keys, so
+  // without one their tabs are taken out of it, and an order on one of them becomes a free form order.
+  const tabList = form.querySelector<HTMLElement>('.govuk-tabs__list')!;
+  const hearingTabs = tabs.filter(tab => tab.dataset.atHearingOnly !== undefined);
+  const hearingTabItems = hearingTabs.map(tab => tab.parentElement!);
+  const offerHearingTabs = (): void => {
+    if (chosenMadeAt(form) !== WITHOUT_HEARING) {
+      tabList.prepend(...hearingTabItems);
+      return;
+    }
+    if (hearingTabs.some(tab => tab.dataset.orderType === openTabType())) {
+      tabs.find(tab => tab.dataset.orderType === 'FREE_FORM')!.click();
+      if (orderingOnClaim()) {
+        selectOrderType('FREE_FORM');
+      }
+    }
+    hearingTabItems.forEach(item => item.remove());
+  };
+  form.addEventListener('change', event => {
+    if ((event.target as HTMLInputElement).name === 'made-at') {
+      showMadeAt(form);
+      offerHearingTabs();
+    }
+  });
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   form.addEventListener('submit', followTab);
+  // Keep JSON in the editor field; encode only the outgoing value.
   form.addEventListener('formdata', ({ formData }) => {
-    // A radio change submits without a submit button. Give that submission its own action.
-    if (!formData.has('action') && formData.get('made-at') !== formData.get('shown-made-at')) {
-      formData.set('action', 'CHANGE_MADE_AT');
-    }
-    // Keep JSON in the editor field; encode only the outgoing value.
     formData.set(
       'orderDocument',
       new TextEncoder().encode(documentField.value).toBase64({ alphabet: 'base64url', omitPadding: true })
     );
   });
-  form.querySelectorAll<HTMLInputElement>('input[type="radio"][name="made-at"]').forEach(choice => {
-    choice.addEventListener('change', () => form.requestSubmit());
-  });
+  offerHearingTabs();
 
   selectOrderType(orderingOnClaim() ? (tabType() ?? (orderTypeField.value as OrderType)) : 'NO_ORDER_ON_CLAIM');
   initApplicationDecisions(form);
 }
 
 /**
- * Starts GOV.UK's components with the saved order type's tab open. GOV.UK tabs open the tab the
- * fragment names, or else the first, so the fragment names the saved tab while they start and is
- * then taken away again: left in place, the browser would scroll to it once the page loads, past
- * the top of the page or the error summary of a refused submission.
+ * Starts GOV.UK's components with the tab the page marks open: the saved order type's, or the first the order is
+ * offered where it is made. GOV.UK tabs open the tab the fragment names, or else the first, so the fragment names
+ * that tab while they start and is then taken away again: left in place, the browser would scroll to it once the
+ * page loads, past the top of the page or the error summary of a refused submission.
  */
 export function startWithSavedOrderTab(start: () => void): void {
-  const orderType = document.querySelector<HTMLInputElement>('#make-order-form #order-type')?.value;
-  const savedTab = Array.from(document.querySelectorAll<HTMLAnchorElement>('#make-order-form [data-order-type]')).find(
-    tab => tab.dataset.orderType === orderType
+  const savedTab = document.querySelector<HTMLAnchorElement>(
+    '#make-order-form .govuk-tabs__list-item--selected [data-order-type]'
   );
   if (window.location.hash || !savedTab) {
     start();

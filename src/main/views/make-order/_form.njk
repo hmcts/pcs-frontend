@@ -8,6 +8,7 @@
 <input type="hidden" id="order-type" name="orderType" value="{{ draftOrderType }}">
 
 {% import "make-order/_application.njk" as applicationRow with context %}
+{% import "make-order/_case-facts.njk" as caseFacts with context %}
 
 {#
   One screen, whatever the order is for: the hearing's facts and who attended for an order made at a hearing, then
@@ -15,13 +16,17 @@
   claim's order types wait behind a tick box: an application is nearly always decided without the claim being, so
   the judge chooses to order on it.
 #}
-{# Only the judge making an order for a hearing records its facts and note. #}
-{% if hearing.caseFacts %}
-  {% include "make-order/_case-facts.njk" %}
-{% endif %}
-{% if not withoutHearing %}
+{#
+  Only the judge making an order for a hearing records its facts and note, and the page has those of each hearing
+  they can choose. A part of the form marked data-made-at is shown, and sent, only for the choice it names
+  (showMadeAt in make-order.ts).
+#}
+{% for record in hearingRecords %}
+  {{ caseFacts.panel(record) }}
+{% endfor %}
+<fieldset class="govuk-fieldset" data-made-at="hearing" {%- if withoutHearing %} hidden disabled{% endif %}>
   {% include "make-order/_attendance.njk" %}
-{% endif %}
+</fieldset>
 
 <h2 class="govuk-heading-l govuk-!-margin-top-6">Recitals</h2>
 
@@ -60,7 +65,8 @@
 <div data-claim-order {%- if applications | length and draftOrderType == "NO_ORDER_ON_CLAIM" %} hidden{% endif %}>
 {#
   One list drives both the tabs and their panels: what the order does about the claim, which the order types
-  exclude one another over. The judges asked for no possession tabs without a hearing.
+  exclude one another over. The judges asked for no possession tabs without a hearing, which the page's script takes
+  out of the list. The tab marked open is the order's, or the first it is offered.
 #}
 {% set orderTypeTabs = [
   { id: "tab-outright", type: "OUTRIGHT_POSSESSION", label: "Outright possession", template: "make-order/tabs/_outright.njk", atHearingOnly: true },
@@ -69,9 +75,7 @@
   { id: "tab-strike-out", type: "STRIKE_OUT_DISMISSAL", label: "Strike out/dismiss", template: "make-order/tabs/_strike-out.njk" },
   { id: "tab-free-form", type: "FREE_FORM", label: "Free form", template: "make-order/tabs/_free-form.njk" }
 ] %}
-{% if withoutHearing %}
-  {% set orderTypeTabs = orderTypeTabs | rejectattr("atHearingOnly") %}
-{% endif %}
+{% set openOrderType = draftOrderType if draftOrderType != "NO_ORDER_ON_CLAIM" else ("ADJOURNMENT" if withoutHearing else "OUTRIGHT_POSSESSION") %}
 
 {# The macro hardcodes an h2 tab-list heading, so use its markup directly to preserve heading order. #}
 <div class="govuk-tabs" data-module="govuk-tabs">
@@ -79,15 +83,15 @@
 
   <ul class="govuk-tabs__list">
     {% for tab in orderTypeTabs %}
-      <li class="govuk-tabs__list-item {%- if tab.type == draftOrderType %} govuk-tabs__list-item--selected{% endif %}">
-        <a class="govuk-tabs__tab" href="#{{ tab.id }}" data-order-type="{{ tab.type }}">{{ tab.label }}</a>
+      <li class="govuk-tabs__list-item {%- if tab.type == openOrderType %} govuk-tabs__list-item--selected{% endif %}">
+        <a class="govuk-tabs__tab" href="#{{ tab.id }}" data-order-type="{{ tab.type }}" {%- if tab.atHearingOnly %} data-at-hearing-only{% endif %}>{{ tab.label }}</a>
       </li>
     {% endfor %}
   </ul>
 
   {# govuk-frontend expects every panel after the first to start hidden. #}
   {% for tab in orderTypeTabs %}
-    <div class="govuk-tabs__panel {%- if tab.type != draftOrderType %} govuk-tabs__panel--hidden{% endif %}" id="{{ tab.id }}">
+    <div class="govuk-tabs__panel {%- if tab.type != openOrderType %} govuk-tabs__panel--hidden{% endif %}" id="{{ tab.id }}">
       {% include tab.template %}
     </div>
   {% endfor %}
@@ -103,7 +107,7 @@
   possession order to the High Court, whatever else it orders. An order made at a hearing transfers it with outright possession.
   Last on the form, as the judges seldom need it.
 #}
-{% if withoutHearing %}
+<fieldset class="govuk-fieldset" data-made-at="without-hearing" {%- if not withoutHearing %} hidden disabled{% endif %}>
   {% set registryHtml %}
     {{ compact.text("transfer-enforcement-registry", {
       label: "District Registry",
@@ -120,7 +124,7 @@
       { value: "district-registry", text: "A District Registry", conditional: { html: registryHtml } }
     ]
   })) }}
-{% endif %}
+</fieldset>
 
 <section class="govuk-!-margin-top-6" aria-labelledby="order-preview-heading">
   <h2 class="govuk-heading-l" id="order-preview-heading">{{ orderPreviewHeading | default("Order preview") }}</h2>

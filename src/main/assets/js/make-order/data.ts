@@ -1,4 +1,4 @@
-import type { OrderContext } from '../../../utils/makeOrderForm';
+import type { OrderBefore, OrderContext } from '../../../utils/makeOrderForm';
 
 export interface OrderParty {
   id: string;
@@ -38,7 +38,7 @@ export interface OrderData {
   selectedControlIds: Readonly<Record<string, string>>;
   propertyAddress: string;
   /** Before whom, where and when the order says it was made. */
-  before: OrderContext['before'];
+  before: OrderBefore;
   /** An order made without a hearing, which says so instead of who attended. */
   withoutHearing: boolean;
   claimants: readonly OrderParty[];
@@ -51,8 +51,20 @@ export function readOrderContext(form: HTMLFormElement): OrderContext {
   return JSON.parse(form.querySelector('#order-context')!.textContent!);
 }
 
+/**
+ * Where the order is made: the judge's choice on the page, a hearing's id or without one, or where the page opened
+ * it for court staff reviewing it, who choose none.
+ */
+export function chosenMadeAt(form: HTMLFormElement, context: OrderContext = readOrderContext(form)): string {
+  const choice = form.querySelector<HTMLInputElement>(
+    'input[name="made-at"]:checked, input[name="made-at"][type="hidden"]'
+  );
+  return choice?.value ?? context.madeAt;
+}
+
 export function readOrderData(form: HTMLFormElement): OrderData {
   const context = readOrderContext(form);
+  const hearing = context.hearings.find(({ id }) => id === chosenMadeAt(form, context));
 
   const answers: Record<string, string[]> = {};
   new FormData(form).forEach((entry, name) => {
@@ -68,8 +80,9 @@ export function readOrderData(form: HTMLFormElement): OrderData {
     }
   });
 
+  // No one attends an order made without a hearing.
   const attendance: AttendanceEntry[] = [];
-  form.querySelectorAll<HTMLElement>('[data-attendance-row]').forEach((row, rowIndex) => {
+  form.querySelectorAll<HTMLElement>(hearing ? '[data-attendance-row]' : ':not(*)').forEach((row, rowIndex) => {
     const partyKind = row.dataset.partyKind === 'claimant' ? 'claimant' : 'defendant';
     const partyName = row.dataset.partyName;
 
@@ -100,8 +113,8 @@ export function readOrderData(form: HTMLFormElement): OrderData {
     answers,
     selectedControlIds,
     propertyAddress: context.propertyAddress,
-    before: context.before,
-    withoutHearing: context.withoutHearing,
+    before: { ...context.before, date: hearing?.date ?? context.today },
+    withoutHearing: !hearing,
     claimants: context.parties.filter(({ kind }) => kind === 'claimant').map(party),
     defendants: context.parties.filter(({ kind }) => kind === 'defendant').map(party),
     attendance,

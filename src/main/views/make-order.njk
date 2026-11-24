@@ -23,7 +23,6 @@
   <input type="hidden" name="orderId" value="{{ order.id }}">
   <input type="hidden" name="taskId" value="{{ taskId }}">
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
-  <input type="hidden" name="hearingVersion" value="{{ hearingVersion }}">
   {{ csrfProtection(csrfToken) }}
   <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ pageHeading }}</h1>
   <p class="govuk-body govuk-!-margin-bottom-1">
@@ -35,7 +34,7 @@
   </p>
   {% include "make-order/_whole-file.njk" %}
 
-  <input type="hidden" name="shown-made-at" value="{{ madeAt }}">
+  {# The page has every hearing's facts and notes, and shows what the choice asks for as it is made (showMadeAt). #}
   {% if madeAtItems | length > 1 %}
     <h2 class="govuk-heading-l govuk-!-margin-top-6">When the order is made</h2>
     {{ govukRadios({
@@ -48,7 +47,7 @@
       errorMessage: validationErrors["made-at"]
     }) }}
   {% else %}
-    <input type="hidden" name="made-at" value="{{ madeAt }}">
+    <input type="hidden" name="made-at" value="{{ madeAtItems[0].value }}">
   {% endif %}
 
   {% if order.queryFromCaseworker %}

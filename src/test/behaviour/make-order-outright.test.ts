@@ -75,14 +75,14 @@ describe('make an order: outright possession', () => {
     check('outright-options', 'money-judgment');
     check('outright-mj-sections', 'arrears');
     // A keystroke alone fires input, so the preview must follow without a change event.
-    const arrearsToday = control('[name="arrears-today"]');
+    const arrearsToday = control('[name="hearing-1-arrears-today"]');
     arrearsToday.value = '5000';
     arrearsToday.dispatchEvent(new Event('input', { bubbles: true }));
     expect(page.documentText()).toContain('Judgment for the claimant(s) in the sum of £5,000.00.');
     expect(control('[name="suspended-arrears"]').value).toBe('5000');
 
     type('outright-mj-arrears', '4000');
-    type('arrears-today', '6000');
+    type('hearing-1-arrears-today', '6000');
     expect(control('[name="outright-mj-arrears"]').value).toBe('4000');
     expect(control('[name="suspended-arrears"]').value).toBe('6000');
 
@@ -91,7 +91,7 @@ describe('make an order: outright possession', () => {
     body.set('action', 'SAVE_DRAFT');
     expect((await app.post(PAGE, body)).status).toBe(302);
     await openPage((await app.get(PAGE)).text);
-    type('arrears-today', '7000');
+    type('hearing-1-arrears-today', '7000');
     expect(control('[name="outright-mj-arrears"]').value).toBe('4000');
     expect(control('[name="suspended-arrears"]').value).toBe('7000');
   });
@@ -99,14 +99,14 @@ describe('make an order: outright possession', () => {
   it('works out the daily rate for damages from the rent until the judge enters their own', async () => {
     app = await bootApp();
     await openPage((await app.get(PAGE)).text);
-    type('rent-frequency', 'WEEKLY');
-    type('current-rent', '102.50');
+    type('hearing-1-rent-frequency', 'WEEKLY');
+    type('hearing-1-current-rent', '102.50');
     expect(control('[name="outright-use-occupation-rate"]').value).toBe('14.64');
-    type('rent-frequency', 'MONTHLY');
+    type('hearing-1-rent-frequency', 'MONTHLY');
     expect(control('[name="outright-use-occupation-rate"]').value).toBe('3.37');
 
     type('outright-use-occupation-rate', '15');
-    type('current-rent', '900');
+    type('hearing-1-current-rent', '900');
     expect(control('[name="outright-use-occupation-rate"]').value).toBe('15');
   });
 
@@ -163,12 +163,12 @@ describe('make an order: outright possession', () => {
     expect(document.querySelector('h1')?.textContent).toContain('Make an order');
     expect(document.body.textContent).toContain('10 Test Street, Bristol, BS1 1AA');
     expect(document.body.textContent).toContain('Example Housing vs Alex Example');
-    expect(control('[name="current-rent"]').value).toBe('750');
+    expect(control('[name="hearing-1-current-rent"]').value).toBe('750');
     // The judge works out the arrears on issue for themselves, even if pcs-api sends the claim's.
-    expect(control('[name="arrears-issue"]').value).toBe('');
-    expect(control('[name="date-tenancy-day"]').value).toBe('9');
-    expect(control('[name="date-tenancy-month"]').value).toBe('1');
-    expect(control('[name="date-tenancy-year"]').value).toBe('2024');
+    expect(control('[name="hearing-1-arrears-issue"]').value).toBe('');
+    expect(control('[name="hearing-1-date-tenancy-day"]').value).toBe('9');
+    expect(control('[name="hearing-1-date-tenancy-month"]').value).toBe('1');
+    expect(control('[name="hearing-1-date-tenancy-year"]').value).toBe('2024');
 
     check('claimant-claimant-id-attendance', 'solicitor');
     type('claimant-claimant-id-name', 'Sam Solicitor');

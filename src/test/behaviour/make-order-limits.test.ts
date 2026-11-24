@@ -35,7 +35,7 @@ describe('make an order: limits', () => {
     const tooLong = 'a'.repeat(30001);
     expect(
       await errors('tab-free-form', {
-        'hearing-notes': tooLong,
+        'hearing-1-notes': tooLong,
         recitals: 'yes',
         'recitals-text': tooLong,
         'staff-message': 'yes',
@@ -62,7 +62,7 @@ describe('make an order: limits', () => {
     const atTheLimit = `${'a'.repeat(29998)}\r\na`;
     expect(
       await errors('tab-free-form', {
-        'hearing-notes': atTheLimit,
+        'hearing-1-notes': atTheLimit,
         'recitals-text': 'a'.repeat(30001),
         'staff-message-text': 'a'.repeat(30001),
       })
@@ -89,7 +89,7 @@ describe('make an order: limits', () => {
     expect(
       await errors('tab-outright', {
         ...judgment,
-        'current-rent': '1,000,000,000',
+        'hearing-1-current-rent': '1,000,000,000',
         'outright-mj-arrears': '1000000000.00',
         'outright-mj-interest': '0.5',
         'costs-def-pay-cl-fixed-amount': '355',
@@ -98,9 +98,9 @@ describe('make an order: limits', () => {
     expect(
       await errors('tab-outright', {
         ...judgment,
-        'arrears-notice': '-5',
-        'current-rent': '750.001',
-        'arrears-today': '1000000000.01',
+        'hearing-1-arrears-notice': '-5',
+        'hearing-1-current-rent': '750.001',
+        'hearing-1-arrears-today': '1000000000.01',
         'outright-mj-arrears': '2,000,000,000',
         'outright-mj-interest': 'ten pounds',
         'costs-def-pay-cl-fixed-amount': '1000000001',

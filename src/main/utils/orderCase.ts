@@ -108,6 +108,11 @@ export interface OrderStart {
    * is, without its facts and notes, which are the judge's to record.
    */
   hearing?: OrderHearing | null;
+  /**
+   * The case's other hearings a judge can choose to make the order at instead, each with its facts and notes as they
+   * would start an order for it. Court staff reviewing an order choose no hearing, so are sent none.
+   */
+  otherHearings: OrderHearing[];
   /** The application the judge's task asked them to decide, which the order must decide. */
   taskGenAppId?: string | null;
   /**

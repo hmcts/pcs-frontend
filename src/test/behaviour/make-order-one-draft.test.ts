@@ -62,10 +62,9 @@ describe("make an order: the judge's one draft on a case", () => {
     check('order-notice', 'without-notice');
     const due = futureDate(25);
     typeDate('without-notice-by', due.day, due.month, due.year);
-    // The judge writes in the order itself, then says it is made at the hearing.
-    writeInPreview(OWN_WORDING);
+    // The judge says it is made at the hearing, on the page, and writes in the order itself.
     check('made-at', '2');
-    page = await openPage((await app.post(FROM_APPLICATION, page.body('CHANGE_MADE_AT'))).text);
+    writeInPreview(OWN_WORDING);
     expect(submittedOrders()).toEqual([]);
     expect(page.documentText()).toContain(OWN_WORDING);
     expect(page.documentText()).not.toContain('without a hearing');
@@ -79,7 +78,7 @@ describe("make an order: the judge's one draft on a case", () => {
       page = await openPage((await app.get(link)).text);
       expect(madeAt()).toBe('2');
       expect(orderId()).not.toBe('');
-      expect(control('[name="current-rent"]').value).toBe('800');
+      expect(control('[name="hearing-2-current-rent"]').value).toBe('800');
       expect(control('[name="app-gen-app-1-decision"][value="grant"]').checked).toBe(true);
       expect(control('[name="order-notice"][value="without-notice"]').checked).toBe(true);
       expect(control('[name="without-notice-by-day"]').value).toBe(due.day);
@@ -92,7 +91,6 @@ describe("make an order: the judge's one draft on a case", () => {
 
     // Moved to no hearing and back, saving each time, it stays the same draft with the judge's own wording.
     check('made-at', 'without-hearing');
-    page = await openPage((await app.post(PAGE, page.body('CHANGE_MADE_AT'))).text);
     expect(page.documentText()).toContain('without a hearing');
     expect(page.documentText()).toContain(OWN_WORDING);
     expect((await app.post(PAGE, page.body('SAVE_DRAFT'))).status).toBe(302);
@@ -102,7 +100,6 @@ describe("make an order: the judge's one draft on a case", () => {
     page = await openPage((await app.get(FROM_APPLICATION)).text);
     expect(madeAt()).toBe('without-hearing');
     check('made-at', '2');
-    page = await openPage((await app.post(FROM_APPLICATION, page.body('CHANGE_MADE_AT'))).text);
     expect((await app.post(FROM_APPLICATION, page.body('SAVE_DRAFT'))).status).toBe(302);
 
     const saves = submittedOrders() as unknown as Saved[];

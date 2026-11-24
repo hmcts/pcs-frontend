@@ -4,6 +4,7 @@ import {
   bootApp,
   check,
   control,
+  offered,
   openPage,
   recordAttendance,
   selectTab,
@@ -120,10 +121,13 @@ describe('make an order: deciding applications', () => {
 
     it('offers no striking out at a hearing, and refuses it', async () => {
       const page = await openPage((await app.get(PAGE)).text);
-      const offered = [...document.querySelectorAll<HTMLInputElement>(`[name="${P}-decision"]`)].map(
+      const decisions = [...document.querySelectorAll<HTMLInputElement>(`[name="${P}-decision"]:enabled`)].map(
         input => input.value
       );
-      expect(offered).toEqual(['none', 'grant', 'dismiss', 'list', 'other']);
+      expect(decisions).toEqual(['none', 'grant', 'dismiss', 'list', 'other']);
+      expect(
+        control(`[name="${P}-decision"][value="strike-out"]`).closest<HTMLElement>('.govuk-radios__item')!.hidden
+      ).toBe(true);
       recordAttendance();
       const body = page.body('SUBMIT_FOR_REVIEW');
       body.set(`${P}-decision`, 'strike-out');
@@ -207,7 +211,7 @@ describe('make an order: deciding applications', () => {
       expect(document.querySelector('h1')?.textContent).toBe('Make an order');
       expect(startClientContexts()).toEqual([{ genAppId: 'gen-app-1' }]);
       // Made without a hearing: no one attended.
-      expect(document.querySelector('[data-attendance-row]')).toBeNull();
+      expect(offered('[data-attendance-row]')).toBe(false);
       expect(control<HTMLDetailsElement>(`details#${P}-more`).open).toBe(true);
       expect(control<HTMLDetailsElement>('details#app-gen-app-2-more').open).toBe(false);
       expect(document.querySelector(`[name="${P}-decision"]:checked`)).toBeNull();
@@ -476,10 +480,10 @@ describe('make an order: deciding applications', () => {
 
     it('offers no striking out, and refuses it', async () => {
       const page = await openPage((await app.get(WARRANT_PAGE)).text);
-      const offered = [...document.querySelectorAll<HTMLInputElement>(`[name="${W}-decision"]`)].map(
+      const decisions = [...document.querySelectorAll<HTMLInputElement>(`[name="${W}-decision"]`)].map(
         input => input.value
       );
-      expect(offered).toEqual(['none', 'grant', 'dismiss', 'list', 'other']);
+      expect(decisions).toEqual(['none', 'grant', 'dismiss', 'list', 'other']);
       const body = page.body('SUBMIT_FOR_REVIEW');
       body.set(`${W}-decision`, 'strike-out');
       const rejected = await app.post(WARRANT_PAGE, body);

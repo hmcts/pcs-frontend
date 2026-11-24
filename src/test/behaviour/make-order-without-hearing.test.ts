@@ -3,6 +3,7 @@ import {
   type TestApp,
   bootApp,
   check,
+  offered,
   openPage,
   selectTab,
   submittedOrders,
@@ -33,7 +34,7 @@ describe('make an order: without a hearing or an application', () => {
     const page = await openPage((await app.get(PAGE)).text);
 
     expect(document.querySelector('h1')?.textContent).toBe('Make an order');
-    expect(document.querySelector('[data-attendance-row]')).toBeNull();
+    expect(offered('[data-attendance-row]')).toBe(false);
     expect(document.querySelector('[data-application]')).toBeNull();
     expect([...document.querySelectorAll<HTMLElement>('[data-order-type]')].map(tab => tab.dataset.orderType)).toEqual([
       'ADJOURNMENT',
@@ -54,8 +55,8 @@ describe('make an order: without a hearing or an application', () => {
 
   it('refuses a possession order sent without a hearing', async () => {
     const page = await openPage((await app.get(PAGE)).text);
-    expect(document.querySelector('#tab-outright')).toBeNull();
-    expect(document.querySelector('#tab-suspended')).toBeNull();
+    expect(document.querySelector('[href="#tab-outright"]')).toBeNull();
+    expect(document.querySelector('[href="#tab-suspended"]')).toBeNull();
 
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
@@ -159,10 +160,10 @@ describe('make an order: without a hearing or an application', () => {
     app = await bootApp();
     const page = await openPage((await app.get(PAGE)).text);
 
-    expect(document.querySelector('[data-attendance-row]')).not.toBeNull();
-    expect(document.querySelector('input[name="list-on-notice"]')).toBeNull();
-    expect(document.querySelector('input[name="transfer-enforcement"]')).toBeNull();
-    expect(document.querySelector('#tab-outright')).not.toBeNull();
+    expect(offered('[data-attendance-row]')).toBe(true);
+    expect(offered('input[name="list-on-notice"]')).toBe(false);
+    expect(offered('input[name="transfer-enforcement"]')).toBe(false);
+    expect(document.querySelector('[href="#tab-outright"]')).not.toBeNull();
     expect(page.orderText()).not.toContain('considering the papers');
   });
 });

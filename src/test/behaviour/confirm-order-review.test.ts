@@ -410,14 +410,15 @@ describe('confirm order review', () => {
     it('does not go on to issue an order the judge could not have sent', async () => {
       app = await caseworkerReviewing();
       const page = await openReview(app);
-      type('current-rent', 'a lot');
+      check('recitals', 'yes');
+      type('recitals-text', 'x'.repeat(30001));
 
       const refused = await app.post(REVIEW, page.body('ISSUE'));
 
       expect(refused.status).toBe(400);
-      expect(errors(refused.text)).toEqual(['Enter a valid current rent']);
+      expect(errors(refused.text)).toEqual(['Recitals must be 30,000 characters or less']);
       await openPage(refused.text);
-      expect(control('[name="current-rent"]').value).toBe('a lot');
+      expect(control<HTMLTextAreaElement>('[name="recitals-text"]').value).toHaveLength(30001);
     });
 
     it('does not go on to issue an order whose wording the page did not send, as when its script did not load', async () => {

@@ -423,8 +423,8 @@ function validateApplications(
 }
 
 /**
- * The hearing's record: the judge's own figures for the case and their note, which they need not give, but
- * which pcs-api records whenever they save, so are checked on every save.
+ * The hearing's record, by its fields' own names: the judge's own figures for the case and their note, which they
+ * need not give, but which pcs-api records whenever they save, so are checked on every save.
  */
 export function validateHearingRecord(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, add, optionalMoney, optionalDate } = validation(formData);
@@ -453,7 +453,7 @@ export function validateHearingRecord(formData: Record<string, unknown>): MakeOr
   );
   optionalMoney('last-payment', 'Enter a valid last payment');
   optionalMoney('arrears-today', 'Enter valid arrears today');
-  return [...issues, ...validateText(formData, 'hearing-notes', 'Hearing notes')];
+  return [...issues, ...validateText(formData, 'notes', 'Hearing notes')];
 }
 
 /** A long text box the page has whatever the order type: hearing notes, recitals or the staff message. */
@@ -557,7 +557,6 @@ export function validateMakeOrder(
   }
   // In the order the page asks, so the error summary follows the page.
   return [
-    ...validateHearingRecord(formData),
     // No one attended an order made without a hearing, whose parties the caller leaves out.
     ...validateAttendance(formData, parties),
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),

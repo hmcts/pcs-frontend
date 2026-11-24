@@ -45,7 +45,8 @@
       hint: item.hint,
       conditional: item.conditional,
       checked: draftChecked(name, item.value) or (item.value == params.default and not draftValue(name)),
-      attributes: { required: true } if not params.optional
+      disabled: item.disabled,
+      attributes: item.attributes or ({ required: true } if not params.optional)
     }]) %}
   {% endfor %}
   {{ govukRadios({

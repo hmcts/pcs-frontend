@@ -87,8 +87,13 @@
     { value: "grant", text: "Granted" },
     { value: "dismiss", text: "Dismissed" }
   ] %}
-  {% if withoutHearing and not application.enforcementSuspension %}
-    {% set items = items.concat([{ value: "strike-out", text: "Struck out" }]) %}
+  {% if not application.enforcementSuspension %}
+    {% set items = items.concat([{
+      value: "strike-out",
+      text: "Struck out",
+      disabled: not withoutHearing,
+      attributes: { required: true, "data-made-at": "without-hearing" }
+    }]) %}
   {% endif %}
   {% set items = items.concat([
     { value: "list", text: "Listed for a hearing" },
@@ -118,13 +123,18 @@
 
   {#
     Listed at a new hearing, the judge says when and whether the other parties are given notice of it; listed at one of
-    the case's hearings still to come, which already has its parties, the order only says which.
+    the case's hearings still to come, which already has its parties, the order only says which. The hearing the
+    order is made at is not one to list it at, so the page takes that one away.
   #}
   <div data-decision-shows="list" data-application-listing {%- if not draftChecked(name, "list") %} hidden{% endif %}>
     {% if upcomingHearings | length %}
       {% set atItems = [{ value: "new", text: "A new hearing", conditional: { html: newHearing(prefix) } }] %}
       {% for option in upcomingHearings %}
-        {% set atItems = atItems.concat([{ value: option.id, text: "The hearing on " + option.text }]) %}
+        {% set atItems = atItems.concat([{
+          value: option.id,
+          text: "The hearing on " + option.text,
+          attributes: { required: true, "data-made-at": "not-" + option.id }
+        }]) %}
       {% endfor %}
       {{ compact.radios(prefix + "-list-at", {
         legend: "Which hearing?",
