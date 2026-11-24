@@ -44,9 +44,9 @@ function lines(element: Element): string[] {
  * nested in it; their emphasis is not kept.
  */
 export function draftClauses(html: string): DraftClause[] {
-  const template = document.createElement('template');
-  template.innerHTML = html;
-  const blocks = (parent: Element | DocumentFragment): DraftClause[] =>
+  // Parsed into a document of its own, which runs and loads nothing.
+  const { body } = new DOMParser().parseFromString(html, 'text/html');
+  const blocks = (parent: Element): DraftClause[] =>
     [...parent.children].flatMap(element => {
       if (LISTS.has(element.tagName)) {
         return [...element.children].map(item => ({
@@ -56,7 +56,7 @@ export function draftClauses(html: string): DraftClause[] {
       }
       return lines(element).map(text => ({ text, children: [] }));
     });
-  return blocks(template.content);
+  return blocks(body);
 }
 
 /** An open application the order can decide, with what the judge decides about it. */
