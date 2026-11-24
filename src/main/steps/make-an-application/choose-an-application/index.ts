@@ -58,6 +58,12 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
+    noticeText: 'noticeText',
+    noticeTextByPost: 'noticeTextByPost',
+    readTheGuidance: 'noticeTextList.readTheGuidance',
+    fillInTheForm: 'noticeTextList.fillInTheForm',
+    findYourLocalCourt: 'noticeTextList.findYourLocalCourt',
+    sendTheFormToTheCourt: 'noticeTextList.sendTheFormToTheCourt',
   },
   beforeGet: async (req: Request) => {
     if (!getApplicationId(req)) {
@@ -65,11 +71,12 @@ export const step: StepDefinition = createFormStep({
     }
   },
   extendGetContent: async (req: Request, formContent: BuiltFormContent) => {
-    if (!(await isDefendantGeneralApplicationsR2Enabled(req))) {
-      removeSuspendOption(formContent);
+    if (await isDefendantGeneralApplicationsR2Enabled(req)) {
+      return { context: 'r2', showPostOnlyNotice: false };
     }
 
-    return {};
+    removeSuspendOption(formContent);
+    return { showPostOnlyNotice: true };
   },
   beforeRedirect: async (req: Request) => {
     if (
