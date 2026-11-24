@@ -2,6 +2,7 @@ import config from 'config';
 import type { Application, NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
+import { VIEW_DOCUMENTS_ROUTE } from '../constants/caseRoutes';
 import {
   CLAIMANT_DASHBOARD_ROUTE,
   CLAIM_SUBMITTED_ROUTE,
@@ -26,6 +27,7 @@ import { ccdCaseService } from '@services/ccdCaseService';
 import { getPaymentSessionState, persistPaymentSessionState } from '@services/paymentSessionService';
 import { getPaymentOutcome, paymentService } from '@services/pcsApi/paymentService';
 import { formatCaseReferenceForDisplay, sanitiseCaseReference } from '@utils/caseReference';
+import { isClaimantOfCase } from '@utils/claimantClaims';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('makeAClaim');
@@ -241,6 +243,9 @@ function registerSubmittedClaimRoutes(app: Application): void {
       const panelTitle = t(`makeAClaim:claimSubmitted.${SUBMITTED_PANEL_TITLES.get(String(req.query.status)) ?? 'submittedTitle'}`);
       const fee = await claimFeeFor(req, caseReference);
       const paymentReference = req.session.claimFeePayments?.[caseReference];
+      const dashboardUrl = (await isClaimantOfCase(req, caseReference))
+        ? makeAClaimPath(CLAIMANT_DASHBOARD_ROUTE, caseReference)
+        : undefined;
       res.render('make-a-claim/templates/claimSubmitted.njk', {
         ...content,
         pageTitle: panelTitle,
@@ -249,11 +254,11 @@ function registerSubmittedClaimRoutes(app: Application): void {
           ? t('makeAClaim:claimSubmitted.paymentReference', { paymentReference })
           : undefined,
         totalAmount: fee ? formatPence(fee.feeAmountInPence) : undefined,
-        overviewUrl: '/claims',
+        overviewUrl: dashboardUrl ?? '/claims',
         panelText: t('makeAClaim:claimSubmitted.panelText', {
           caseNumber: formatCaseReferenceForDisplay(caseReference),
         }),
-        claimFormUrl: makeAClaimPath(CLAIMANT_DASHBOARD_ROUTE, caseReference),
+        claimFormUrl: dashboardUrl ?? makeAClaimPath(VIEW_DOCUMENTS_ROUTE, caseReference),
         feedbackUrl: 'https://www.smartsurvey.co.uk/s/Poss_feedback/',
       });
     } catch (error) {

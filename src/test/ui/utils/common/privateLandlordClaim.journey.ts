@@ -267,9 +267,14 @@ export async function completeNotice(page: Page): Promise<void> {
   await expectTaskStatus(page, 'About the notice you served', 'Done');
 }
 
+/** The arrears on the notice date and today come before the rent and how often it is due. */
 async function startRentArrears(page: Page): Promise<void> {
   await openTask(page, 'Proof of rent arrears');
   await continueOn(page);
+  await page.getByLabel('How much were the rent arrears on the date you served notice?').fill('3000');
+  await saveAndContinue(page);
+  await page.getByLabel('How much are the rent arrears on today’s date?').fill('2880');
+  await saveAndContinue(page);
   await page.getByLabel('How much is the rent?').fill('1000');
   await saveAndContinue(page);
   await answer(page, 'Monthly');
@@ -277,23 +282,16 @@ async function startRentArrears(page: Page): Promise<void> {
 
 async function finishRentArrears(page: Page): Promise<void> {
   await answer(page, 'Yes');
+  await page.getByLabel('What steps have you already taken to recover any arrears?').fill('Sent two letters');
   await saveAndContinue(page);
   await expect(page.getByRole('heading', { level: 1, name: 'Check your answers' })).toBeVisible();
   await saveAndContinue(page);
   await expectTaskStatus(page, 'Proof of rent arrears', 'Done');
 }
 
-async function enterArrearsAmounts(page: Page): Promise<void> {
-  await page.getByLabel('How much were the rent arrears on the date you served notice?').fill('3000');
-  await saveAndContinue(page);
-  await page.getByLabel('How much are the rent arrears on today’s date?').fill('2880');
-  await saveAndContinue(page);
-}
-
 /** The claimant uploads a rent statement of their own. */
 export async function completeRentArrearsWithUpload(page: Page): Promise<void> {
   await startRentArrears(page);
-  await enterArrearsAmounts(page);
   await answer(page, 'Upload a rent statement that follows the guidelines');
   await performAction('uploadFile', 'NoticeServiceJurisdiction.docx');
   await saveAndContinue(page);
@@ -313,7 +311,6 @@ async function addPayment(page: Page, day: string, amount: string, addAnother: '
 /** The service lays out the rent due each period and the claimant adds the payments made in each. */
 export async function completeRentArrearsWithTable(page: Page): Promise<void> {
   await startRentArrears(page);
-  await enterArrearsAmounts(page);
   await answer(page, 'Create a rent statement');
   await page.getByLabel('Which date of the month is rent due?').fill('1');
   await saveAndContinue(page);
@@ -367,8 +364,13 @@ export async function answerFinalQuestions(page: Page): Promise<void> {
   await continueOn(page);
   await answer(page, 'No');
   await answer(page, 'No');
-  await continueOn(page);
-  await continueOn(page);
+  await page.getByRole('button', { name: 'I do not need any support at this time' }).click();
+  const equality = page.getByRole('heading', { level: 1, name: 'Equality and diversity questions' });
+  const language = page.getByRole('heading', { level: 1, name: 'Which language did you use to complete this claim?' });
+  await expect(equality.or(language)).toBeVisible();
+  if (await equality.isVisible()) {
+    await page.getByRole('button', { name: 'I do not want to answer these questions' }).click();
+  }
   await answer(page, 'English');
 }
 

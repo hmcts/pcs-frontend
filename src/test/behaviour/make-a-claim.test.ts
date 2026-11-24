@@ -1406,6 +1406,64 @@ describe('submitting the claim', () => {
     expect(text(document.body.innerHTML)).toContain('Is there more than one adult in possession of the property? No');
   });
 
+  it('shows the additional claimants and the Wales tenancy answers on the final check your answers page', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({
+      ...COMPLETE_CLAIM,
+      eligibility: { ...COMPLETE_CLAIM.eligibility, legislativeCountry: 'Wales' },
+      claimant: { ...COMPLETE_CLAIM.claimant, multipleClaimants: 'YES' },
+      additionalClaimants: [
+        {
+          id: 'one',
+          value: {
+            individualOrOrganisation: 'INDIVIDUAL',
+            firstName: 'Jo',
+            lastName: 'Smith',
+            address: { AddressLine1: '1 Low Road', PostTown: 'Leeds', PostCode: 'LS1 1AA' },
+            emailAddress: 'jo@example.test',
+            contactByPhone: 'NO',
+            contactByText: 'NO',
+          },
+        },
+      ],
+      tenancy: {
+        occupationContractType: 'STANDARD_CONTRACT',
+        tenancyStartDate: '2022-09-27',
+        tenancyAgreementAvailable: 'NO',
+        noTenancyAgreementReason: 'Lost',
+        hasEnergyPerformanceCertificate: 'NO',
+        noEnergyPerformanceCertificateReason: 'Not issued',
+        hasGasSafetyReport: 'NO',
+        noGasSafetyReportReason: 'No gas supply',
+        hasElectricalInstallationConditionReport: 'NO',
+        noElectricalInstallationConditionReason: 'Not inspected',
+      },
+      grounds: { hasRentArrearsGrounds: 'YES', walesDiscretionaryGrounds: ['RENT_ARREARS_S157'] },
+    });
+    const document = new JSDOM((await app.get(claimPath('check-your-answers'))).text).window.document;
+    expect(
+      [...document.querySelectorAll('.govuk-summary-card__title')].map(title => title.textContent?.trim())
+    ).toEqual([
+      'The property',
+      'About you and your contact preferences',
+      'Additional claimant 1',
+      'About the defendants',
+      'About the tenancy and your grounds for possession',
+      'About the notice you served',
+      'Proof of rent arrears',
+      'Circumstances',
+      'Upload documents',
+      'Other information',
+      'Language used',
+      'Your support',
+      'Equality and diversity questions',
+    ]);
+    const body = text(document.body.innerHTML);
+    expect(body).toContain('What is their name? Jo Smith');
+    expect(body).toMatch(/Can you upload a copy of the energy performance certificate\? No\s*Not issued/);
+    expect(body).toContain('Can you upload a copy of the current gas safety report? No');
+    expect(body).not.toContain('Do you have grounds for possession?');
+  });
 });
 
 describe('review fixes', () => {
@@ -1687,6 +1745,24 @@ describe('review fixes', () => {
       const link = [...page.querySelectorAll('a.govuk-link')].find(a => a.textContent === 'View your claim form');
       expect(link?.getAttribute('href')).toBe(`/case/${CASE_REFERENCE}/claimant-dashboard`);
       expect(text(page.body.innerHTML)).toContain('Your claim form will be ready a few minutes after your payment');
+      const close = [...page.querySelectorAll('a.govuk-button')].find(
+        a => a.textContent?.trim() === 'Close and return to case overview'
+      );
+      expect(close?.getAttribute('href')).toBe(`/case/${CASE_REFERENCE}/claimant-dashboard`);
+    });
+
+    it('returns to the claims list and the case documents when there is no claimant dashboard for the case', async () => {
+      app = await bootMakeAClaim();
+      givenClaim(FEE, 'CASE_ISSUED');
+      ccd.storedCaseIsTheirs = false;
+      const page = new JSDOM((await app.get(`/case/${CASE_REFERENCE}/claim-submitted?status=success`)).text).window
+        .document;
+      const close = [...page.querySelectorAll('a.govuk-button')].find(
+        a => a.textContent?.trim() === 'Close and return to case overview'
+      );
+      expect(close?.getAttribute('href')).toBe('/claims');
+      const link = [...page.querySelectorAll('a.govuk-link')].find(a => a.textContent === 'View your claim form');
+      expect(link?.getAttribute('href')).toBe(`/case/${CASE_REFERENCE}/view-documents`);
     });
 
     it('says the payment is being processed while GOV.UK Pay has not finished it', async () => {
