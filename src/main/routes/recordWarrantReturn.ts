@@ -243,10 +243,19 @@ export default function recordWarrantReturnRoutes(app: Application): void {
       return res.redirect(pageUrl(caseReference, 'warrantReturn'));
     }
 
+    const submittedWarrantReturn: WarrantReturn = {
+      ...warrantReturn,
+      outcomeDate: warrantReturn.outcomeDate
+        ? (DateTime.fromISO(warrantReturn.outcomeDate, { zone: OUTCOME_DATE_ZONE })
+            .toUTC()
+            .toISO({ includeOffset: false }) ?? undefined)
+        : undefined,
+    };
+
     try {
       const accessToken = req.session.user!.accessToken;
       await ccdCaseService.startAndSubmitEvent(accessToken, caseReference, RECORD_WARRANT_RETURN_EVENT_ID, {
-        warrantReturn,
+        warrantReturn: submittedWarrantReturn,
       });
     } catch (error) {
       return refusedXuiEvent(res, next, error, rejected => void showFailedSubmit(req, res, next, rejected));

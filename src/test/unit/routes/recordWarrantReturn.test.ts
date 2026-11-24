@@ -695,7 +695,7 @@ describe('recordWarrantReturnRoutes', () => {
       const { req, res } = await post({ action: 'continue' }, successful);
 
       expect(mockStartAndSubmitEvent).toHaveBeenCalledWith('token', '123', 'ext:recordWarrantReturn', {
-        warrantReturn: successful,
+        warrantReturn: { ...successful, outcomeDate: '2026-07-01T07:05:00.000' },
       });
       expect(req.session.warrantReturn).toEqual({ '456': { returnType: 'INTERIM' } });
       expect(req.session.save).toHaveBeenCalled();
