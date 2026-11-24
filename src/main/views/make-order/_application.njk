@@ -38,8 +38,8 @@
   {% endset %}
 
   {% set rows = [
-    { key: { text: "Submitted by" }, value: { text: application.applicant or "Not known" } },
-    { key: { text: "Submitted on" }, value: { text: application.submittedOnDisplay or "Not known" } }
+    { key: { text: "Submitted by" }, value: { text: application.applicant } },
+    { key: { text: "Submitted on" }, value: { text: application.submittedOnDisplay } }
   ] %}
   {% if application.somethingElseDetails %}
     {% set rows = rows.concat([{ key: { text: "What the application is for" }, value: { text: application.somethingElseDetails } }]) %}
@@ -158,7 +158,7 @@
       {{ application.reference }}: {{ application.type }}{% if application.somethingElseDetails %} – {{ application.somethingElseDetails }}{% endif %}
     </h3>
     <p class="govuk-body-s govuk-!-margin-bottom-2">
-      {{ application.applicant or "Applicant not known" }}{% if application.submittedOnDisplay %}, {{ application.submittedOnDisplay }}{% endif %}
+      {{ application.applicant }}, {{ application.submittedOnDisplay }}
     </p>
     {{ govukDetails({
       summaryText: "Application details and the order asked for",

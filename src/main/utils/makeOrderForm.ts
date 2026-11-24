@@ -68,9 +68,8 @@ export function hearingTime(iso: string): string {
     .replace(/AM|PM/, m => m.toLowerCase());
 }
 
-function displayDate(iso?: string | null): string | undefined {
-  const date = DateTime.fromISO(String(iso ?? ''), { zone: 'Europe/London' });
-  return date.isValid ? date.setLocale('en-GB').toFormat('d MMMM yyyy') : undefined;
+function displayDate(iso: string): string {
+  return DateTime.fromISO(iso, { zone: 'Europe/London' }).setLocale('en-GB').toFormat('d MMMM yyyy');
 }
 
 /** The case bundle as the order pages link it, with when it was last brought up to date. */
@@ -374,8 +373,8 @@ export function orderContext(start: OrderStart): OrderContext {
     parties: attendanceParties(start).map(({ partyId, name, type }) => ({ id: partyId, name, kind: type })),
     applications: applicationsToDecide(start).map(application => ({
       prefix: applicationPrefix(application),
-      applicant: application.applicant || 'the applicant',
-      submittedOn: displayDate(application.submittedOn) ?? '',
+      applicant: application.applicant,
+      submittedOn: displayDate(application.submittedOn),
       enforcementSuspension: application.enforcementSuspension,
     })),
     upcomingHearings: upcomingHearings(start),

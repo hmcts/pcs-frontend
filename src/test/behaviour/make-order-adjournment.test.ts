@@ -28,7 +28,16 @@ describe('make an order: adjournment', () => {
     await app.close();
     app = await bootApp({
       openCounterclaim: true,
-      applications: [{ id: 'gen-app-1', reference: 'GA1', type: 'Adjourn the hearing', documents: [] }],
+      applications: [
+        {
+          id: 'gen-app-1',
+          reference: 'GA1',
+          type: 'Adjourn the hearing',
+          applicant: 'Alex Example (Defendant 1)',
+          submittedOn: '2026-10-01',
+          documents: [],
+        },
+      ],
     });
     const page = await openPage((await app.get(PAGE)).text);
     // With an application open, the claim waits behind a tick box.

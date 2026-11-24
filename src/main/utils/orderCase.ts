@@ -50,8 +50,8 @@ export interface OrderApplication {
   reference: string;
   type: string;
   somethingElseDetails?: string | null;
-  applicant?: string | null;
-  submittedOn?: string | null;
+  applicant: string;
+  submittedOn: string;
   within14Days?: 'YES' | 'NO' | null;
   otherPartiesAgreed?: 'YES' | 'NO' | null;
   withoutNotice?: 'YES' | 'NO' | null;

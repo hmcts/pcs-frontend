@@ -18,7 +18,7 @@ export function decidedApplications(data: OrderData): OrderApplication[] {
  * party by role, numbered only where the case has more than one of that role, and never the GA reference.
  */
 export function describeApplication(data: OrderData, application: OrderApplication): string {
-  const dated = application.submittedOn ? ` dated ${application.submittedOn}` : '';
+  const dated = ` dated ${application.submittedOn}`;
   const role = /\((Claimant|Defendant)(?: (\d+))?\)\s*$/.exec(application.applicant);
   if (!role) {
     return `the application of ${application.applicant}${dated}`;
