@@ -16,6 +16,7 @@ const AWAITING_HEARING_STATES = ['PENDING_CASE_ISSUED', 'CASE_ISSUED'];
 
 const HELP_AND_SUPPORT_LINKS = [
   { key: 'helpWithFees', href: 'https://www.gov.uk/get-help-with-court-fees' },
+  { key: 'mediation', href: 'https://www.gov.uk/guidance/a-guide-to-civil-mediation' },
   {
     key: 'whatToExpectAtAHearing',
     href: 'https://www.gov.uk/guidance/what-to-expect-coming-to-a-court-or-tribunal',

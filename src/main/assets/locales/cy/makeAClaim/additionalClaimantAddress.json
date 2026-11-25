@@ -1,10 +1,6 @@
 {
   "pageTitle": "cyWhat is their postal address?",
   "heading": "cyWhat is their postal address?",
-  "finder": {
-    "label": "cyEnter address details",
-    "hint": "cyEnter a UK postcode"
-  },
   "errors": {
     "additionalClaimant-addressLine1": "cyEnter the first line of their address",
     "additionalClaimant-town": "cyEnter the town or city of their address",

@@ -118,9 +118,12 @@ describe('claimant dashboard', () => {
     expect(page.querySelector('h1')?.textContent?.trim()).toBe('15 Garden Drive, Luton, LU1 1AB');
     expect(page.body.textContent).toContain('Case number: 1777 0276 0001 7761');
     expect(page.body.textContent).toContain('You’ve made a property possession claim');
-    expect(linkNamed(page, 'View the claim form')?.getAttribute('href')).toBe(`/case/${CASE_REFERENCE}/view-documents`);
+    expect(linkNamed(page, 'View the claim')?.getAttribute('href')).toBe(`/case/${CASE_REFERENCE}/view-documents`);
     expect(linkNamed(page, 'View documents')?.getAttribute('href')).toBe(`/case/${CASE_REFERENCE}/view-documents`);
     expect(page.body.textContent).toContain('Contact us for help');
+    expect(linkNamed(page, 'Find out about mediation')?.getAttribute('href')).toBe(
+      'https://www.gov.uk/guidance/a-guide-to-civil-mediation'
+    );
   });
 
   it('never offers the claimant a general application, which the case does not allow them', async () => {

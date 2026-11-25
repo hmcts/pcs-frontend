@@ -137,10 +137,10 @@ export async function completeDefendants(page: Page): Promise<void> {
 export type OtherGroundReasons = { ground: RegExp; heading: string; reason: string }[];
 
 export const GROUND_1A_AND_14: OtherGroundReasons = [
-  { ground: /\(Ground 1A\)$/, heading: 'Sale of dwelling house (Ground 1A)', reason: 'I am selling the property' },
+  { ground: /\(Ground 1A\)$/, heading: 'ground 1A (sale of dwelling house)', reason: 'I am selling the property' },
   {
     ground: /^Antisocial behaviour \(Ground 14\)$/,
-    heading: 'Antisocial behaviour (Ground 14)',
+    heading: 'ground 14 (antisocial behaviour)',
     reason: 'Noise complaints',
   },
 ];
@@ -426,7 +426,7 @@ export async function viewClaimantDashboardAndAccount(page: Page): Promise<void>
   await expect(page).toHaveURL(new RegExp(`/case/${caseReference}/claimant-dashboard$`));
   await expect(page.getByText(`Case number: ${formatCaseReferenceForDisplay(caseReference)}`)).toBeVisible();
   await expect(page.getByText('You’ve made a property possession claim')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'View the claim form' })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'View the claim' })).toHaveAttribute(
     'href',
     `/case/${caseReference}/view-documents`
   );

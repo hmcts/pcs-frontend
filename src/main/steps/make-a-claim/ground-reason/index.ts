@@ -30,6 +30,19 @@ function redirectForUnknownGround(req: Request): string | undefined {
   return returnTo ? withReturnTo(url, returnTo) : url;
 }
 
+const LISTED_GROUND_LABEL = /^(.+) \(Ground ([^)]+)\)$/;
+
+/** A listed ground as "ground 7B (no right to rent)"; a Wales ground keeps its full label. */
+function groundHeadingName(req: Request, ground: string): string {
+  const label = getTranslationFunction(req, ['makeAClaim', 'common'])(`makeAClaim:grounds.${ground}`);
+  const listed = LISTED_GROUND_LABEL.exec(label);
+  if (!listed) {
+    return label;
+  }
+  const name = `${listed[1].charAt(0).toLowerCase()}${listed[1].slice(1)}`;
+  return getTranslationFunction(req)('groundNamed', { number: listed[2], name });
+}
+
 /** One page for each ground that needs a reason, in the order the claimant chose them. */
 export const step: StepDefinition = createMakeAClaimStep({
   stepName: 'ground-reason',
@@ -41,7 +54,7 @@ export const step: StepDefinition = createMakeAClaimStep({
     const ground = groundForReasonOf(req, readClaim(req));
     const position = ground ? grounds.indexOf(ground) : -1;
     return {
-      ground: ground ? getTranslationFunction(req, ['makeAClaim', 'common'])(`makeAClaim:grounds.${ground}`) : '',
+      ground: ground ? groundHeadingName(req, ground) : '',
       ...(position > 0 ? { backUrl: reasonUrl(req, grounds[position - 1]) } : {}),
     };
   },

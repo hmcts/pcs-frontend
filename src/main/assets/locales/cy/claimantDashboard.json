@@ -11,7 +11,7 @@
     "documents": "cyDocuments"
   },
   "tasks": {
-    "viewClaimForm": "cyView the claim form",
+    "viewClaimForm": "cyView the claim",
     "viewDocuments": "cyView documents",
     "payClaimFee": "cyPay the claim fee"
   },
@@ -22,6 +22,7 @@
   "helpAndSupport": "cyHelp and support",
   "links": {
     "helpWithFees": "cyHelp with fees",
+    "mediation": "cyFind out about mediation",
     "whatToExpectAtAHearing": "cyWhat to expect at a hearing",
     "representMyselfAtAHearing": "cyRepresent myself at a hearing",
     "findLegalAdvice": "cyFind legal advice",

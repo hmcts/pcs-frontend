@@ -58,7 +58,7 @@ export function addressContent(
   req: Request,
   prefix: string,
   formContent?: BuiltFormContent,
-  overrides: { enterPostcode?: string; postcodeHint?: string } = {}
+  overrides: { enterPostcode?: string; enterManually?: string } = {}
 ): Record<string, unknown> {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const label = (key: string) => t(`makeAClaim:address.finder.${key}`);
@@ -67,10 +67,10 @@ export function addressContent(
     addressOpen: req.method === 'POST' || holdsAddress(formContent, prefix),
     addressLabels: {
       enterPostcode: overrides.enterPostcode ?? label('enterPostcode'),
-      postcodeHint: overrides.postcodeHint,
+      postcodeHint: label('postcodeHint'),
       findAddress: label('findAddress'),
       selectAddress: label('selectAddress'),
-      enterManually: label('enterManually'),
+      enterManually: overrides.enterManually ?? label('enterManually'),
       lookupPostcodeError: label('lookupPostcodeError'),
       postcodeNotFoundError: label('postcodeNotFoundError'),
       selectAddressError: label('selectAddressError'),

@@ -2,7 +2,6 @@ import { createAdditionalClaimantStep } from '../additionalClaimantStep';
 import { ADDRESS_TEMPLATE, addressContent, addressFields } from '../addressFields';
 import { ADDITIONAL_CLAIMANT_ADDRESS } from '../claimMapping';
 
-import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createAdditionalClaimantStep({
@@ -10,13 +9,7 @@ export const step: StepDefinition = createAdditionalClaimantStep({
   stepDir: __dirname,
   customTemplate: ADDRESS_TEMPLATE,
   fields: addressFields(ADDITIONAL_CLAIMANT_ADDRESS),
-  extendGetContent: (req, formContent) => {
-    const t = getTranslationFunction(req);
-    return addressContent(req, ADDITIONAL_CLAIMANT_ADDRESS, formContent, {
-      enterPostcode: t('finder.label'),
-      postcodeHint: t('finder.hint'),
-    });
-  },
+  extendGetContent: (req, formContent) => addressContent(req, ADDITIONAL_CLAIMANT_ADDRESS, formContent),
   previous: claimant =>
     claimant?.individualOrOrganisation === 'ORGANISATION'
       ? 'additional-claimant-organisation-name'

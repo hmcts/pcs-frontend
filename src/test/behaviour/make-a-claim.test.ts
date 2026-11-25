@@ -1070,8 +1070,11 @@ describe('answering questions', () => {
     it('is required when the claimant does not want calls', async () => {
       app = await bootMakeAClaim();
       givenClaim({ claimant: { contactByPhone: 'NO' } });
-      expect(await page()).toContain('to this number');
-      expect(await page()).not.toContain('if different');
+      const noPhonePage = await page();
+      expect(noPhonePage).toContain('We might also send you updates about your case by text message');
+      expect(noPhonePage).not.toContain('to this number');
+      expect(noPhonePage).not.toContain('to the number you gave');
+      expect(noPhonePage).not.toContain('if different');
 
       const refused = await app.post(claimPath('claimant-text-message'), { contactByText: 'yes' });
       expect(text(refused.text)).toContain('Enter a mobile phone number');
@@ -1456,6 +1459,7 @@ describe('submitting the claim', () => {
 
     const pay = text((await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee`)).text);
     expect(pay).toContain('Claim fee £404.00');
+    expect(pay).not.toContain('Help with fees');
     const start = await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee/start`);
     expect(start.location).toBe('https://card.payments.test/pay/1');
     expect(ccd.cardPayments).toEqual([
@@ -1522,9 +1526,9 @@ describe('submitting the claim', () => {
       'Circumstances',
       'Upload documents',
       'Other information',
-      'Language used',
       'Your support',
       'Equality and diversity questions',
+      'Language used',
     ]);
     expect(text(document.body.innerHTML)).toContain('Is there more than one adult in possession of the property? No');
   });
@@ -1577,9 +1581,9 @@ describe('submitting the claim', () => {
       'Circumstances',
       'Upload documents',
       'Other information',
-      'Language used',
       'Your support',
       'Equality and diversity questions',
+      'Language used',
     ]);
     const body = text(document.body.innerHTML);
     expect(body).toContain('What is their name? Jo Smith');
@@ -1636,6 +1640,122 @@ describe('review fixes', () => {
       'useAccountEmail.emailAddress': 'short@example.test',
     });
     expect(storedClaim().claimant).toMatchObject({ contactByEmail: 'NO', emailAddress: 'short@example.test' });
+  });
+
+  describe('the check your answers rows', () => {
+    const rowsOf = async (path: string): Promise<Map<string, string>> => {
+      const document = new JSDOM((await app.get(path)).text).window.document;
+      return new Map(
+        [...document.querySelectorAll('.govuk-summary-list__row')].map(row => [
+          row.querySelector('.govuk-summary-list__key')?.textContent?.trim() ?? '',
+          row.querySelector('.govuk-summary-list__value')?.innerHTML.replace(/<br>/g, ' | ').trim() ?? '',
+        ])
+      );
+    };
+
+    it('asks the email question as the claimant saw it, and has no row for adding another claimant', async () => {
+      app = await bootMakeAClaim({ email: 'billy.wright@email.com' });
+      givenClaim({
+        ...ANSWERED_CLAIM,
+        claimant: { ...ANSWERED_CLAIM.claimant, contactByEmail: 'YES', emailAddress: 'billy.wright@email.com' },
+      });
+      const rows = await rowsOf(claimPath('claimant-cya'));
+      expect(rows.get('Do you want to receive email updates to billy.wright@email.com?')).toBe('Yes');
+      expect([...rows.keys()].some(label => label.includes('add another claimant'))).toBe(false);
+      expect([...rows.keys()].some(label => label.startsWith('Email address for updates'))).toBe(false);
+    });
+
+    it('shows another email address under No, and the plain question when the account email is too long', async () => {
+      app = await bootMakeAClaim({ email: 'billy.wright@email.com' });
+      givenClaim({
+        ...ANSWERED_CLAIM,
+        claimant: { ...ANSWERED_CLAIM.claimant, contactByEmail: 'NO', emailAddress: 'updates@example.com' },
+      });
+      expect(
+        (await rowsOf(claimPath('claimant-cya'))).get('Do you want to receive email updates to billy.wright@email.com?')
+      ).toBe('No | updates@example.com');
+
+      app = await bootMakeAClaim({ email: `pl-${'x'.repeat(250)}@example.test` });
+      givenClaim({
+        ...ANSWERED_CLAIM,
+        claimant: { ...ANSWERED_CLAIM.claimant, contactByEmail: 'NO', emailAddress: 'updates@example.com' },
+      });
+      expect(
+        (await rowsOf(claimPath('claimant-cya'))).get('What email address do you want updates to be sent to?')
+      ).toBe('updates@example.com');
+    });
+
+    it('lists the uploaded agreement under its question on the tenancy summary, and on a row of its own at the end', async () => {
+      app = await bootMakeAClaim();
+      givenClaim({
+        ...COMPLETE_CLAIM,
+        tenancy: {
+          ...COMPLETE_CLAIM.tenancy,
+          tenancyAgreementAvailable: 'YES',
+          tenancyAgreementDocuments: [
+            { id: 'd1', value: { document_filename: 'agreement.pdf', document_url: 'u', document_binary_url: 'b' } },
+          ],
+        },
+      });
+      const tenancy = await rowsOf(claimPath('tenancy-cya'));
+      expect(tenancy.get('Can you upload a copy of the tenancy or licence agreement?')).toBe('Yes | agreement.pdf');
+      expect(tenancy.has('Upload tenancy or licence agreement')).toBe(false);
+
+      const final = await rowsOf(claimPath('check-your-answers'));
+      expect(final.get('Can you upload a copy of the tenancy or licence agreement?')).toBe('Yes');
+      expect(final.get('Upload tenancy or licence agreement')).toBe('agreement.pdf');
+    });
+
+    it('labels the posted date and the uploaded notice as the design does', async () => {
+      app = await bootMakeAClaim();
+      givenClaim({
+        ...ANSWERED_CLAIM,
+        notice: {
+          ...ANSWERED_CLAIM.notice,
+          noticeMethods: ['FIRST_CLASS_POST'],
+          postedDate: '2026-05-12',
+          noticeAvailable: 'YES',
+          noticeDocuments: [
+            { id: 'n1', value: { document_filename: 'notice.pdf', document_url: 'u', document_binary_url: 'b' } },
+          ],
+        },
+      });
+      const rows = await rowsOf(claimPath('notice-cya'));
+      expect(rows.get('When was the document posted?')).toBe('12 May 2026');
+      expect(rows.get('Upload notice of service')).toBe('notice.pdf');
+    });
+
+    it('words the Remove link of a later defendant as the defendant’s number and name', async () => {
+      app = await bootMakeAClaim();
+      givenClaim({
+        ...COMPLETE_CLAIM,
+        defendants: [
+          ...COMPLETE_CLAIM.defendants,
+          { value: { nameKnown: 'YES', firstName: 'Jo', lastName: 'Bloggs', addressSameAsProperty: 'YES' } },
+        ],
+      });
+      const document = new JSDOM((await app.get(claimPath('defendant-cya'))).text).window.document;
+      const remove = [...document.querySelectorAll('a')].filter(link => link.textContent?.trim().startsWith('Remove'));
+      expect(remove).toHaveLength(1);
+      expect(remove[0].querySelector('.govuk-visually-hidden')?.textContent?.trim()).toContain(
+        'Defendant 2 name Jo Bloggs'
+      );
+    });
+  });
+
+  it('asks for an address with the finder label, hint and manual link the design shows', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
+    await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
+    for (const path of [claimPath('claimant-address'), '/make-a-claim/property-address']) {
+      const body = text((await app.get(path)).text);
+      expect(body).toContain('Enter address details Enter a UK postcode');
+      expect(body).toContain('Enter address manually');
+    }
+    const defendant = text((await app.get(`${claimPath('defendant-address')}?index=0`)).text);
+    expect(defendant).toContain('What is their address for service? Enter a UK postcode');
+    expect(defendant).toContain('Enter an address manually');
   });
 
   it('sends the claimant back to check their answers when the claim changed elsewhere', async () => {
@@ -1773,7 +1893,7 @@ describe('review fixes', () => {
         .location
     ).toBe(`${claimPath('ground-reason')}?nav=1`);
     expect(text((await app.get(claimPath('ground-reason'))).text)).toContain(
-      'Why are you making a claim for possession under Sale of dwelling house (Ground 1A)?'
+      'Why are you making a claim for possession under ground 1A (sale of dwelling house)?'
     );
     expect((await app.post(claimPath('ground-reason'), { groundReason: 'Selling' })).location).toBe(
       `${claimPath('ground-reason')}?ground=GROUND_14`

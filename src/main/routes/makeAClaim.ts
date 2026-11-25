@@ -157,7 +157,6 @@ function registerSubmittedClaimRoutes(app: Application): void {
           'feeHeading',
           'amountHeading',
           'feeName',
-          'redirectText',
           'payButton',
           'problemTitle',
         ],

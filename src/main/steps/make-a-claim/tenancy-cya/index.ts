@@ -15,7 +15,7 @@ export const step: StepDefinition = createMakeAClaimStep({
   extendGetContent: (req, formContent) => {
     const grounds = needsGroundReasons(req) ? groundsNeedingReasons(readClaim(req)) : [];
     return {
-      ...(isRendering(formContent) ? { cards: [tenancyCard(req)] } : {}),
+      ...(isRendering(formContent) ? { cards: [tenancyCard(req, true)] } : {}),
       ...(grounds.length > 0 ? { backUrl: reasonUrl(req, grounds[grounds.length - 1]) } : {}),
     };
   },

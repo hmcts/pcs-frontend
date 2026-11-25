@@ -1,6 +1,10 @@
 {
   "pageTitle": "Defendant’s address for service",
   "question": "Is {{defendantName}}’s address for service {{propertyAddress}}?",
+  "finder": {
+    "label": "What is their address for service?",
+    "enterManually": "Enter an address manually"
+  },
   "theDefendant": "the defendant",
   "hint": "An address for service is where someone will receive court documents about the claim by post. If you’re not sure where a defendant is living, you should provide their last known address.",
   "options": {

@@ -1,6 +1,10 @@
 {
   "pageTitle": "cyDefendant’s address for service",
   "question": "cyIs {{defendantName}}’s address for service {{propertyAddress}}?",
+  "finder": {
+    "label": "cyWhat is their address for service?",
+    "enterManually": "cyEnter an address manually"
+  },
   "theDefendant": "cythe defendant",
   "hint": "cyAn address for service is where someone will receive court documents about the claim by post. If you’re not sure where a defendant is living, you should provide their last known address.",
   "options": {

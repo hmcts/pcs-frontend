@@ -1,7 +1,7 @@
 {
   "pageTitle": "cyAre you claiming possession because you’re owed rent?",
   "question": "cyAre you claiming possession because you’re owed rent?",
-  "hint": "cyThis is known as ‘rent arrears’",
+  "hint": "cyThis is known as ‘rent arrears’.",
   "errors": {
     "hasRentArrearsGrounds": "cySelect whether you’re claiming possession because you’re owed rent"
   }

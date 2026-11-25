@@ -15,6 +15,5 @@
     head: [{ text: feeHeading }, { text: amountHeading, format: 'numeric' }],
     rows: [[{ text: feeName }, { text: feeAmount, format: 'numeric' }]]
   }) }}
-  <p class="govuk-body">{{ redirectText }}</p>
   {{ govukButton({ text: payButton, href: payUrl }) }}
 {% endblock %}

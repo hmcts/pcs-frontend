@@ -11,7 +11,7 @@
     "documents": "Documents"
   },
   "tasks": {
-    "viewClaimForm": "View the claim form",
+    "viewClaimForm": "View the claim",
     "viewDocuments": "View documents",
     "payClaimFee": "Pay the claim fee"
   },
@@ -22,6 +22,7 @@
   "helpAndSupport": "Help and support",
   "links": {
     "helpWithFees": "Help with fees",
+    "mediation": "Find out about mediation",
     "whatToExpectAtAHearing": "What to expect at a hearing",
     "representMyselfAtAHearing": "Represent myself at a hearing",
     "findLegalAdvice": "Find legal advice",

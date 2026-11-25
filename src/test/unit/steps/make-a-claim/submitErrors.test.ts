@@ -48,6 +48,14 @@ describe('submitRefusalOutcome', () => {
     ).toEqual({ codes: ['REQUIRED:defendants[1].address', 'TOO_LONG:claimant.organisationName', 'DRAFT_NOT_FOUND'] });
   });
 
+  it.each(['OTHER_GROUND_NOT_ALLOWED', 'MULTIPLE_CLAIMANTS_NOT_ELIGIBLE'])(
+    'treats %s, which pcs-api no longer sends, as an unexplained refusal',
+    code => {
+      expect(submitRefusalOutcome(refused(code), CASE)).toEqual({ codes: ['failed'] });
+      expect(submitErrorCodes(code)).toEqual([]);
+    }
+  );
+
   it.each([
     ['an unexplained refusal', refused('This service is not available')],
     ['a failure', new HTTPError('CCD down', 502)],

@@ -29,7 +29,10 @@ export const step: StepDefinition = createMakeAClaimStep({
     ...addressFields('defendant', formData => formData.sameAsProperty === 'no'),
   ],
   extendGetContent: (req, formContent) => ({
-    ...addressContent(req, 'defendant', formContent),
+    ...addressContent(req, 'defendant', formContent, {
+      enterPostcode: getTranslationFunction(req)('finder.label'),
+      enterManually: getTranslationFunction(req)('finder.enterManually'),
+    }),
     addressQuestion: 'sameAsProperty',
     defendantName: defendantNameForQuestion(req),
     propertyAddress: formatCcdAddress(propertyAddressOf(req)),

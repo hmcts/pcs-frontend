@@ -5,7 +5,7 @@ import type { TFunction } from 'i18next';
 import { formatCcdAddress, formatCcdAddressLines } from '../utils/ccdAddress';
 
 import { readClaim } from './claimDraft';
-import { propertyAddressOf } from './claimMapping';
+import { accountEmailOf, propertyAddressOf, usableAccountEmailOf } from './claimMapping';
 import { usesTable } from './conditions';
 import { formatClaimDate } from './dates';
 import { flowConfig } from './flow.config';
@@ -19,6 +19,7 @@ import type { CcdCaseAddress } from '@services/ccdCase.interface';
 import {
   type CitizenAdditionalClaimant,
   type CitizenDefendant,
+  type CitizenPossessionClaim,
   type ClaimDocuments,
   NOTICE_METHODS,
   NOTICE_METHOD_DETAILS,
@@ -27,6 +28,9 @@ import {
   groundReasonsOf,
   groundsNeedingReasons,
 } from '@services/citizenPossessionClaim.interface';
+
+type CitizenClaimant = NonNullable<CitizenPossessionClaim['claimant']>;
+type CitizenTenancy = NonNullable<CitizenPossessionClaim['tenancy']>;
 
 export interface SummaryRow {
   key: { text: string };
@@ -114,8 +118,33 @@ function documents(value: ClaimDocuments | undefined): string[] {
   return (value ?? []).map(item => item.value.document_filename);
 }
 
+/** "Yes" with the names of the uploaded files, or "No" with the reason. */
+function agreementValue(t: TFunction, tenancy: CitizenTenancy, withFiles: boolean): string | string[] | undefined {
+  if (withFiles && tenancy.tenancyAgreementAvailable === 'YES') {
+    return [yesNo(t, 'YES') ?? '', ...documents(tenancy.tenancyAgreementDocuments)];
+  }
+  return withDetail(yesNo(t, tenancy.tenancyAgreementAvailable), tenancy.noTenancyAgreementReason);
+}
+
 function money(value: string | undefined): string | undefined {
   return value ? formatPence(value) : undefined;
+}
+
+/** The email question as the claimant saw it: the account email, or the plain question when it was too long to use. */
+function emailLabel(t: TFunction, req: Request): string {
+  const email = usableAccountEmailOf(req);
+  return email
+    ? t('makeAClaim:summary.labels.emailAddress', { accountEmail: email })
+    : t('makeAClaim:summary.labels.emailAddressOther');
+}
+
+function emailValue(t: TFunction, claimant: CitizenClaimant, req: Request): string | string[] | undefined {
+  if (claimant.contactByEmail === 'NO') {
+    return accountEmailOf(req) && !usableAccountEmailOf(req)
+      ? claimant.emailAddress
+      : [yesNo(t, 'NO') ?? '', claimant.emailAddress ?? ''];
+  }
+  return yesNo(t, claimant.contactByEmail);
 }
 
 export function aboutYouCard(req: Request): SummaryCard {
@@ -130,7 +159,7 @@ export function aboutYouCard(req: Request): SummaryCard {
     .add('claimant-name', 'claimantName', [claimant.firstName, claimant.lastName].filter(Boolean).join(' '))
     .add('organisation-name', 'organisationName', claimant.organisationName)
     .add('claimant-address', 'claimantAddress', address(claimant.address))
-    .add('claimant-email', 'emailAddress', claimant.emailAddress)
+    .add('claimant-email', 'emailAddress', emailValue(t, claimant, req), '', emailLabel(t, req))
     .add(
       'claimant-phone',
       'contactByPhone',
@@ -145,7 +174,6 @@ export function aboutYouCard(req: Request): SummaryCard {
         ? [yesNo(t, claimant.contactByText) ?? '', claimant.textMessageNumber]
         : yesNo(t, claimant.contactByText)
     )
-    .add('multiple-claimants', 'multipleClaimants', yesNo(t, claimant.multipleClaimants))
     .build();
   return { id: 'aboutYou', title: t('makeAClaim:summary.cards.aboutYou'), rows };
 }
@@ -262,7 +290,10 @@ export function defendantsCard(req: Request, opensWithAdultsStatement = false): 
       builder.withAction(
         `${getStepUrl('remove-defendant', flowConfig, req.res?.locals.validatedCase?.id)}?${defendant.id ? `id=${defendant.id}` : `index=${index}`}`,
         t('makeAClaim:summary.remove'),
-        `${nameLabel} ${defendantDisplayName(defendant.value, req)}`
+        t('makeAClaim:summary.removeDefendantHidden', {
+          number: index + 1,
+          name: defendantDisplayName(defendant.value, req),
+        })
       );
     }
     builder.add(
@@ -284,7 +315,11 @@ export function defendantsCard(req: Request, opensWithAdultsStatement = false): 
 /** The grounds the grounds page words on its own. */
 const GROUNDS_ON_LIST: Record<string, true> = { GROUND_8: true, GROUND_10: true, GROUND_11: true, OTHER: true };
 
-export function tenancyCard(req: Request): SummaryCard {
+/**
+ * The tenancy card. On the tenancy summary the uploaded agreement is listed under the question about it;
+ * on the final check your answers page it has a row of its own.
+ */
+export function tenancyCard(req: Request, agreementFilesOnQuestion = false): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const claim = readClaim(req);
   const { tenancy = {}, grounds = {} } = claim;
@@ -297,12 +332,11 @@ export function tenancyCard(req: Request): SummaryCard {
         : valueOf(t, 'tenancyType', tenancy.tenancyType)
     )
     .add('tenancy-start-date', 'tenancyStartDate', formatClaimDate(tenancy.tenancyStartDate, req))
-    .add(
-      'tenancy-agreement',
-      'tenancyAgreementAvailable',
-      withDetail(yesNo(t, tenancy.tenancyAgreementAvailable), tenancy.noTenancyAgreementReason)
-    )
-    .add('upload-tenancy-agreement', 'tenancyAgreementDocuments', documents(tenancy.tenancyAgreementDocuments))
+    .add('tenancy-agreement', 'tenancyAgreementAvailable', agreementValue(t, tenancy, agreementFilesOnQuestion));
+  if (!agreementFilesOnQuestion) {
+    builder.add('upload-tenancy-agreement', 'tenancyAgreementDocuments', documents(tenancy.tenancyAgreementDocuments));
+  }
+  builder
     .add(
       'occupation-contract-type',
       'occupationContractType',
@@ -318,9 +352,16 @@ export function tenancyCard(req: Request): SummaryCard {
     .add(
       'occupation-contract-agreement',
       'occupationContractAgreementAvailable',
-      withDetail(yesNo(t, tenancy.tenancyAgreementAvailable), tenancy.noTenancyAgreementReason)
-    )
-    .add('upload-occupation-contract', 'occupationContractDocuments', documents(tenancy.tenancyAgreementDocuments))
+      agreementValue(t, tenancy, agreementFilesOnQuestion)
+    );
+  if (!agreementFilesOnQuestion) {
+    builder.add(
+      'upload-occupation-contract',
+      'occupationContractDocuments',
+      documents(tenancy.tenancyAgreementDocuments)
+    );
+  }
+  builder
     .add(
       'epc-available',
       'hasEnergyPerformanceCertificate',
@@ -546,12 +587,12 @@ export function propertyCard(req: Request): SummaryCard {
 const SECTION_CARDS: Record<string, readonly ((req: Request) => SummaryCard | SummaryCard[])[]> = {
   aboutYou: [aboutYouCard, additionalClaimantCards],
   defendants: [req => defendantsCard(req, true)],
-  tenancyAndGrounds: [tenancyCard],
+  tenancyAndGrounds: [req => tenancyCard(req)],
   notice: [noticeCard],
   rentArrears: [rentArrearsCard],
   circumstances: [circumstancesCard],
   uploadDocuments: [uploadDocumentsCard],
-  checkAndSubmit: [otherInformationCard, languageUsedCard, supportCard, equalityCard],
+  checkAndSubmit: [otherInformationCard, supportCard, equalityCard, languageUsedCard],
 };
 
 /** Every card the final check your answers page shows: the property, then a card for each task list section. */

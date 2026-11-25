@@ -1,5 +1,5 @@
 {
-  "pageTitle": "How much are the rent arrears on today’s date?",
+  "pageTitle": "What are the rent arrears today?",
   "question": "How much are the rent arrears on today’s date?",
   "hint": "You should give the total amount of rent owed by the defendants on today’s date.",
   "errors": {
