@@ -58,6 +58,15 @@ test.describe('Make an Application - e2e Journey - R2 flag on @nightly', async (
     initializeExecutor(page);
     await performAction('skipTestIfLdFlagDisabled', DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG);
     await openChooseAnApplication(chooseAnApplication.mainHeaderR2Dynamic);
+    await performValidation('text', { elementType: 'inlineText', text: chooseAnApplication.captionR2Dynamic });
+    await performValidation('text', {
+      elementType: 'label',
+      text: chooseAnApplication.suspendApplicationRadioOptionDynamic,
+    });
+    await performValidation('text', {
+      elementType: 'hintText',
+      text: chooseAnApplication.suspendApplicationHintTextDynamic,
+    });
   });
 
   test(
@@ -258,13 +267,9 @@ test.describe('Make an Application - e2e Journey - R2 flag off @nightly', async 
 
   test(
     'As a Defendant, I cannot apply to Suspend eviction online and am directed to apply by post - R2 flag off',
-    {
-      tag: ['@regression'],
-      annotation: [
-        { type: 'jira', description: `The corresponding jira ticket : https://hmcts.atlassian.net/browse/HDPI-4622` },
-      ],
-    },
+    { tag: ['@regression'] },
     async () => {
+      await performValidation('text', { elementType: 'inlineText', text: chooseAnApplication.captionDynamic });
       await performValidation('textNotVisible', {
         elementType: 'label',
         text: chooseAnApplication.suspendApplicationRadioOptionDynamic,
@@ -272,6 +277,10 @@ test.describe('Make an Application - e2e Journey - R2 flag off @nightly', async 
       await performValidation('text', {
         elementType: 'paragraphWithLink',
         text: chooseAnApplication.postOnlyNoticeParagraphDynamic,
+      });
+      await performValidation('text', {
+        elementType: 'paragraphWithLink',
+        text: chooseAnApplication.postOnlyByPostLineDynamic,
       });
       await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyGuidanceLinkDynamic });
       await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyFillInFormLinkDynamic });

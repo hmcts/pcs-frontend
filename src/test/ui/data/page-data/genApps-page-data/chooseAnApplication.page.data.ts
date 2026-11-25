@@ -1,7 +1,10 @@
 export const chooseAnApplication = {
   mainHeaderDynamic: `Choose an application`,
   mainHeaderR2Dynamic: `Choose your application`,
+  captionDynamic: `Make an application`,
+  captionR2Dynamic: `Stop or delay an eviction`,
   postOnlyNoticeParagraphDynamic: `You cannot apply to suspend (stop or delay) the eviction online.`,
+  postOnlyByPostLineDynamic: `You must apply by post:`,
   postOnlyGuidanceLinkDynamic: `read the guidance explaining how to suspend the eviction (GOV.UK, opens in a new tab)`,
   postOnlyFillInFormLinkDynamic: `fill in the N244a form`,
   postOnlyFindCourtLinkDynamic: `find your local court`,

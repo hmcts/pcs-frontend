@@ -8,6 +8,11 @@ import { performAction, performValidation } from '../../utils/controller';
 
 export async function chooseAnApplicationErrorValidation(): Promise<void> {
   const isR2Enabled = await new LaunchDarklyAction().getFlagValue(DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG);
+  if (isR2Enabled === undefined) {
+    throw new Error(
+      `Cannot evaluate LaunchDarkly flag "${DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG}", so it is unknown which error message to expect`
+    );
+  }
   await performAction('inputErrorValidationGenApp', {
     validationType: chooseAnApplication.errorValidationType.one,
     inputArray: isR2Enabled
