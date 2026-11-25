@@ -1,4 +1,3 @@
-import config from 'config';
 import type { Application, Request, Response } from 'express';
 
 import { legalRepresentativeHeaderMiddleware } from '../middleware';
@@ -37,20 +36,8 @@ export default function footerPagesRoutes(app: Application): void {
     legalRepresentativeHeaderMiddleware
   );
 
-  const lrFooterBaseUri: string = config.has('pcsFrontend.aatUri')
-    ? config.get('pcsFrontend.aatUri')
-    : 'https://pcs.aat.platform.hmcts.net';
-
   footerPages.forEach(page => {
     app.get(page.path, async (req: Request, res: Response) => {
-      if (res.locals.isLegalRepresentative) {
-        const targetUrl = new URL(page.path, lrFooterBaseUri);
-
-        if (req.hostname !== targetUrl.hostname) {
-          return res.redirect(targetUrl.toString());
-        }
-      }
-
       await req.i18n?.loadNamespaces([page.namespace]);
 
       const fixedT = req.i18n?.getFixedT(req.language || 'en', page.namespace);
