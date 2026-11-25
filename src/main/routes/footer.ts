@@ -1,4 +1,4 @@
-import config from 'config';
+// import config from 'config';
 import type { Application, Request, Response } from 'express';
 
 import { legalRepresentativeHeaderMiddleware } from '../middleware';
