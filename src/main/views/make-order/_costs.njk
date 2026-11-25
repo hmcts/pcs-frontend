@@ -3,15 +3,14 @@
 
 <h2 class="govuk-heading-l govuk-!-margin-top-6">Costs</h2>
 
-{% set costsChoices = [
+{#
+  One costs-choice question in two banks: the claimant's costs and the orders that favour neither
+  side on the left, the defendant's costs on the right. Each part is its own radios group sharing the name, so
+  choosing in one clears the others.
+#}
+{% set claimantCostsChoices = [
   { value: "def-pay-cl-fixed", text: "Defendant pays claimant's fixed costs", amountLabel: "Fixed costs of" },
-  { value: "def-pay-cl-summary", text: "Defendant pays claimant's summary assessed costs", amountLabel: "Summary assessed costs of" },
-  { value: "cl-pay-def-summary", text: "Claimant pays defendant's summary assessed costs", amountLabel: "Summary assessed costs of" },
-  { value: "in-case", text: "Costs in the case" },
-  { value: "reserved", text: "Costs reserved" },
-  { value: "no-order", text: "No order as to costs" },
-  { value: "public-funding", text: "Public funding assessment of the defendant's costs" },
-  { value: "other", text: "Other" }
+  { value: "def-pay-cl-summary", text: "Defendant pays claimant's summary assessed costs", amountLabel: "Summary assessed costs of" }
 ] %}
 
 {% set suspendedCostsChoices = [
@@ -20,7 +19,19 @@
   { value: "summary-same-terms", text: "Defendant pays claimant's summary assessed costs, payable on the same terms as the suspension", amountLabel: "Summary assessed costs of" }
 ] %}
 
-{% macro costRadios(choices, idPrefix, disabled=false) %}
+{% set defendantCostsChoices = [
+  { value: "cl-pay-def-summary", text: "Claimant pays defendant's summary assessed costs", amountLabel: "Summary assessed costs of" },
+  { value: "public-funding", text: "Public funding assessment of the defendant's costs" }
+] %}
+
+{% set otherCostsChoices = [
+  { value: "in-case", text: "Costs in the case" },
+  { value: "reserved", text: "Costs reserved" },
+  { value: "no-order", text: "No order as to costs" },
+  { value: "other", text: "Other" }
+] %}
+
+{% macro costRadios(choices, idPrefix, params={}) %}
   {% set items = [] %}
   {% for choice in choices %}
     {% set fields %}
@@ -34,8 +45,8 @@
       value: choice.value,
       text: choice.text,
       checked: draftChecked("costs-choice", choice.value),
-      disabled: disabled,
-      attributes: { required: true } if not disabled,
+      disabled: params.disabled,
+      attributes: { required: true } if not params.disabled,
       conditional: { html: fields } if choice.amountLabel or choice.value == "other"
     }]) %}
   {% endfor %}
@@ -43,8 +54,9 @@
     idPrefix: idPrefix,
     name: "costs-choice",
     classes: "govuk-radios--small",
+    fieldset: { legend: { text: params.legend, classes: "govuk-fieldset__legend--s" } } if params.legend,
     items: items,
-    errorMessage: validationErrors[idPrefix]
+    errorMessage: params.errorMessage
   }) }}
 {% endmacro %}
 
@@ -52,10 +64,17 @@
   <fieldset class="govuk-fieldset">
     <legend class="govuk-fieldset__legend govuk-visually-hidden">Costs order</legend>
     <div class="pcs-costs-columns">
-      {{ costRadios(costsChoices, "costs-choice") }}
-      <div data-suspended-costs-column{% if draftOrderType != "SUSPENDED_POSSESSION" %} hidden{% endif %}>
-        {{ costRadios(suspendedCostsChoices, "suspended-costs-choice", draftOrderType != "SUSPENDED_POSSESSION") }}
+      <div>
+        {{ costRadios(claimantCostsChoices, "costs-choice", {
+          legend: "Claimant's costs",
+          errorMessage: validationErrors["costs-choice"]
+        }) }}
+        <div data-suspended-costs-column{% if draftOrderType != "SUSPENDED_POSSESSION" %} hidden{% endif %}>
+          {{ costRadios(suspendedCostsChoices, "suspended-costs-choice", { disabled: draftOrderType != "SUSPENDED_POSSESSION" }) }}
+        </div>
+        {{ costRadios(otherCostsChoices, "other-costs-choice", { legend: "Neither party" }) }}
       </div>
+      {{ costRadios(defendantCostsChoices, "defendant-costs-choice", { legend: "Defendant's costs" }) }}
     </div>
   </fieldset>
 {% endset %}

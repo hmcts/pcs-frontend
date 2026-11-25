@@ -462,6 +462,7 @@ export interface CcdRelatedApplication {
 }
 
 export enum GenAppType {
+  SUSPEND = 'SUSPEND',
   ADJOURN = 'ADJOURN',
   SET_ASIDE = 'SET_ASIDE',
   SOMETHING_ELSE = 'SOMETHING_ELSE',

@@ -1,0 +1,156 @@
+{% extends "confirm-order-review/_layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% import "confirm-order-review/_buttons.njk" as buttons with context %}
+
+{% set pageHeading = "Money judgments and costs" %}
+
+{#
+  What the order says about costs, and who owes each sum it orders paid and who is owed it, for the case to act on.
+  For an order its form generated they start as the judge's answers make them. Nothing here changes the order.
+#}
+
+{% macro money(id, label, value) %}
+  {{ govukInput({
+    id: id,
+    name: id,
+    label: { text: label, classes: "govuk-label--s" },
+    prefix: { text: "£" },
+    classes: "govuk-input--width-10",
+    inputmode: "decimal",
+    spellcheck: false,
+    value: value,
+    errorMessage: validationErrors[id]
+  }) }}
+{% endmacro %}
+
+{% macro date(prefix, legend, value) %}
+  {{ govukDateInput({
+    id: prefix,
+    namePrefix: prefix,
+    fieldset: { legend: { text: legend, classes: "govuk-fieldset__legend--s" } },
+    hint: { text: "For example, 27 3 2027" },
+    errorMessage: validationErrors[prefix + "-day"],
+    items: [
+      { id: prefix + "-day", name: "day", label: "Day", classes: "govuk-input--width-2", value: value.day },
+      { id: prefix + "-month", name: "month", label: "Month", classes: "govuk-input--width-2", value: value.month },
+      { id: prefix + "-year", name: "year", label: "Year", classes: "govuk-input--width-4", value: value.year }
+    ]
+  }) }}
+{% endmacro %}
+
+{% macro partyChoices(name, legend, chosen) %}
+  {% set items = [] %}
+  {% for party in parties %}
+    {% set items = (items.push({ value: party.value, text: party.text, checked: party.value in chosen }), items) %}
+  {% endfor %}
+  {{ govukCheckboxes({
+    name: name,
+    idPrefix: name,
+    fieldset: { legend: { text: legend, classes: "govuk-fieldset__legend--s" } },
+    errorMessage: validationErrors[name],
+    items: items
+  }) }}
+{% endmacro %}
+
+{% block page %}
+  <form method="post" action="{{ formAction }}" novalidate>
+    {{ csrfProtection(csrfToken) }}
+    <input type="hidden" name="reviewOrderId" value="{{ reviewOrderId }}">
+    {# Enter in a field submits the form's first button: this one continues, rather than removing or adding a judgment. #}
+    <button type="submit" name="action" value="continue" class="govuk-visually-hidden" tabindex="-1" aria-hidden="true">Continue</button>
+
+    {% if issuingHtml %}
+      <h2 class="govuk-heading-m">The order to issue</h2>
+      <div class="pcs-order-preview govuk-!-margin-bottom-6" id="issuing-order" aria-label="The order to issue" role="region">
+        {{ issuingHtml | safe }}
+      </div>
+    {% endif %}
+
+    {% set costsItems = [] %}
+    {% for option in costsOptions %}
+      {% set costsItems = (costsItems.push({ value: option.value, text: option.text, checked: answers.costs == option.value }), costsItems) %}
+    {% endfor %}
+    {{ govukRadios({
+      name: "costs",
+      idPrefix: "costs",
+      fieldset: { legend: { text: "What does the order say about costs?", classes: "govuk-fieldset__legend--m" } },
+      hint: { text: "Record any sum of costs to be paid as a money judgment below." },
+      errorMessage: validationErrors["costs"],
+      items: costsItems
+    }) }}
+
+    {% set judgmentsHtml %}
+      {% for judgment in judgments %}
+        {% set n = loop.index %}
+        {% set prefix = "judgment-" + n %}
+        {% set frequencyItems = [{ value: "", text: "Select how often" }] %}
+        {% for option in frequencies %}
+          {% set frequencyItems = (frequencyItems.push({ value: option.value, text: option.text, selected: judgment.instalmentFrequency == option.value }), frequencyItems) %}
+        {% endfor %}
+        <fieldset class="govuk-fieldset pcs-money-judgment" id="{{ prefix }}">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">Money judgment {{ n }}</legend>
+          {{ partyChoices(prefix + "-debtors", "Who must pay?", judgment.debtors) }}
+          {{ partyChoices(prefix + "-creditors", "Who is paid?", judgment.creditors) }}
+          {{ money(prefix + "-arrears", "Arrears (optional)", judgment.arrears) }}
+          {{ money(prefix + "-other-amount", "Interest or other sum (optional)", judgment.otherAmount) }}
+          {{ money(prefix + "-costs", "Costs (optional)", judgment.costs) }}
+
+          <h3 class="govuk-heading-s">How it is paid</h3>
+          <p class="govuk-hint">Leave these blank if the order does not say. It is then due within 14 days.</p>
+          {{ money(prefix + "-one-off-amount", "One-off payment (optional)", judgment.oneOffAmount) }}
+          {{ date(prefix + "-one-off-date", "One-off payment due by (optional)", judgment.oneOffDate) }}
+          {{ date(prefix + "-pay-by", "Whole sum, or the balance, to be paid by (optional)", judgment.payBy) }}
+          {{ money(prefix + "-instalment-amount", "Instalment (optional)", judgment.instalmentAmount) }}
+          {{ govukSelect({
+            id: prefix + "-instalment-frequency",
+            name: prefix + "-instalment-frequency",
+            label: { text: "How often instalments are paid (optional)", classes: "govuk-label--s" },
+            errorMessage: validationErrors[prefix + "-instalment-frequency"],
+            items: frequencyItems
+          }) }}
+          {{ date(prefix + "-first-instalment-date", "First instalment due by (optional)", judgment.firstInstalmentDate) }}
+          {{ govukCheckboxes({
+            name: prefix + "-suspended",
+            idPrefix: prefix + "-suspended",
+            items: [{ value: "yes", text: "Enforcement is suspended on the terms of the possession order", checked: judgment.suspended }]
+          }) }}
+          {% if answers.judgments.length > 1 %}
+            {{ govukButton({
+              text: "Remove",
+              classes: "govuk-button--secondary",
+              name: "action",
+              value: "remove-" + n,
+              attributes: { "aria-label": "Remove money judgment " + n }
+            }) }}
+          {% endif %}
+        </fieldset>
+      {% endfor %}
+      {% if canAddJudgment %}
+        {{ govukButton({ text: "Add another money judgment", classes: "govuk-button--secondary", name: "action", value: "add" }) }}
+      {% else %}
+        <p class="govuk-body">You can add up to 10 money judgments.</p>
+      {% endif %}
+    {% endset %}
+
+    {{ govukRadios({
+      name: "has-money-judgments",
+      idPrefix: "has-money-judgments",
+      fieldset: { legend: { text: "Does the order make a money judgment?", classes: "govuk-fieldset__legend--m" } },
+      hint: { text: "Different sums or terms for different parties are separate judgments." },
+      errorMessage: validationErrors["has-money-judgments"],
+      items: [
+        { value: "yes", text: "Yes", checked: answers.hasMoneyJudgments == "yes", conditional: { html: judgmentsHtml } },
+        { value: "no", text: "No", checked: answers.hasMoneyJudgments == "no" }
+      ]
+    }) }}
+
+    {{ buttons.eventButtons() }}
+  </form>
+{% endblock %}

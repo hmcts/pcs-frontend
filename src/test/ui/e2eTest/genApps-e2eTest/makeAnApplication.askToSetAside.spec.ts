@@ -8,7 +8,6 @@ import {
   doYouWantToUploadDocumentsToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
-  paymentDetails,
   uploadDocumentsToSupportYourApplication,
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
@@ -19,6 +18,8 @@ import { test } from '../../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
 const home_url = process.env.TEST_URL;
+
+let doYouNeedHelpPayingTheFeeSuspend: ReturnType<typeof doYouNeedHelpPayingTheFee>;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
@@ -38,6 +39,8 @@ test.beforeEach(async ({ page }) => {
   await performValidation('mainHeader', dashboard.mainHeader);
   await performAction('clickLink', dashboard.askTheCourtToMakeAnOrderLink);
   await performValidation('mainHeader', chooseAnApplication.mainHeader);
+
+  doYouNeedHelpPayingTheFeeSuspend = doYouNeedHelpPayingTheFee(test.info().title);
 });
 
 test.afterEach(async () => {
@@ -51,10 +54,11 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       option: chooseAnApplication.setAsideRadioOption,
     });
     await performAction('clickButton', askTheCourtToSetAsideTheOrder.startNowButton);
-    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    await performValidation('mainHeader', doYouNeedHelpPayingTheFeeSuspend.mainHeader);
     await performAction('doYouNeedHelpPayingFee', {
-      question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
-      option: doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption,
+      question: doYouNeedHelpPayingTheFeeSuspend.doYouNeedHelpPayingTheFeeQuestion,
+      option: doYouNeedHelpPayingTheFeeSuspend.iNeedHelpPayingTheFeeRadioOption,
+      continueButton: doYouNeedHelpPayingTheFeeSuspend.continueButton,
     });
     await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
     await performAction('confirmYouHaveAppliedForFeeHelp', {
@@ -85,8 +89,9 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
     await performAction('reviewAndUpdateCYA', {
-      changeOption: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
+      changeOption: doYouNeedHelpPayingTheFeeSuspend.doYouNeedHelpPayingTheFeeQuestion,
       journey: 'journey2',
+      feeData: doYouNeedHelpPayingTheFeeSuspend,
     });
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
@@ -96,32 +101,6 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: checkYourAnswersGenApps.yourFullNameTextLabel,
       input: checkYourAnswersGenApps.yourFullNameTextInput,
     });
-    await performAction('payForApplication');
-    await performValidation('mainHeader', paymentDetails.mainHeader);
-    await performAction('inputPaymentDetails', {
-      question: paymentDetails.mainHeader,
-      cardNumberLabel: paymentDetails.cardNumberTextLabel,
-      cardNumber: paymentDetails.cardNumberTextInput,
-      monthLabel: paymentDetails.monthTextLabel,
-      month: paymentDetails.monthTextInput,
-      yearLabel: paymentDetails.yearTextLabel,
-      year: paymentDetails.yearTextInput,
-      nameOnCardLabel: paymentDetails.nameOnCardTextLabel,
-      nameOnCard: paymentDetails.nameOnCardTextInput,
-      cardSecurityCodeLabel: paymentDetails.cardSecurityCodeTextLabel,
-      cardSecurityCode: paymentDetails.cardSecurityCodeTextInput,
-      addressLine1Label: paymentDetails.addressLine1TextLabel,
-      addressLine1: paymentDetails.addressLine1TextInput,
-      townOrCityLabel: paymentDetails.townOrCityTextLabel,
-      townOrCity: paymentDetails.townOrCityTextInput,
-      postcodeLabel: paymentDetails.postcodeTextLabel,
-      postcode: paymentDetails.postcodeTextInput,
-      emailLabel: paymentDetails.emailTextLabel,
-      email: paymentDetails.emailTextInput,
-    });
-    await performAction('confirmPayment');
-    await performAction('verifyApplicationSubmitted');
-    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('Select an Application - Ask to Set aside - You need to apply for application fee', async () => {
@@ -130,10 +109,11 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       option: chooseAnApplication.setAsideRadioOption,
     });
     await performAction('clickButton', askTheCourtToSetAsideTheOrder.startNowButton);
-    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    await performValidation('mainHeader', doYouNeedHelpPayingTheFeeSuspend.mainHeader);
     await performAction('doYouNeedHelpPayingFee', {
-      question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
-      option: doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption,
+      question: doYouNeedHelpPayingTheFeeSuspend.doYouNeedHelpPayingTheFeeQuestion,
+      option: doYouNeedHelpPayingTheFeeSuspend.iNeedHelpPayingTheFeeRadioOption,
+      continueButton: doYouNeedHelpPayingTheFeeSuspend.continueButton,
     });
     await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
     await performAction('confirmYouHaveAppliedForFeeHelp', {

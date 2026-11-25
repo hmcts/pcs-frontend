@@ -16,12 +16,12 @@ export const paymentApiData = {
 
   updatePaymentApiEndPoint: '/payment-update',
 
-  paymentUpdatePayload: (requestReference: string, feeAmountInPounds?: number) => {
+  paymentUpdatePayload: (requestReference: string, feeAmountInPounds: number) => {
     // fee-payment-info returns pounds; the payload expects pence
-    const serviceRequestAmount =
-      typeof feeAmountInPounds === 'number' && !Number.isNaN(feeAmountInPounds)
-        ? Math.round(feeAmountInPounds * 100)
-        : 40400;
+    if (!Number.isFinite(feeAmountInPounds) || feeAmountInPounds <= 0) {
+      throw new Error(`Invalid fee amount received for service request ${requestReference}: ${feeAmountInPounds}`);
+    }
+    const serviceRequestAmount = Math.round(feeAmountInPounds * 100);
     const accountNumber = process.env.PBA_ACCOUNT_NUMBER || 'PBA0084541';
 
     console.log('[PAYMENT API] fee (pounds) =', feeAmountInPounds, '-> pence =', serviceRequestAmount);
@@ -33,10 +33,10 @@ export const paymentApiData = {
       service_request_amount: serviceRequestAmount,
       service_request_status: 'Paid',
       payments: {
-        payment_amount: 2500,
-        payment_reference: 'RC-1780-3235-2218-3722',
+        payment_amount: serviceRequestAmount,
+        payment_reference: `TEST-${requestReference}`,
         payment_method: 'payment by account',
-        case_reference: '098DC868',
+        case_reference: process.env.CASE_NUMBER,
         account_number: accountNumber,
       },
     };

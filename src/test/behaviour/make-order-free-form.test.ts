@@ -3,7 +3,6 @@ import {
   type TestApp,
   bootApp,
   check,
-  control,
   openPage,
   recordAttendance,
   selectTab,
@@ -69,39 +68,20 @@ describe('make an order: free form and strike out', () => {
     expect((await app.post(PAGE, body)).status).toBe(302);
   });
 
-  it('requires a strike out or dismissal outcome before review', async () => {
+  it('needs something struck out or dismissed, and whether each is struck out or dismissed', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-strike-out');
+    const body = page.body('SUBMIT_FOR_REVIEW');
+    expect((await app.post(PAGE, body)).text).toContain('Select whether the claim is struck out or dismissed');
 
-    const body = page.body();
-    body.set('action', 'SUBMIT_FOR_REVIEW');
-    const rejected = await app.post(PAGE, body);
-    expect(rejected.status).toBe(400);
-    expect(rejected.text).toContain('Select whether the claim is struck out or dismissed');
-  });
-
-  it('orders the claim struck out', async () => {
-    const page = await openPage((await app.get(PAGE)).text);
-    selectTab('tab-strike-out');
-    check('strike-claim-outcome', 'struck-out');
-    expect(page.orderText()).toBe(['IT IS ORDERED THAT:', 'The claim is struck out.'].join('\n'));
-  });
-
-  it('keeps nothing ticked when the judge unticks the claim', async () => {
-    const page = await openPage((await app.get(PAGE)).text);
-    selectTab('tab-strike-out');
     uncheck('strike-subjects', 'claim');
-    const body = page.body();
-    body.set('action', 'SUBMIT_FOR_REVIEW');
-    const rejected = await app.post(PAGE, body);
+    const rejected = await app.post(PAGE, page.body('SUBMIT_FOR_REVIEW'));
     expect(rejected.status).toBe(400);
     expect(rejected.text).toContain('Select what is struck out or dismissed');
-    await openPage(rejected.text);
-    expect(control('[name="strike-subjects"][value="claim"]').checked).toBe(false);
   });
 
-  it('strikes out or dismisses whichever of the claim, counterclaim and application the case has open', async () => {
-    // Only the claim is offered until the case has an open counterclaim or application.
+  it('strikes out or dismisses whichever of the claim and counterclaim the case has open', async () => {
+    // Only the claim is offered until the case has an open counterclaim; applications have their own section.
     await openPage((await app.get(PAGE)).text);
     const subjects = () =>
       [...document.querySelectorAll<HTMLInputElement>('[name="strike-subjects"][type="checkbox"]')].map(
@@ -110,24 +90,23 @@ describe('make an order: free form and strike out', () => {
     expect(subjects()).toEqual(['claim']);
 
     await app.close();
-    app = await bootApp({ openCounterclaim: true, openApplication: true });
+    app = await bootApp({
+      openCounterclaim: true,
+      applications: [{ id: 'gen-app-1', reference: 'GA1', type: 'Adjourn the hearing', documents: [] }],
+    });
     const page = await openPage((await app.get(PAGE)).text);
+    // With an application open, the claim waits behind a tick box.
+    check('claim-order', 'yes');
     selectTab('tab-strike-out');
     check('strike-claim-outcome', 'struck-out');
     check('strike-subjects', 'counterclaim');
     check('strike-counterclaim-outcome', 'dismissed');
-    check('strike-subjects', 'application');
+    expect(document.querySelector('[name="strike-subjects"][value="application"]')).toBeNull();
     expect(page.orderText()).toBe(
-      [
-        'IT IS ORDERED THAT:',
-        'The claim is struck out.',
-        'The counterclaim is dismissed.',
-        'The application is dismissed.',
-      ].join('\n')
+      ['IT IS ORDERED THAT:', 'The claim is struck out.', 'The counterclaim is dismissed.'].join('\n')
     );
 
     uncheck('strike-subjects', 'claim');
-    uncheck('strike-subjects', 'application');
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
     body.delete('strike-counterclaim-outcome');

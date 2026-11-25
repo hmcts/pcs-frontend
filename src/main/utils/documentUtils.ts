@@ -117,6 +117,8 @@ export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLook
     'rentArrears_StatementDocuments'
   );
   addDocumentsFromCollection(documents, seen, caseData.rentStatement, 'rentStatement');
+  // The case bundle, which CCD gives judges only.
+  addDocumentsFromCollection(documents, seen, caseData.bundleTab_Bundle, 'bundleTab_Bundle');
 
   for (const path of CASE_DETAILS_DOCUMENT_PATHS) {
     addDocumentsFromCollection(documents, seen, get(caseData, path), path);
