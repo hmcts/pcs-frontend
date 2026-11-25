@@ -31,7 +31,6 @@ interface CustomSessionData extends SessionData {
   nonce?: string;
   user?: UserInfoResponseWithToken;
   returnTo?: string;
-  handoffReauthentication?: string;
   // Step form data keyed by journey name, then case reference (or 'default'), then step name.
   formData?: Record<string, Record<string, Record<string, any>>>;
   uploadedDocs?: Record<string, Record<string, unknown[]>>;

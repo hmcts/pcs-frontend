@@ -60,18 +60,12 @@ export default function decentralisedEventRoutes(app: Application): void {
     const isUserMatch = [user?.sub, user?.uid, user?.id, user?.email].includes(expectedSub);
 
     if (!isUserMatch) {
-      if (req.session.handoffReauthentication === req.originalUrl) {
-        delete req.session.handoffReauthentication;
-        logger.warn('User IDAM subject still mismatched after re-authentication', { caseReference });
-        return res.status(403).render('error', {
-          errorTitle: 'The signed-in account does not match',
-          errorParagraph: 'Return to Manage cases and use the same account in both services.',
-          errorReturnUrl: config.get<string>('xui.uri'),
-        });
+      logger.warn('User IDAM subject mismatch (expected_sub), forcing re-authentication', {
+        caseReference,
+      });
+      if (!req.session.returnTo) {
+        req.session.returnTo = req.originalUrl;
       }
-      logger.warn('User IDAM subject mismatch (expected_sub), forcing re-authentication', { caseReference });
-      req.session.handoffReauthentication = req.originalUrl;
-      req.session.returnTo = req.originalUrl;
       const authSessionKeys = ['user', 'ccdCase', 'codeVerifier', 'nonce'] as const;
       for (const key of authSessionKeys) {
         delete req.session[key];
@@ -80,7 +74,6 @@ export default function decentralisedEventRoutes(app: Application): void {
       return res.redirect('/login');
     }
 
-    delete req.session.handoffReauthentication;
     logger.info('Decentralised event validation successful, redirecting to CUI', {
       caseReference,
       eventId,

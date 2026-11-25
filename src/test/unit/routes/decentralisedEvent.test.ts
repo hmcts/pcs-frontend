@@ -138,11 +138,10 @@ describe('decentralisedEvent route', () => {
       handler(req, res);
 
       expect(req.session.returnTo).toBe(req.originalUrl);
-      expect(req.session.handoffReauthentication).toBe(req.originalUrl);
       expect(res.redirect).toHaveBeenCalledWith('/login');
     });
 
-    it('clears the previous authentication and returns to the handoff after fresh sign-in', () => {
+    it('deletes auth session keys and preserves pre-existing returnTo URL on user mismatch', () => {
       decentralisedEventRoutes(app);
       const handler = mockRouterGet.mock.calls[0][1] as (req: Request, res: Response) => void;
 
@@ -167,32 +166,12 @@ describe('decentralisedEvent route', () => {
 
       handler(req, res);
 
-      expect(session.returnTo).toBe(req.originalUrl);
+      expect(session.returnTo).toBe('/existing-return-page');
       expect(session.user).toBeUndefined();
       expect(session.ccdCase).toBeUndefined();
       expect(session.codeVerifier).toBeUndefined();
       expect(session.nonce).toBeUndefined();
       expect(res.redirect).toHaveBeenCalledWith('/login');
-    });
-
-    it('stops at an error page when the handoff identity still mismatches after fresh sign-in', () => {
-      decentralisedEventRoutes(app);
-      const handler = mockRouterGet.mock.calls[0][1] as (req: Request, res: Response) => void;
-      const originalUrl = '/cases/1234567890123456/event/ext:makeOrder?expected_sub=expected-user-sub';
-      const req = {
-        params: { caseReference: '1234567890123456', eventId: 'ext:makeOrder' },
-        query: { expected_sub: 'expected-user-sub' },
-        session: { user: { sub: 'different-user-sub' }, handoffReauthentication: originalUrl },
-        originalUrl,
-      } as unknown as Request;
-      const res = { status: jest.fn().mockReturnThis(), render: jest.fn(), redirect: jest.fn() } as unknown as Response;
-
-      handler(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(403);
-      expect(res.render).toHaveBeenCalledWith('error', expect.objectContaining({ errorReturnUrl: expect.any(String) }));
-      expect(res.redirect).not.toHaveBeenCalled();
-      expect(req.session.handoffReauthentication).toBeUndefined();
     });
 
     it('returns 404 Bad Request if expected_sub query parameter is missing or not a string', () => {
