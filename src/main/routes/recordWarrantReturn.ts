@@ -374,6 +374,7 @@ export default function recordWarrantReturnRoutes(app: Application): void {
   app.get(route('cancel'), ...journey, (req: Request, res: Response, next: NextFunction) => {
     const caseReference = caseReferenceOf(req);
     delete req.session.warrantReturn?.[caseReference];
+    delete req.session.warrantReturnCaseDetails?.[caseReference];
     req.session.save(error => (error ? next(error) : res.redirect(manageCaseDetailsUrl(caseReference))));
   });
 }

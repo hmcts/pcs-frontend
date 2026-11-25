@@ -947,13 +947,21 @@ describe('recordWarrantReturnRoutes', () => {
   describe('GET cancel', () => {
     const path = '/case/:caseReference/record-warrant-return/cancel';
     const saved = { returnType: WarrantReturnType.INTERIM, returnName: InterimReturnName.CROWDS_OR_PROTESTS };
+    const caseDetails = {
+      propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
+      caseName: 'Housing Ltd vs Sam Smith',
+    };
 
     const cancel = (save = jest.fn((callback: (error?: Error) => void) => callback())) => {
       const res = { redirect: jest.fn() };
       const next = jest.fn();
       const req = {
         params: { caseReference: '123' },
-        session: { warrantReturn: { '123': saved, '456': saved }, save },
+        session: {
+          warrantReturn: { '123': saved, '456': saved },
+          warrantReturnCaseDetails: { '123': caseDetails, '456': caseDetails },
+          save,
+        },
       };
       void getHandler(path)(req as unknown as Request, res as unknown as Response, next);
       return { req, res, next };
@@ -963,6 +971,7 @@ describe('recordWarrantReturnRoutes', () => {
       const { req, res } = cancel();
 
       expect(req.session.warrantReturn).toEqual({ '456': saved });
+      expect(req.session.warrantReturnCaseDetails).toEqual({ '456': caseDetails });
       expect(req.session.save).toHaveBeenCalled();
       expect(res.redirect).toHaveBeenCalledWith(expect.stringMatching(/\/cases\/case-details\/PCS\/PCS\/123$/));
     });
