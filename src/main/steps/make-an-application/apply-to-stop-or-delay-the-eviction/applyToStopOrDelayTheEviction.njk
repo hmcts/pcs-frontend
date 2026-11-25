@@ -1,0 +1,61 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block mainContent %}
+
+  <span class="govuk-caption-xl">{{ caption }}</span>
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+  <p class="govuk-body">{{ paragraph1 }}</p>
+  <p class="govuk-body">{{ paragraph2 }}</p>
+
+  <h2 class="govuk-heading-s">{{ ifCourtApprovesHeading }}</h2>
+  <p class="govuk-body">{{ ifCourtApprovesParagraph1 }}</p>
+  <p class="govuk-body">{{ ifCourtApprovesParagraph2 }}</p>
+
+  <h2 class="govuk-heading-s">{{ ifCourtRefusesHeading }}</h2>
+  <p class="govuk-body">{{ ifCourtRefusesParagraph }}</p>
+
+  <form method="post" action="{{ url }}" novalidate>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('buttons.startNow'),
+        isStartButton: true,
+        attributes: { type: 'submit', name: 'action', value: 'continue' }
+      }) }}
+    </div>
+
+    {{ csrfProtection(csrfToken) }}
+  </form>
+
+  <h2 class="govuk-heading-m">{{ whatYouWillNeedToApply }}</h2>
+  <p class="govuk-body">{{ youWillNeedToKnow }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ ifYouCanPayTheCourtFee }}</li>
+    <li>{{ whyYouAreAskingTheCourt }}</li>
+  </ul>
+  <p class="govuk-body">{{ youWillAlsoNeedEvidence }}</p>
+
+  <h2 class="govuk-heading-m">{{ howLongItTakes }}</h2>
+  <p class="govuk-body">{{ reviewTime }}</p>
+
+  <h2 class="govuk-heading-m">{{ howMuchItWillCost }}</h2>
+  <p class="govuk-body">{{ suspendCost }}</p>
+  <p class="govuk-body">{{ moreThanOneThing }}</p>
+
+  <h2 class="govuk-heading-s">{{ ifYouAreWorriedAboutPayingFees }}</h2>
+  <p class="govuk-body">{{ helpWithFees | safe }}</p>
+
+  <h2 class="govuk-heading-m">{{ applyByPost }}</h2>
+  <p class="govuk-body">{{ ifPreferToRespondByPost }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ fillInFormForPost | safe }}</li>
+    <li><a href="https://www.gov.uk/find-court-tribunal" target="_blank"
+        rel="noopener noreferrer" class="govuk-link">{{ findYourLocalCourt }}</a></li>
+    <li>{{ sendTheCompletedFormToTheCourt }}</li>
+  </ul>
+
+{% endblock %}
