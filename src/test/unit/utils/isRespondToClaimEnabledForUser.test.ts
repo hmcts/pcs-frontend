@@ -10,16 +10,12 @@ jest.mock('../../../main/steps/utils/userRole', () => ({
 
 import { getUserType } from '../../../main/steps/utils/userRole';
 
+import { ENABLE_CUI_RESPOND_TO_CLAIM, ENABLE_CUI_RESPOND_TO_CLAIM_LR, RELEASE_1_2_ENABLED } from '@utils/featureFlags';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import {
   isRespondToClaimEnabledForRelease,
   isRespondToClaimEnabledForUser,
 } from '@utils/isRespondToClaimEnabledForUser';
-import {
-  ENABLE_CUI_RESPOND_TO_CLAIM,
-  ENABLE_CUI_RESPOND_TO_CLAIM_LR,
-  RELEASE_1_2_ENABLED,
-} from '@utils/respondToClaimFlags';
 
 const mockGetLaunchDarklyFlag = getLaunchDarklyFlag as jest.MockedFunction<typeof getLaunchDarklyFlag>;
 const mockGetUserType = getUserType as jest.MockedFunction<typeof getUserType>;
