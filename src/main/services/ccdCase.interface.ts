@@ -2,6 +2,8 @@ import type { RespondToClaimSectionEnum } from '../steps/respond-to-claim/sectio
 
 import type { CcdFlags } from './cuiRa/cuiRa.interface';
 
+import { WarrantReturn } from '@utils/warrantReturn';
+
 export type YesNoValue = 'YES' | 'NO' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 export enum YesNoEnum {
@@ -209,6 +211,13 @@ export interface CcdUploadedDocument {
   sizeInBytes?: number;
 }
 
+export interface CcdDynamicStringListType {
+  value: {
+    code: string;
+    label: string;
+  };
+}
+
 export interface CcdCollectionItem<T> {
   id?: string;
   value: T;
@@ -296,6 +305,7 @@ export type CaseData = CcdCaseData;
 
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
 export interface CcdCaseData {
+  caseNameHmctsInternal?: string;
   dateIssued?: string;
   claimIssueDate?: string;
   dateSubmitted?: string;
@@ -359,6 +369,8 @@ export interface CcdCaseData {
   detailsTab_NoticeDetails?: {
     noticeDocuments?: CcdCollectionItem<Document>[];
   };
+  warrantReturn?: WarrantReturn;
+  claimantType?: CcdDynamicStringListType;
 }
 
 export interface CcdCaseDocument {

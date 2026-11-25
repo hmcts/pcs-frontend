@@ -24,10 +24,9 @@ import {
   manageCaseDetailsUrl,
   postedSnapshot,
   refusalPage,
-  refusedOrderEvent,
-  xuiHeaderModel,
 } from '@utils/orderCase';
 import { applicationDecisions } from '@utils/orderOutcome';
+import { refusedXuiEvent, xuiHeaderModel } from '@utils/xuiUtils';
 
 const MAKE_ORDER_EVENT_ID = 'ext:makeOrder';
 
@@ -134,7 +133,7 @@ export default function makeOrderRoutes(app: Application): void {
       );
       res.render('make-order', pageModel(req, started));
     } catch (error) {
-      refusedOrderEvent(res, next, error, refusalPage(req, res, ['judge']));
+      refusedXuiEvent(res, next, error, refusalPage(req, res, ['judge']));
     }
   });
 
@@ -246,7 +245,7 @@ export default function makeOrderRoutes(app: Application): void {
       }
       return res.redirect(manageCaseDetailsUrl(caseReference));
     } catch (error) {
-      refusedOrderEvent(res, next, error);
+      refusedXuiEvent(res, next, error);
     }
   });
 

@@ -28,8 +28,6 @@ import {
   manageCaseDetailsUrl,
   postedSnapshot,
   refusalPage,
-  refusedOrderEvent,
-  xuiHeaderModel,
 } from '@utils/orderCase';
 import {
   ADJOURNMENT,
@@ -69,6 +67,7 @@ import {
   validateQuery,
   validateReviewDates,
 } from '@utils/orderReview';
+import { refusedXuiEvent, xuiHeaderModel } from '@utils/xuiUtils';
 
 /*
  * A caseworker's review of a judge's order, reached from their Work Allocation task through XUI. Like the
@@ -477,7 +476,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
         continueUrl: pageUrl(caseReference, 'review'),
       });
     } catch (error) {
-      refusedOrderEvent(res, next, error, refusalPage(req, res));
+      refusedXuiEvent(res, next, error, refusalPage(req, res));
     }
   });
 
@@ -526,7 +525,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       startMoneyJudgments(review);
       return res.redirect(pageUrl(caseReferenceOf(req), firstIncompletePage(review, 'review') ?? 'checkYourAnswers'));
     } catch (error) {
-      refusedOrderEvent(res, next, error, showRefusal(req, res, 'review'));
+      refusedXuiEvent(res, next, error, showRefusal(req, res, 'review'));
     }
   });
 
@@ -675,7 +674,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       await submitReview(req, review, 'ISSUE');
       return res.redirect(pageUrl(caseReference, 'confirmed'));
     } catch (error) {
-      refusedOrderEvent(res, next, error, showRefusal(req, res, 'check-your-answers'));
+      refusedXuiEvent(res, next, error, showRefusal(req, res, 'check-your-answers'));
     }
   });
 
