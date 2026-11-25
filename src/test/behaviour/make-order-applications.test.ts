@@ -39,7 +39,6 @@ const ADJOURN = {
   otherPartiesAgreed: 'NO',
   withoutNotice: 'NO',
   whatOrderWanted: 'I am in hospital that week.',
-  draftOrderWording: '<ol><li>The hearing on 14 October is adjourned.</li><li>Costs in the case.</li></ol>',
   listed: false,
   documents: [{ id: '3f2a6c1e-0000-4000-8000-000000000001', fileName: 'hospital-letter.pdf' }],
 };
@@ -56,8 +55,6 @@ const WARRANT = {
   listed: false,
   documents: [],
 };
-
-const WORDING = ['The hearing on 14 October is adjourned.', 'Costs in the case.'];
 
 /** The order's lines from "IT IS ORDERED THAT:" on. */
 function ordered(text: string): string[] {
@@ -134,7 +131,7 @@ describe('make an order: deciding applications', () => {
       const decisions = [...document.querySelectorAll<HTMLInputElement>(`[name="${P}-decision"]:enabled`)].map(
         input => input.value
       );
-      expect(decisions).toEqual(['none', 'applicant-wording', 'adjourn', 'dismiss', 'list', 'freeform']);
+      expect(decisions).toEqual(['none', 'adjourn', 'dismiss', 'list', 'freeform']);
       expect(
         control(`[name="${P}-decision"][value="strike-out"]`).closest<HTMLElement>('.govuk-radios__item')!.hidden
       ).toBe(true);
@@ -179,17 +176,17 @@ describe('make an order: deciding applications', () => {
       expect(submitted.order.formData['app-gen-app-2-decision']).toBe('dismiss');
     });
 
-    it("keeps the applicant's wording the order takes as the judge orders on the claim and stops again", async () => {
+    it("keeps an application's clause as the judge orders on the claim and stops again", async () => {
       const page = await openPage((await app.get(PAGE)).text);
       recordAttendance();
-      check(`${P}-decision`, 'applicant-wording');
+      check(`${P}-decision`, 'dismiss');
       check('claim-order', 'yes');
       selectTab('tab-adjournment');
       check('adj-type', 'generally');
       expect(ordered(page.documentText())).toEqual([
         'IT IS ORDERED THAT:',
         'The claim is adjourned generally with liberty to restore by application by any party on notice to all other parties.',
-        ...WORDING,
+        "The defendant's application dated 1 October 2026 is dismissed.",
       ]);
       expect(control('#order-type').value).toBe('ADJOURNMENT');
 
@@ -200,7 +197,7 @@ describe('make an order: deciding applications', () => {
       // Ticking again goes back to the tab the judge had open.
       check('claim-order', 'yes');
       expect(control('#order-type').value).toBe('ADJOURNMENT');
-      expect(page.documentText().match(/The hearing on 14 October is adjourned\./g)).toHaveLength(1);
+      expect(page.documentText().match(/application dated 1 October 2026 is dismissed\./g)).toHaveLength(1);
     });
   });
 
@@ -229,9 +226,6 @@ describe('make an order: deciding applications', () => {
       expect(control(`#${P}-details`).textContent).toContain('Alex Example (Defendant 1)');
       expect(control<HTMLAnchorElement>(`#${P}-details a`).href).toContain(
         `/case/${CASE_REFERENCE}/view-documents/3f2a6c1e-0000-4000-8000-000000000001`
-      );
-      expect(control(`#${P}-requested`).innerHTML.trim()).toBe(
-        '<ol><li>The hearing on 14 October is adjourned.</li><li>Costs in the case.</li></ol>'
       );
 
       check(`${P}-decision`, 'dismiss');
@@ -278,63 +272,23 @@ describe('make an order: deciding applications', () => {
       expect((await app.post(TASK_PAGE, again.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
     });
 
-    it("takes the applicant's draft order as the application's clauses, before the costs", async () => {
+    it("puts the application's clauses before the costs", async () => {
       const page = await openPage((await app.get(TASK_PAGE)).text);
       check('order-notice', 'none');
-      check(`${P}-decision`, 'applicant-wording');
+      check(`${P}-decision`, 'dismiss');
       check('costs', 'yes');
       check('costs-choice', 'def-pay-cl-fixed');
       type('costs-def-pay-cl-fixed-amount', '150');
 
       expect(ordered(page.documentText())).toEqual([
         'IT IS ORDERED THAT:',
-        ...WORDING,
+        "The defendant's application dated 1 October 2026 is dismissed.",
         "The defendant shall pay the claimant's costs of the application in the fixed sum of £150.00.",
       ]);
-      expect(clauseLists()).toEqual([2, 1]);
+      expect(clauseLists()).toEqual([1, 1]);
     });
 
-    it("shows the applicant's draft order as they formatted it, apart from why they want it, and takes it as plain text", async () => {
-      await app.close();
-      app = await bootApp({
-        application: {
-          ...ADJOURN,
-          whatOrderWanted: 'I am in hospital that week.',
-          draftOrderWording:
-            '<p>Upon reading the papers:<br>by consent</p>' +
-            '<ol><li>The hearing on 14 October is <strong>adjourned</strong>.</li>' +
-            '<li>The defendant shall:<ol><li>file a defence;</li><li>pay the costs &amp; fees.</li></ol></li></ol>' +
-            '<img src="x" onerror="alert(1)"><script>alert(2)</script>',
-        },
-      });
-      const page = await openPage((await app.get(TASK_PAGE)).text);
-      check('order-notice', 'none');
-      const requested = control<HTMLElement>(`#${P}-requested`);
-      expect(requested.querySelectorAll('ol > li')).toHaveLength(4);
-      expect(requested.querySelector('strong')?.textContent).toBe('adjourned');
-      // Nothing that would run or load.
-      expect(requested.querySelector('img, script')).toBeNull();
-      expect(control(`#${P}-explanation`).textContent?.trim()).toBe('I am in hospital that week.');
-
-      check(`${P}-decision`, 'applicant-wording');
-      expect(ordered(page.documentText())).toEqual([
-        'IT IS ORDERED THAT:',
-        'Upon reading the papers:',
-        'by consent',
-        'The hearing on 14 October is adjourned.',
-        'The defendant shall:',
-        'file a defence;',
-        'pay the costs & fees.',
-      ]);
-      // Each line and item a clause, the nested list nested, without their emphasis.
-      expect(clauseLists()).toEqual([4]);
-      expect(control<HTMLTextAreaElement>('#order-document').value).not.toContain('"marks"');
-      expect(page.documentText()).not.toContain('I am in hospital');
-    });
-
-    it("offers no applicant's wording when the applicant gave no draft order, and refuses it", async () => {
-      await app.close();
-      app = await bootApp({ application: { ...ADJOURN, draftOrderWording: null } });
+    it("shows what the applicant asked for and why, and refuses taking an applicant's wording", async () => {
       const page = await openPage((await app.get(TASK_PAGE)).text);
       check('order-notice', 'none');
       expect(document.querySelector(`[name="${P}-decision"][value="applicant-wording"]`)).toBeNull();
@@ -346,19 +300,6 @@ describe('make an order: deciding applications', () => {
       const rejected = await app.post(TASK_PAGE, body);
       expect(rejected.status).toBe(400);
       expect(rejected.text).toContain('Select what you decide about application GA1');
-    });
-
-    it("takes the applicant's wording out when the judge decides otherwise", async () => {
-      const page = await openPage((await app.get(TASK_PAGE)).text);
-      check('order-notice', 'none');
-      check(`${P}-decision`, 'applicant-wording');
-      check(`${P}-decision`, 'dismiss');
-      expect(ordered(page.documentText())).toEqual([
-        'IT IS ORDERED THAT:',
-        "The defendant's application dated 1 October 2026 is dismissed.",
-      ]);
-      check(`${P}-decision`, 'applicant-wording');
-      expect(ordered(page.documentText())).toEqual(['IT IS ORDERED THAT:', ...WORDING]);
     });
 
     it('lists the application for a hearing on notice, asking when as an adjournment does', async () => {
@@ -426,7 +367,6 @@ describe('make an order: deciding applications', () => {
         [...document.querySelectorAll<HTMLInputElement>(`[name="${name}"]`)].map(input => input.value);
       expect(decisions(`${P}-decision`)).toEqual([
         'none',
-        'applicant-wording',
         'adjourn',
         'dismiss',
         'strike-out',

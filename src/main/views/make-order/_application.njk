@@ -1,22 +1,20 @@
 {#
   An open application the order can decide, as a row of the applications section: what was applied for and by
-  whom, the applicant's answers, documents and the order they asked for, then what the judge decides about it.
+  whom, the applicant's answers, documents and what they asked for, then what the judge decides about it.
   Each application's answers start with its prefix (app-<id>), so an order made at a hearing keeps each one's.
 
   The details are folded away, as the judge has the file, but for the application the judge's task asked them to
   decide, which is open and which the order must decide. Any other may be left as it is.
 
   Each decision but freeform puts its own wording in the order, which says what was decided: there is no bare
-  "granted". Taking the applicant's wording, offered only when they gave a draft order, makes it the application's
-  clauses in plain text, which the judge edits in the order preview as any other. Adjourning, offered on an application
-  to adjourn a hearing, adjourns it to a further hearing or generally, as the adjournment tab does. Suspending
+  "granted"; a freeform decision leaves the wording to the judge. Adjourning, offered on an application to adjourn a
+  hearing, adjourns it to a further hearing or generally, as the adjournment tab does. Suspending
   enforcement, offered on an application to suspend it, does so on the conditions a suspended possession order has.
   Listing it for a hearing asks when, as the adjournment tab does, and leaves the application open, as not dealing with
   it does; any other decision closes it. Inline radios can't reveal a question, so what follows a decision is on its own
   rows, shown while it is chosen (initApplicationDecisions in make-order.ts).
 #}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% import "make-order/_compact.njk" as compact with context %}
@@ -57,17 +55,6 @@
   ]) %}
   {{ govukSummaryList({ rows: rows, classes: "govuk-!-margin-bottom-4", attributes: { id: application.prefix + "-details" } }) }}
 
-  <h4 class="govuk-heading-s">The order the applicant asked for</h4>
-  {% if application.requestedWordingHtml %}
-    {# As the applicant wrote it: their draft order's lists and emphasis, or their lines, so their numbering is the
-       numbering they refer to. #}
-    {{ govukInsetText({
-      html: application.requestedWordingHtml,
-      attributes: { id: application.prefix + "-requested" }
-    }) }}
-  {% else %}
-    <p class="govuk-body">The applicant gave no draft order. Read the application documents.</p>
-  {% endif %}
   {% if application.explanationHtml %}
     <h4 class="govuk-heading-s">What they asked the court for and why</h4>
     <div class="govuk-body" id="{{ application.prefix }}-explanation">{{ application.explanationHtml | safe }}</div>
@@ -86,9 +73,6 @@
     suspend enforcement is never struck out (judicial feedback, November 2026).
   #}
   {% set items = [{ value: "none", text: "Not dealt with" }] %}
-  {% if application.applicantWording %}
-    {% set items = items.concat([{ value: "applicant-wording", text: "Applicant’s wording" }]) %}
-  {% endif %}
   {% if application.adjournment %}
     {% set items = items.concat([{ value: "adjourn", text: "Adjourned" }]) %}
   {% endif %}

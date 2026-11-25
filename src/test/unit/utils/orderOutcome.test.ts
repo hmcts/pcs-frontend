@@ -4,7 +4,7 @@ describe('orderOutcome', () => {
   it('disposes of each application the order deals with but for one it lists, leaving out those it does not', () => {
     expect(
       applicationDecisions({
-        'app-a-decision': 'applicant-wording',
+        'app-a-decision': 'adjourn',
         'app-b-decision': 'none',
         'app-c-decision': 'strike-out',
         'app-d-decision': 'list',

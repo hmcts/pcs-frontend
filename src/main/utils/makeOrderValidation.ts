@@ -374,7 +374,6 @@ function validateAttendance(formData: Record<string, unknown>, parties: readonly
 
 export const APPLICATION_DECISIONS = [
   'none',
-  'applicant-wording',
   'adjourn',
   'suspend',
   'dismiss',
@@ -389,8 +388,6 @@ export interface ApplicationToDecide {
   reference: string;
   enforcementSuspension?: boolean;
   adjournment?: boolean;
-  /** Whether the applicant gave a draft order, which the order can take as its wording. */
-  applicantWording?: boolean;
   /** The application the judge's task asked them to decide, which the order may not leave as it is. */
   required?: boolean;
 }
@@ -418,8 +415,7 @@ function validateApplications(
     const allowed =
       (APPLICATION_DECISIONS as readonly string[]).includes(decision) &&
       !(application.required && decision === 'none') &&
-      // Only an applicant who gave a draft order has wording to take, and only enforcement is suspended on conditions.
-      !(decision === 'applicant-wording' && !application.applicantWording) &&
+      // Only enforcement is suspended on conditions, and only a hearing adjourned on an application to adjourn it.
       !(decision === 'suspend' && !application.enforcementSuspension) &&
       !(decision === 'adjourn' && !application.adjournment) &&
       // Striking out is a decision on the papers, and never one on an application to suspend enforcement.

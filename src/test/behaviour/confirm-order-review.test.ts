@@ -139,7 +139,6 @@ const APPLICATIONS = [
     applicant: 'Alex Example (Defendant 1)',
     submittedOn: '2026-10-19',
     whatOrderWanted: 'I missed the deadline through illness.',
-    draftOrderWording: '<p>The defendant has relief from sanctions.</p><p>No order as to costs.</p>',
     documents: [],
   },
   {
@@ -238,12 +237,12 @@ describe('confirm order review', () => {
       expect(errors(refused.text)).toEqual([DECIDED_SINCE]);
     });
 
-    it("shows the applications first with the claim untouched, the judge's inserted wording, and issues", async () => {
+    it('shows the applications first with the claim untouched, the decisions, and issues', async () => {
       app = await caseworkerReviewing(
         await judgesOrder({
           applications: APPLICATIONS,
           decide: () => {
-            check('app-gen-app-1-decision', 'applicant-wording');
+            check('app-gen-app-1-decision', 'dismiss');
             check('app-gen-app-2-decision', 'dismiss');
           },
         }),
@@ -251,9 +250,9 @@ describe('confirm order review', () => {
       );
       const page = await openReview(app);
 
-      // The judge's order as submitted, with the applicant's wording it takes.
+      // The judge's order as submitted.
       const preview = document.querySelector('[data-order-preview]')!;
-      expect(preview.textContent).toContain('The defendant has relief from sanctions.');
+      expect(preview.textContent).toContain("The defendant's application dated 19 October 2026 is dismissed.");
       expect(preview.textContent).toContain("The claimant's application dated 21 October 2026 is dismissed.");
       expect(preview.textContent).not.toContain('possession');
 
@@ -261,13 +260,12 @@ describe('confirm order review', () => {
       expect(control('input[name="claim-order"]').checked).toBe(false);
       expect(control<HTMLElement>('[data-claim-order]').hidden).toBe(true);
       expect(control('#order-type').value).toBe('NO_ORDER_ON_CLAIM');
-      expect(control('[name="app-gen-app-1-decision"][value="applicant-wording"]').checked).toBe(true);
+      expect(control('[name="app-gen-app-1-decision"][value="dismiss"]').checked).toBe(true);
       expect(control('[name="app-gen-app-2-decision"][value="dismiss"]').checked).toBe(true);
       const lines = page.documentText().split('\n');
       expect(lines.slice(lines.indexOf('IT IS ORDERED THAT:'))).toEqual([
         'IT IS ORDERED THAT:',
-        'The defendant has relief from sanctions.',
-        'No order as to costs.',
+        "The defendant's application dated 19 October 2026 is dismissed.",
         "The claimant's application dated 21 October 2026 is dismissed.",
       ]);
 

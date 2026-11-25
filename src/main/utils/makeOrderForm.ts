@@ -1,6 +1,5 @@
 import escapeHtml from 'escape-html';
 import { DateTime } from 'luxon';
-import { filterXSS } from 'xss';
 
 import {
   NOTICE_DATE_PREFIXES,
@@ -81,99 +80,11 @@ function caseBundleModel(bundle: OrderCaseBundle, caseReference: number) {
   };
 }
 
-/** The rich text an applicant's draft order may hold: its paragraphs, lists and emphasis, nothing that runs. */
-const DRAFT_ORDER_TAGS = ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'strike', 'ul', 'ol', 'li', 'blockquote'];
-
-const draftOrderHtml = (html: string): string =>
-  filterXSS(html, {
-    whiteList: { ...Object.fromEntries(DRAFT_ORDER_TAGS.map(tag => [tag, []])), ol: ['start'], li: ['value'] },
-    stripIgnoreTag: true,
-    stripIgnoreTagBody: ['script', 'style'],
-  });
-
-/** A paragraph or list item of an applicant's draft order, as plain text, with any list nested in it. */
-export interface DraftClause {
-  text: string;
-  children: DraftClause[];
-}
-
-const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
-
-const plain = (text: string): string =>
-  text
-    .replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (entity, name: string) =>
-      name.startsWith('#')
-        ? String.fromCodePoint(
-            parseInt(name.slice(name[1].toLowerCase() === 'x' ? 2 : 1), name[1].toLowerCase() === 'x' ? 16 : 10)
-          )
-        : (ENTITIES[name.toLowerCase()] ?? entity)
-    )
-    .replace(/\s+/g, ' ')
-    .trim();
-
-/**
- * An applicant's draft order, as draftOrderHtml cleaned it, as plain clauses: each line of a paragraph one, and each
- * list item one with any list nested in it. Their emphasis is not kept. The cleaned HTML holds only the tags it
- * allows, so its tags and text are read in turn.
- */
-export function draftClauses(html: string): DraftClause[] {
-  const root: DraftClause[] = [];
-  const lists: DraftClause[][] = [root];
-  const items: DraftClause[] = [];
-  let line = '';
-  const endLine = (): void => {
-    const text = plain(line);
-    line = '';
-    if (text) {
-      lists[lists.length - 1].push({ text, children: [] });
-    }
-  };
-  for (const [token, closing, tag] of html.matchAll(/<(\/?)([a-z]+)[^>]*>|[^<]+/gi)) {
-    const item = items[items.length - 1];
-    const name = tag?.toLowerCase();
-    if (!name) {
-      if (item) {
-        item.text += token;
-      } else {
-        line += token;
-      }
-    } else if (name === 'ol' || name === 'ul') {
-      endLine();
-      if (closing) {
-        lists.pop();
-      } else {
-        lists.push(item ? item.children : lists[lists.length - 1]);
-      }
-    } else if (name === 'li') {
-      if (closing) {
-        item.text = plain(item.text);
-        items.pop();
-      } else {
-        const opened = { text: '', children: [] };
-        lists[lists.length - 1].push(opened);
-        items.push(opened);
-      }
-    } else if (item) {
-      item.text += name === 'br' ? ' ' : '';
-    } else if (name === 'br' || name === 'p' || name === 'blockquote') {
-      endLine();
-    }
-  }
-  endLine();
-  return root;
-}
-
 const lines = (text: string): string => `<p>${escapeHtml(text).replace(/\r?\n/g, '<br>')}</p>`;
 
-/**
- * The order the applicant asked for: their draft order as the rich text they wrote it in, which the order can take as
- * its wording, and apart from it what they asked the court for and why, as its lines. A paper application has neither.
- */
-function requestedWording({ draftOrderWording, whatOrderWanted }: OrderApplication) {
-  return {
-    requestedWordingHtml: draftOrderWording ? draftOrderHtml(draftOrderWording) : '',
-    explanationHtml: whatOrderWanted ? lines(whatOrderWanted) : '',
-  };
+/** What the applicant asked the court for and why, as its lines. A paper application has none. */
+function requestedWording({ whatOrderWanted }: OrderApplication) {
+  return { explanationHtml: whatOrderWanted ? lines(whatOrderWanted) : '' };
 }
 
 /**
@@ -433,7 +344,6 @@ export function applicationsToDecide({
   return caseContext.applications.map(application => ({
     ...application,
     required: application.id === taskGenAppId,
-    applicantWording: Boolean(application.draftOrderWording),
   }));
 }
 
@@ -471,8 +381,6 @@ export interface OrderContext {
     submittedOn: string;
     enforcementSuspension: boolean;
     adjournment: boolean;
-    /** The applicant's draft order as plain clauses, which the order takes as its wording if the judge chooses. */
-    draftOrder: DraftClause[];
   }[];
   /** The case's hearings still to come that an application can be listed at, but for the one the order is made at. */
   upcomingHearings: { id: string; text: string }[];
@@ -495,7 +403,6 @@ export function orderContext(start: OrderStart, formData: FormData = {}, now = D
       submittedOn: displayDate(application.submittedOn),
       enforcementSuspension: application.enforcementSuspension,
       adjournment: application.adjournment,
-      draftOrder: draftClauses(application.draftOrderWording ? draftOrderHtml(application.draftOrderWording) : ''),
     })),
     upcomingHearings: upcomingHearings(start, listedAtHearings(formData), now),
     bankHolidays: start.bankHolidays,

@@ -1,4 +1,4 @@
-import type { DraftClause, OrderBefore, OrderContext } from '../../../utils/makeOrderForm';
+import type { OrderBefore, OrderContext } from '../../../utils/makeOrderForm';
 
 export interface OrderParty {
   id: string;
@@ -25,8 +25,6 @@ export interface OrderApplication {
   enforcementSuspension: boolean;
   /** An application to adjourn a hearing, which an order can adjourn. */
   adjournment: boolean;
-  /** The applicant's draft order as plain clauses, which the order takes as its wording if the judge chooses. */
-  draftOrder: readonly DraftClause[];
   /** What the judge decides about it: "none" while they leave it as it is. */
   decision: string;
   /** When the case's hearing the judge lists it to be heard at is, if they list it at one rather than a new one. */

@@ -31,8 +31,8 @@ const APPLICATION = {
   applicant: 'Alex Example (Defendant 1)',
   submittedOn: '2026-10-01',
   withoutNotice: 'YES',
+  adjournment: true,
   whatOrderWanted: 'I am in hospital.',
-  draftOrderWording: '<p>The hearing is adjourned.</p>',
   documents: [],
 };
 
@@ -131,18 +131,19 @@ describe("make an order: made on the court's own initiative or without notice", 
     expect(sent.order.formData).toMatchObject({ 'order-notice': 'own-initiative', 'own-initiative-by-day': due.day });
   });
 
-  it("keeps the applicant's wording on an order deciding an application without notice, which court staff review", async () => {
+  it('keeps the adjournment on an order deciding an application without notice, which court staff review', async () => {
     app = await bootApp({ application: APPLICATION });
     const page = await openPage((await app.get(`${PAGE}?genAppId=gen-app-1`)).text);
-    check('app-gen-app-1-decision', 'applicant-wording');
-    expect(page.documentText()).toContain('The hearing is adjourned.');
+    check('app-gen-app-1-decision', 'adjourn');
+    check('app-gen-app-1-adjourn-type', 'generally');
+    expect(page.documentText()).toContain('The hearing is adjourned generally');
 
     check('order-notice', 'without-notice');
     const due = futureDate(25);
     typeDate('without-notice-by', due.day, due.month, due.year);
 
     const text = page.documentText();
-    expect(text).toContain('The hearing is adjourned.');
+    expect(text).toContain('The hearing is adjourned generally');
     expect(text.split('\n').at(-1)).toBe(`${WITHOUT_NOTICE} ${shown(due)}.`);
     expect((await app.post(`${PAGE}?genAppId=gen-app-1`, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
     const [{ order }] = submittedOrders() as { order: Record<string, unknown> }[];
@@ -157,12 +158,12 @@ describe("make an order: made on the court's own initiative or without notice", 
     await app.get(`${REVIEW}?orderId=order-awaiting-review&taskId=task-1`);
     const review = await openPage((await app.get(`${REVIEW}/review`)).text);
     expect(control('[name="order-notice"][value="without-notice"]').checked).toBe(true);
-    expect(review.documentText()).toContain('The hearing is adjourned.');
+    expect(review.documentText()).toContain('The hearing is adjourned generally');
     expect(review.documentText()).toContain(`${WITHOUT_NOTICE} ${shown(due)}.`);
     const later = futureDate(26);
     typeDate('without-notice-by', later.day, later.month, later.year);
     expect(review.documentText()).toContain(`${WITHOUT_NOTICE} ${shown(later)}.`);
-    expect(review.documentText()).toContain('The hearing is adjourned.');
+    expect(review.documentText()).toContain('The hearing is adjourned generally');
   });
 
   it('offers the default date, not one kept from before, on a draft saved with neither', async () => {
