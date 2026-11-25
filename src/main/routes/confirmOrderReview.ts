@@ -5,6 +5,7 @@ import { Application, Request, RequestHandler, Response } from 'express';
 import { CallbackRejectedError, HTTPError } from '../HttpError';
 import { CONFIRM_ORDER_REVIEW_ROUTE } from '../constants/caseRoutes';
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
+import { featureFlagMiddleware } from '../middleware/featureFlagMiddleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
 import { applicationsToDecide, attendanceParties, orderFormModel } from '@utils/makeOrderForm';
@@ -133,7 +134,7 @@ const sameOrder: RequestHandler = (req, res, next) =>
     ? next()
     : refusalPage(req, res)(new CallbackRejectedError([ANOTHER_REVIEW_OPENED], 409));
 
-const journey = [oidcMiddleware, makeOrderFeatureMiddleware];
+const journey = [oidcMiddleware, makeOrderFeatureMiddleware, featureFlagMiddleware];
 const inJourney = [...journey, reviewInProgress, sameOrder];
 
 function errorSummary(issues: ValidationIssue[]) {

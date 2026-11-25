@@ -321,8 +321,16 @@ export async function bootApp(
   app.locals.nunjucksEnv.addGlobal('sessionTimeout', {});
   // LaunchDarkly, with the make order flag on unless a test turns it off.
   app.locals.launchDarklyClient = {
-    variation: async (flag: string, _context: unknown, fallback: unknown) =>
-      flag === 'make-order-enabled' ? options.makeOrderEnabled !== false : fallback,
+    variation: async (flag: string, _context: unknown, fallback: unknown) => {
+      switch (flag) {
+        case 'make-order-enabled':
+          return options.makeOrderEnabled !== false;
+        case 'release-1b-enabled':
+          return true;
+        default:
+          return fallback;
+      }
+    },
   };
   app.locals.nunjucksEnv.addGlobal('t', (key: string, fallback?: unknown) =>
     typeof fallback === 'string' ? fallback : key
