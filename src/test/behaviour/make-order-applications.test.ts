@@ -365,14 +365,7 @@ describe('make an order: deciding applications', () => {
       const page = await openPage((await app.get(TASK_PAGE)).text);
       const decisions = (name: string): string[] =>
         [...document.querySelectorAll<HTMLInputElement>(`[name="${name}"]`)].map(input => input.value);
-      expect(decisions(`${P}-decision`)).toEqual([
-        'none',
-        'adjourn',
-        'dismiss',
-        'strike-out',
-        'list',
-        'freeform',
-      ]);
+      expect(decisions(`${P}-decision`)).toEqual(['none', 'adjourn', 'dismiss', 'strike-out', 'list', 'freeform']);
       expect(decisions('app-gen-app-2-decision')).not.toContain('adjourn');
       const body = page.body('SUBMIT_FOR_REVIEW');
       body.set(`${P}-decision`, 'dismiss');
