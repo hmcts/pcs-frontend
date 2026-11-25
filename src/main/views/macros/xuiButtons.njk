@@ -2,13 +2,13 @@
 
 {#
   The buttons at the foot of a page of an XUI event. Continue comes first, so pressing Enter in a field
-  continues rather than going back.
+  continues rather than going back. previousDisabled shows Previous greyed out, as XUI does on an event's first page.
 #}
-{% macro eventButtons(continueText="Continue", previous=true) %}
+{% macro eventButtons(continueText="Continue", previous=true, previousDisabled=false) %}
   <button type="submit" name="action" value="continue" class="govuk-visually-hidden" tabindex="-1" aria-hidden="true">{{ continueText }}</button>
   <div class="govuk-button-group">
     {% if previous %}
-      {{ govukButton({ text: "Previous", classes: "govuk-button--secondary", name: "action", value: "previous" }) }}
+      {{ govukButton({ text: "Previous", classes: "govuk-button--secondary", name: "action", value: "previous", disabled: previousDisabled }) }}
     {% endif %}
     {{ govukButton({ text: continueText, name: "action", value: "continue", preventDoubleClick: true }) }}
   </div>

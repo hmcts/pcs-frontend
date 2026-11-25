@@ -114,6 +114,12 @@ describe('decentralisedEvent route', () => {
       }
     );
 
+    it('sends the schedule eviction event to its page', () => {
+      const redirect = launch('ext:scheduleEviction', {});
+
+      expect(redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/schedule-eviction');
+    });
+
     it('hands other pages no query', () => {
       const redirect = launch('ext:respondPossessionClaim', { orderId: 'order-1', lang: 'cy', cyaReturn: 'true' });
 

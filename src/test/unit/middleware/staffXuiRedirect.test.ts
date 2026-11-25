@@ -137,6 +137,32 @@ describe('staffXuiRedirectMiddleware', () => {
     expect(res.redirect).not.toHaveBeenCalled();
   });
 
+  const SCHEDULE_EVICTION_PATHS = [
+    '/case/1234567890123456/schedule-eviction',
+    '/case/1234567890123456/schedule-eviction/check-your-answers',
+    '/cases/1234567890123456/event/ext%3AscheduleEviction',
+  ];
+
+  it.each(SCHEDULE_EVICTION_PATHS)('returns staff to the case from %s while release 1B is off', async path => {
+    mockIsStaffUser.mockReturnValue(true);
+    mockGetLaunchDarklyFlag.mockResolvedValue(false);
+
+    await invokeMiddleware(path);
+
+    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(expect.anything(), 'release-1b-enabled', false);
+    expect(res.redirect).toHaveBeenCalledWith(303, `${CASE_DETAILS_BASE_URL}/1234567890123456`);
+  });
+
+  it.each(SCHEDULE_EVICTION_PATHS)('lets staff through to %s while release 1B is on', async path => {
+    mockIsStaffUser.mockReturnValue(true);
+    mockGetLaunchDarklyFlag.mockImplementation(async (_req: unknown, flag: string) => flag === 'release-1b-enabled');
+
+    await invokeMiddleware(path);
+
+    expect(next).toHaveBeenCalled();
+    expect(res.redirect).not.toHaveBeenCalled();
+  });
+
   it.each([
     '/case/1234567890123456/make-order',
     '/case/1234567890123456/make-order/sent-for-review',

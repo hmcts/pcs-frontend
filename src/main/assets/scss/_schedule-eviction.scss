@@ -1,0 +1,12 @@
+@use 'govuk-frontend' as *;
+
+.pcs-eviction-panel {
+  max-width: 630px;
+  margin-bottom: govuk-spacing(4);
+  padding: govuk-spacing(3);
+
+  .govuk-panel__title {
+    @include govuk-font($size: 36, $weight: bold);
+    margin-bottom: 0;
+  }
+}

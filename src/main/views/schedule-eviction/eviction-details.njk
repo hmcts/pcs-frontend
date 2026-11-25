@@ -1,0 +1,48 @@
+{% extends "schedule-eviction/_layout.njk" %}
+
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% from "macros/dateTimeInput.njk" import dateInput %}
+{% import "macros/xuiButtons.njk" as buttons with context %}
+
+{% set pageHeading = "Schedule eviction" %}
+
+{% set claimantsHtml %}<ul class="govuk-list">{% for name in claimantNames %}<li>{{ name }}</li>{% endfor %}</ul>{% endset %}
+{% set defendantsHtml %}<ul class="govuk-list">{% for name in defendantNames %}<li>{{ name }}</li>{% endfor %}</ul>{% endset %}
+
+{% block page %}
+  {{ govukSummaryList({
+    card: { title: { text: "Eviction details" } },
+    rows: [
+      { key: { text: "Claimant type" }, value: { text: claimantType } },
+      { key: { text: "Claimant name" }, value: { html: claimantsHtml } },
+      { key: { text: "Defendant(s) name(s)" }, value: { html: defendantsHtml } }
+    ]
+  }) }}
+
+  <form method="post" action="{{ formAction }}" novalidate>
+    {{ csrfProtection(csrfToken) }}
+
+    {{ govukRadios({
+      name: "dispense-with-service",
+      idPrefix: "dispense-with-service",
+      classes: "govuk-radios--inline",
+      fieldset: { legend: { text: "Has the court given permission to dispense with service?", classes: "govuk-fieldset__legend--s" } },
+      items: [
+        { value: "YES", text: "Yes", checked: answers.dispenseWithService == "YES" },
+        { value: "NO", text: "No", checked: answers.dispenseWithService == "NO" }
+      ]
+    }) }}
+
+    {{ dateInput(
+      "eviction-date",
+      "When do you want to schedule the eviction for?",
+      "Use the 24-hour clock. For example, use 17:30 instead of 5:30pm.",
+      answers,
+      error
+    ) }}
+
+    {{ buttons.eventButtons(previousDisabled=true) }}
+  </form>
+{% endblock %}

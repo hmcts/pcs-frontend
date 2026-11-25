@@ -47,6 +47,8 @@ interface CustomSessionData extends SessionData {
   ordersSentForReview?: Record<string, { caseReference: string; propertyAddress: string; caseName: string }>;
   orderReviews?: Record<string, import('../main/utils/orderReview').OrderReviewSession>;
   warrantReturn?: Record<string, WarrantReturn>;
+  // The schedule eviction journey in progress, keyed by case reference.
+  scheduleEvictions?: Record<string, import('../main/utils/scheduleEviction').ScheduleEvictionSession>;
   payment?: PaymentSessionState;
   destroy(callback: (err?: Error) => void): void;
   clientContext?: ClientContextHeaders;
