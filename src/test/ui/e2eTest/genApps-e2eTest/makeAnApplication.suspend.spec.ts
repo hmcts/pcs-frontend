@@ -12,6 +12,7 @@ import {
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../data/page-data/genApps-page-data';
 import { applyToStopOrDelayEviction } from '../../data/page-data/genApps-page-data/applyToStopOrDelayEviction.page.data';
+import { DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG } from '../../utils/actions/custom-actions/launchDarkly.action';
 import { FieldsStore } from '../../utils/actions/custom-actions/recordAnsweredFields.action';
 import { getFormattedDate } from '../../utils/common/date.utils';
 import { test } from '../../utils/common/test-with-case-role-cleanup';
@@ -21,8 +22,7 @@ const home_url = process.env.TEST_URL;
 
 let doYouNeedHelpPayingTheFeeSuspend: ReturnType<typeof doYouNeedHelpPayingTheFee>;
 
-test.beforeEach(async ({ page }) => {
-  initializeExecutor(page);
+async function openChooseAnApplication(mainHeader: string) {
   FieldsStore.clear();
 
   await test.step('Create and submit case, update payment and create new citizen user', async () => {
@@ -43,19 +43,25 @@ test.beforeEach(async ({ page }) => {
     });
     await performValidation('mainHeader', dashboard.mainHeader);
     await performAction('clickLink', dashboard.askTheCourtToMakeAnOrderLink);
-    await performValidation('mainHeader', chooseAnApplication.mainHeader);
+    await performValidation('mainHeader', mainHeader);
   });
 
   doYouNeedHelpPayingTheFeeSuspend = doYouNeedHelpPayingTheFee(test.info().title);
-});
+}
 
 test.afterEach(async () => {
   finaliseAllValidations();
 });
 
-test.describe('Make an Application - e2e Journey @nightly', async () => {
+test.describe('Make an Application - e2e Journey - R2 flag on @nightly', async () => {
+  test.beforeEach(async ({ page }) => {
+    initializeExecutor(page);
+    await performAction('skipTestIfLdFlagDisabled', DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG);
+    await openChooseAnApplication(chooseAnApplication.mainHeaderR2);
+  });
+
   test(
-    'As a Defendant, I successfully apply to Suspend eviction and request help with fees',
+    'As a Defendant, I successfully apply to Suspend eviction and request help with fees - R2 flag on',
     {
       tag: ['@regression'],
       annotation: [
@@ -144,7 +150,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
   );
 
   test(
-    'As a Defendant, I successfully apply to Suspend eviction without a request for help with fees',
+    'As a Defendant, I successfully apply to Suspend eviction without a request for help with fees - R2 flag on',
     {
       tag: ['@CM'],
       annotation: [
@@ -239,6 +245,38 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
         await performAction('verifyApplicationSubmitted');
         await performValidation('mainHeader', dashboard.mainHeader);
       });
+    }
+  );
+});
+
+test.describe('Make an Application - e2e Journey - R2 flag off @nightly', async () => {
+  test.beforeEach(async ({ page }) => {
+    initializeExecutor(page);
+    await performAction('skipTestIfLdFlagEnabled', DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG);
+    await openChooseAnApplication(chooseAnApplication.mainHeader);
+  });
+
+  test(
+    'As a Defendant, I cannot apply to Suspend eviction online and am directed to apply by post - R2 flag off',
+    {
+      tag: ['@regression'],
+      annotation: [
+        { type: 'jira', description: `The corresponding jira ticket : https://hmcts.atlassian.net/browse/HDPI-4622` },
+      ],
+    },
+    async () => {
+      await performValidation('textNotVisible', {
+        elementType: 'label',
+        text: chooseAnApplication.suspendApplicationRadioOption,
+      });
+      await performValidation('text', {
+        elementType: 'paragraphWithLink',
+        text: chooseAnApplication.postOnlyNoticeParagraph,
+      });
+      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyGuidanceLink });
+      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyFillInFormLink });
+      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyFindCourtLink });
+      await performValidation('text', { elementType: 'listItem', text: chooseAnApplication.postOnlySendFormListItem });
     }
   );
 });

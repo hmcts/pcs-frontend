@@ -1,5 +1,11 @@
 export const chooseAnApplication = {
   mainHeader: `Choose an application`,
+  mainHeaderR2: `Choose your application`,
+  postOnlyNoticeParagraph: `You cannot apply to suspend (stop or delay) the eviction online.`,
+  postOnlyGuidanceLink: `read the guidance explaining how to suspend the eviction (GOV.UK, opens in a new tab)`,
+  postOnlyFillInFormLink: `fill in the N244a form`,
+  postOnlyFindCourtLink: `find your local court`,
+  postOnlySendFormListItem: `send the completed form to the court, or deliver it by hand`,
   whatDoYouWantToApplyForQuestion: `What do you want to apply for?`,
   adjournTheHearingRadioOption: `Ask to adjourn the hearing (move it to a later time or date)`,
   youCanApplyToChangeHintText: `You can apply to change the court hearing until a later time or date`,

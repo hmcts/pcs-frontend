@@ -3,12 +3,18 @@ import { Page, test } from '@playwright/test';
 
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
+export const DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG = 'defendant-general-applications-r-2';
+
 let ldClient: LaunchDarkly.LDClient | null = null;
 
 export class LaunchDarklyAction implements IAction {
   async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
     const flagKey = fieldName as string;
     const flagOn = await this.getFlagValue(flagKey);
+    if (action === 'skipTestIfLdFlagEnabled') {
+      test.skip(flagOn, `Flag "${flagKey}" is ON`);
+      return;
+    }
     test.skip(!flagOn, `Flag "${flagKey}" is OFF / returned NULL`);
   }
 
