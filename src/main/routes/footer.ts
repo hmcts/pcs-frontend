@@ -1,4 +1,4 @@
-// import config from 'config';
+import config from 'config';
 import type { Application, Request, Response } from 'express';
 
 import { legalRepresentativeHeaderMiddleware } from '../middleware';
@@ -37,8 +37,7 @@ export default function footerPagesRoutes(app: Application): void {
     legalRepresentativeHeaderMiddleware
   );
 
-  // const xuiBaseUri: string = config.get('xui.uri');
-  const xuiBaseUri: string = 'pcs.aat.platform.hmcts.net/';
+  const xuiBaseUri: string = config.get('xui.uri');
 
   footerPages.forEach(page => {
     app.get(page.path, async (req: Request, res: Response) => {
