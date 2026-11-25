@@ -345,10 +345,30 @@ export default function recordWarrantReturnRoutes(app: Application): void {
     req.session.save(error => (error ? next(error) : res.redirect(pageUrl(caseReference, 'confirmed'))));
   });
 
-  app.get(route('confirmed'), ...journey, (req: Request, res: Response) => {
-    res.render('record-warrant-return/confirmation', {
-      ...pageModel(req),
-    });
+  app.get(route('confirmed'), ...journey, (req: Request, res: Response, next: NextFunction) => {
+    const caseReference = caseReferenceOf(req);
+    const confirmation = req.session.warrantReturnConfirmation?.[caseReference];
+    const caseDetails = req.session.warrantReturnCaseDetails?.[caseReference];
+    if (!confirmation?.returnName || !caseDetails) {
+      return res.redirect(pageUrl(caseReference, 'warrantReturn'));
+    }
+
+    delete req.session.warrantReturnCaseDetails?.[caseReference];
+    delete req.session.warrantReturnConfirmation?.[caseReference];
+    const caseNumber = caseNumberFormatter(caseReference);
+    req.session.save(error =>
+      error
+        ? next(error)
+        : res.render('record-warrant-return/confirmation', {
+            ...pageModel(req),
+            headerModel: xuiHeaderModel(req),
+            caseReferenceDisplay: caseNumber,
+            ...caseDetails,
+            title: `Outcome recorded as ${returnNameLabel(confirmation)}`,
+            bodyLines: [`Case number: ${caseNumber}`],
+            closeUrl: manageCaseDetailsUrl(caseReference),
+          })
+    );
   });
 
   app.get(route('cancel'), ...journey, (req: Request, res: Response, next: NextFunction) => {

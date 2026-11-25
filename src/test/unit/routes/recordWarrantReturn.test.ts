@@ -858,22 +858,89 @@ describe('recordWarrantReturnRoutes', () => {
   });
 
   describe('GET confirmed', () => {
-    it('renders the confirmation page', () => {
-      const res = { render: jest.fn() };
+    const path = '/case/:caseReference/record-warrant-return/confirmed';
+    const caseReference = '1794231546115667';
+    const confirmation = {
+      returnType: WarrantReturnType.FINAL,
+      evictionOutcome: EvictionOutcome.SUCCESSFUL,
+      returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
+    };
+    const caseDetails = {
+      propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
+      caseName: 'Housing Ltd vs Sam Smith',
+    };
+    const remainingSessionData = { '456': {} };
 
-      void getHandler('/case/:caseReference/record-warrant-return/confirmed')(
-        {
-          params: { caseReference: '123' },
-          originalUrl: '/case/123/record-warrant-return/confirmed',
-        } as unknown as Request,
-        res as unknown as Response,
-        jest.fn()
-      );
+    const confirmed = (
+      session: Record<string, unknown>,
+      save = jest.fn((callback: (error?: Error) => void) => callback())
+    ) => {
+      const res = { render: jest.fn(), redirect: jest.fn() };
+      const next = jest.fn();
+      const req = {
+        params: { caseReference },
+        originalUrl: `/case/${caseReference}/record-warrant-return/confirmed`,
+        session: { ...session, save },
+      };
+      void getHandler(path)(req as unknown as Request, res as unknown as Response, next);
+      return { req, res, next };
+    };
+
+    it('shows the recorded outcome and the case number, then deletes the session data', () => {
+      const { req, res } = confirmed({
+        warrantReturnCaseDetails: { [caseReference]: caseDetails, ...remainingSessionData },
+        warrantReturnConfirmation: { [caseReference]: confirmation, ...remainingSessionData },
+      });
 
       expect(res.render).toHaveBeenCalledWith(
         'record-warrant-return/confirmation',
-        expect.objectContaining({ cancelUrl: '/case/123/record-warrant-return/cancel' })
+        expect.objectContaining({
+          caseReferenceDisplay: '1794-2315-4611-5667',
+          propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
+          caseName: 'Housing Ltd vs Sam Smith',
+          title: 'Outcome recorded as Eviction successful',
+          bodyLines: ['Case number: 1794-2315-4611-5667'],
+          closeUrl: expect.stringMatching(/\/cases\/case-details\/PCS\/PCS\/1794231546115667$/),
+        })
       );
+      expect(req.session).toEqual(
+        expect.objectContaining({
+          warrantReturnCaseDetails: remainingSessionData,
+          warrantReturnConfirmation: remainingSessionData,
+        })
+      );
+      expect(req.session.save).toHaveBeenCalled();
+    });
+
+    it.each([
+      ['no recorded outcome', { warrantReturnCaseDetails: { [caseReference]: caseDetails } }],
+      ['no case details', { warrantReturnConfirmation: { [caseReference]: confirmation } }],
+      [
+        'no return name',
+        {
+          warrantReturnCaseDetails: { [caseReference]: caseDetails },
+          warrantReturnConfirmation: { [caseReference]: { ...confirmation, returnName: undefined } },
+        },
+      ],
+    ])('goes back to the start of the event when there is %s', (_name, session) => {
+      const { res } = confirmed(session);
+
+      expect(res.redirect).toHaveBeenCalledWith(`/case/${caseReference}/record-warrant-return`);
+      expect(res.render).not.toHaveBeenCalled();
+    });
+
+    it('passes a failure to save the session to the error handler', () => {
+      const failure = new Error('Redis is down');
+      const { res, next } = confirmed(
+        {
+          warrantReturnCaseDetails: { [caseReference]: caseDetails },
+          warrantReturnConfirmation: { [caseReference]: confirmation },
+        },
+        jest.fn((callback: (error?: Error) => void) => callback(failure))
+      );
+
+      expect(next).toHaveBeenCalledWith(failure);
+      expect(res.render).not.toHaveBeenCalled();
     });
   });
 

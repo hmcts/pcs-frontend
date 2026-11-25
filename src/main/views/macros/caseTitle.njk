@@ -2,7 +2,9 @@
   {% if params.eventName %}
     <span class="govuk-caption-l">{{ params.eventName }}</span>
   {% endif %}
-  <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ params.heading }}</h1>
+  {% if params.heading %}
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ params.heading }}</h1>
+  {% endif %}
 
   <p class="govuk-body govuk-!-margin-bottom-1">
     <span class="govuk-!-font-weight-bold">Case number:</span> {{ params.caseReference }}
