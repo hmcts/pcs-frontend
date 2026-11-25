@@ -90,15 +90,6 @@ export class LaunchDarklyAction implements IAction {
   async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
     const flagKey = fieldName as string;
     const flagValue = await this.getFlagValue(flagKey);
-    if (action === 'skipTestIfLdFlagEnabled') {
-      if (flagValue === undefined) {
-        throw new Error(
-          `Cannot evaluate LaunchDarkly flag "${flagKey}" (SDK key missing, initialisation failed or evaluation errored), so it is unknown whether to run the test`
-        );
-      }
-      test.skip(flagValue, `Flag "${flagKey}" is ON`);
-      return;
-    }
     test.skip(flagValue !== true, `Flag "${flagKey}" is OFF / could not be evaluated`);
   }
 

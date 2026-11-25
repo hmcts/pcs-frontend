@@ -61,7 +61,6 @@ export class ActionRegistry {
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['skipTestIfLdFlagDisabled', new LaunchDarklyAction()],
-    ['skipTestIfLdFlagEnabled', new LaunchDarklyAction()],
     ['selectPaymentOptions', new PaymentAction()],
 
     //Citizen Dashboard

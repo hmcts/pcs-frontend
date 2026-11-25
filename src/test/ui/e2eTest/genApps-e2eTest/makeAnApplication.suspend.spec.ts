@@ -22,7 +22,9 @@ const home_url = process.env.TEST_URL;
 
 let doYouNeedHelpPayingTheFeeSuspend: ReturnType<typeof doYouNeedHelpPayingTheFee>;
 
-async function openChooseAnApplication() {
+test.beforeEach(async ({ page }) => {
+  initializeExecutor(page);
+  await performAction('skipTestIfLdFlagDisabled', DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG);
   FieldsStore.clear();
 
   await test.step('Create and submit case, update payment and create new citizen user', async () => {
@@ -47,30 +49,15 @@ async function openChooseAnApplication() {
   });
 
   doYouNeedHelpPayingTheFeeSuspend = doYouNeedHelpPayingTheFee(test.info().title);
-}
+});
 
 test.afterEach(async () => {
   finaliseAllValidations();
 });
 
-test.describe('Make an Application - e2e Journey - R2 flag on @nightly', async () => {
-  test.beforeEach(async ({ page }) => {
-    initializeExecutor(page);
-    await performAction('skipTestIfLdFlagDisabled', DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG);
-    await openChooseAnApplication();
-    await performValidation('text', { elementType: 'inlineText', text: chooseAnApplication.caption });
-    await performValidation('text', {
-      elementType: 'label',
-      text: chooseAnApplication.suspendApplicationRadioOption,
-    });
-    await performValidation('text', {
-      elementType: 'hintText',
-      text: chooseAnApplication.suspendApplicationHintText,
-    });
-  });
-
+test.describe('Make an Application - e2e Journey @nightly', async () => {
   test(
-    'As a Defendant, I successfully apply to Suspend eviction and request help with fees - R2 flag on',
+    'As a Defendant, I successfully apply to Suspend eviction and request help with fees',
     {
       tag: ['@regression'],
       annotation: [
@@ -159,7 +146,7 @@ test.describe('Make an Application - e2e Journey - R2 flag on @nightly', async (
   );
 
   test(
-    'As a Defendant, I successfully apply to Suspend eviction without a request for help with fees - R2 flag on',
+    'As a Defendant, I successfully apply to Suspend eviction without a request for help with fees',
     {
       tag: ['@CM'],
       annotation: [
@@ -253,37 +240,6 @@ test.describe('Make an Application - e2e Journey - R2 flag on @nightly', async (
       await test.step('And the application is successfully submitted', async () => {
         await performAction('verifyApplicationSubmitted');
         await performValidation('mainHeader', dashboard.mainHeader);
-      });
-    }
-  );
-});
-
-test.describe('Make an Application - e2e Journey - R2 flag off @nightly', async () => {
-  test.beforeEach(async ({ page }) => {
-    initializeExecutor(page);
-    await performAction('skipTestIfLdFlagEnabled', DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG);
-    await openChooseAnApplication();
-  });
-
-  test(
-    'As a Defendant, I cannot apply to Suspend eviction online and am directed to apply by post - R2 flag off',
-    { tag: ['@regression'] },
-    async () => {
-      await performValidation('text', { elementType: 'inlineText', text: chooseAnApplication.caption });
-      await performValidation('textNotVisible', {
-        elementType: 'label',
-        text: chooseAnApplication.suspendApplicationRadioOption.on as string,
-      });
-      await performValidation('text', {
-        elementType: 'paragraphWithLink',
-        text: chooseAnApplication.postOnlyNoticeParagraph,
-      });
-      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyGuidanceLink });
-      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyFillInFormLink });
-      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyFindCourtLink });
-      await performValidation('text', {
-        elementType: 'listItem',
-        text: chooseAnApplication.postOnlySendFormListItem,
       });
     }
   );
