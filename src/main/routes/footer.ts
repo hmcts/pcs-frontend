@@ -37,7 +37,8 @@ export default function footerPagesRoutes(app: Application): void {
     legalRepresentativeHeaderMiddleware
   );
 
-  const xuiBaseUri: string = config.get('xui.uri');
+  // const xuiBaseUri: string = config.get('xui.uri');
+  const xuiBaseUri: string = 'pcs.aat.platform.hmcts.net/';
 
   footerPages.forEach(page => {
     app.get(page.path, async (req: Request, res: Response) => {
