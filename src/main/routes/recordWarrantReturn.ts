@@ -146,7 +146,14 @@ function evictionSummary(ccdCase: CcdCaseData): EvictionSummaryData {
   };
 }
 
-async function caseModel(req: Request, caseReference: string): Promise<Record<string, unknown>> {
+interface CaseModel {
+  evictionData: EvictionSummaryData;
+  caseReferenceDisplay: string;
+  propertyAddressDisplay?: string;
+  caseName?: string;
+}
+
+async function caseModel(req: Request, caseReference: string): Promise<CaseModel> {
   const started = await ccdCaseService.startCaseEvent(
     req.session.user!.accessToken,
     caseReference,
@@ -191,11 +198,20 @@ export default function recordWarrantReturnRoutes(app: Application): void {
     try {
       const caseReference = caseReferenceOf(req);
       const answers = answersFromSession(req.session.warrantReturn?.[caseReference]);
+      const caseDetails = await caseModel(req, caseReference);
 
-      res.render('record-warrant-return/warrant-return', {
-        ...formModel(req, answers),
-        ...(await caseModel(req, caseReference)),
-      });
+      req.session.warrantReturnCaseDetails = {
+        ...req.session.warrantReturnCaseDetails,
+        [caseReference]: {
+          propertyAddressDisplay: caseDetails.propertyAddressDisplay,
+          caseName: caseDetails.caseName,
+        },
+      };
+      req.session.save(error =>
+        error
+          ? next(error)
+          : res.render('record-warrant-return/warrant-return', { ...formModel(req, answers), ...caseDetails })
+      );
     } catch (error) {
       refusedXuiEvent(res, next, error);
     }
@@ -221,15 +237,18 @@ export default function recordWarrantReturnRoutes(app: Application): void {
     req.session.save(error => (error ? next(error) : res.redirect(pageUrl(caseReference, 'checkYourAnswers'))));
   });
 
-  app.get(route('checkYourAnswers'), ...journey, async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      res.render('record-warrant-return/check-your-answers', {
-        ...pageModel(req),
-        ...(await caseModel(req, caseReferenceOf(req))),
-      });
-    } catch (error) {
-      refusedXuiEvent(res, next, error);
+  app.get(route('checkYourAnswers'), ...journey, (req: Request, res: Response) => {
+    const caseReference = caseReferenceOf(req);
+    const caseDetails = req.session.warrantReturnCaseDetails?.[caseReference];
+    if (!req.session.warrantReturn?.[caseReference] || !caseDetails) {
+      return res.redirect(pageUrl(caseReference, 'warrantReturn'));
     }
+
+    res.render('record-warrant-return/check-your-answers', {
+      ...pageModel(req),
+      caseReferenceDisplay: caseNumberFormatter(caseReference),
+      ...caseDetails,
+    });
   });
 
   app.post(route('checkYourAnswers'), ...journey, async (req: Request, res: Response, next: NextFunction) => {

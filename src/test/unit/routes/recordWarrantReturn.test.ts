@@ -96,7 +96,7 @@ describe('recordWarrantReturnRoutes', () => {
   describe('GET warrantReturn', () => {
     const mockStartCaseEvent = ccdCaseService.startCaseEvent as jest.Mock;
 
-    it('renders the warrant return page with the case and an empty form', async () => {
+    it('renders the warrant return page with the case and an empty form, and remembers the case details', async () => {
       mockStartCaseEvent.mockReturnValueOnce({
         data: {
           claimantType: {
@@ -113,18 +113,31 @@ describe('recordWarrantReturnRoutes', () => {
         eventToken: 'event-token',
       });
       const res = { render: jest.fn() };
+      const session = {
+        user: { accessToken: 'token' },
+        warrantReturnCaseDetails: { '456': { propertyAddressDisplay: '2 Low Road', caseName: 'Other case' } },
+        save: jest.fn((callback: (error?: Error) => void) => callback()),
+      };
 
       await getHandler(basePath)(
         {
           params: { caseReference: '1794231546115667' },
           originalUrl: '/case/1794231546115667/record-warrant-return',
-          session: { user: { accessToken: 'token' } },
+          session,
         } as unknown as Request,
         res as unknown as Response,
         jest.fn()
       );
 
       expect(mockStartCaseEvent).toHaveBeenCalledWith('token', '1794231546115667', 'ext:recordWarrantReturn', {});
+      expect(session.warrantReturnCaseDetails).toEqual({
+        '1794231546115667': {
+          propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
+          caseName: 'Housing Ltd vs Sam Smith',
+        },
+        '456': { propertyAddressDisplay: '2 Low Road', caseName: 'Other case' },
+      });
+      expect(session.save).toHaveBeenCalled();
       expect(res.render).toHaveBeenCalledTimes(1);
       const [template, model] = res.render.mock.calls[0];
       expect(template).toBe('record-warrant-return/warrant-return');
@@ -178,7 +191,10 @@ describe('recordWarrantReturnRoutes', () => {
       const res = { render: jest.fn() };
 
       await getHandler(basePath)(
-        { params: { caseReference: '123' }, session: { user: { accessToken: 'token' } } } as unknown as Request,
+        {
+          params: { caseReference: '123' },
+          session: { user: { accessToken: 'token' }, save: jest.fn((callback: (error?: Error) => void) => callback()) },
+        } as unknown as Request,
         res as unknown as Response,
         jest.fn()
       );
@@ -229,17 +245,20 @@ describe('recordWarrantReturnRoutes', () => {
       expect(res.send).toHaveBeenCalledWith('Not Found');
       expect(next).not.toHaveBeenCalled();
     });
-  });
 
-  describe('GET checkYourAnswers', () => {
-    it('passes a failure to load the case to the error handler', async () => {
-      const failure = new HTTPError('CCD is down', 502);
-      (ccdCaseService.startCaseEvent as jest.Mock).mockRejectedValueOnce(failure);
+    it('passes a failure to save the session to the error handler', async () => {
+      const failure = new Error('Redis is down');
       const res = { render: jest.fn() };
       const next = jest.fn();
 
-      await getHandler('/case/:caseReference/record-warrant-return/check-your-answers')(
-        { params: { caseReference: '123' }, session: { user: { accessToken: 'token' } } } as unknown as Request,
+      await getHandler(basePath)(
+        {
+          params: { caseReference: '123' },
+          session: {
+            user: { accessToken: 'token' },
+            save: jest.fn((callback: (error?: Error) => void) => callback(failure)),
+          },
+        } as unknown as Request,
         res as unknown as Response,
         next
       );
@@ -247,21 +266,28 @@ describe('recordWarrantReturnRoutes', () => {
       expect(next).toHaveBeenCalledWith(failure);
       expect(res.render).not.toHaveBeenCalled();
     });
+  });
 
-    it('loads the check your answers page', async () => {
-      (ccdCaseService.startCaseEvent as jest.Mock).mockReturnValueOnce({
-        data: {
-          propertyAddress: { AddressLine1: '1 High Street', PostTown: 'London', PostCode: 'SW1A 1AA' },
-          caseNameHmctsInternal: 'Housing Ltd vs Sam Smith',
-        },
-      });
+  describe('GET checkYourAnswers', () => {
+    const path = '/case/:caseReference/record-warrant-return/check-your-answers';
+    const answers = { returnType: WarrantReturnType.INTERIM, returnName: InterimReturnName.CROWDS_OR_PROTESTS };
+    const caseDetails = {
+      propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
+      caseName: 'Housing Ltd vs Sam Smith',
+    };
+
+    it('loads the check your answers page from the session', async () => {
       const res = { render: jest.fn() };
 
-      await getHandler('/case/:caseReference/record-warrant-return/check-your-answers')(
+      await getHandler(path)(
         {
           params: { caseReference: '1794231546115667' },
           originalUrl: '/case/1794231546115667/record-warrant-return/check-your-answers',
-          session: { user: { accessToken: 'token' } },
+          session: {
+            user: { accessToken: 'token' },
+            warrantReturn: { '1794231546115667': answers },
+            warrantReturnCaseDetails: { '1794231546115667': caseDetails },
+          },
         } as unknown as Request,
         res as unknown as Response,
         jest.fn()
@@ -275,6 +301,25 @@ describe('recordWarrantReturnRoutes', () => {
           caseName: 'Housing Ltd vs Sam Smith',
         })
       );
+    });
+
+    it.each([
+      ['no answers', { warrantReturnCaseDetails: { '123': caseDetails } }],
+      ['no case details', { warrantReturn: { '123': answers } }],
+    ])('goes back to the start of the event when there are %s', async (_name, saved) => {
+      const res = { render: jest.fn(), redirect: jest.fn() };
+
+      await getHandler(path)(
+        {
+          params: { caseReference: '123' },
+          session: { user: { accessToken: 'token' }, ...saved },
+        } as unknown as Request,
+        res as unknown as Response,
+        jest.fn()
+      );
+
+      expect(res.redirect).toHaveBeenCalledWith('/case/123/record-warrant-return');
+      expect(res.render).not.toHaveBeenCalled();
     });
   });
 
@@ -942,7 +987,11 @@ describe('recordWarrantReturnRoutes', () => {
       await getHandler(basePath)(
         {
           params: { caseReference: '123' },
-          session: { user: { accessToken: 'token' }, warrantReturn: saved ? { '123': saved } : undefined },
+          session: {
+            user: { accessToken: 'token' },
+            warrantReturn: saved ? { '123': saved } : undefined,
+            save: jest.fn((callback: (error?: Error) => void) => callback()),
+          },
         } as unknown as Request,
         res as unknown as Response,
         jest.fn()
