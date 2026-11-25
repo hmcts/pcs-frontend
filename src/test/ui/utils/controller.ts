@@ -10,6 +10,7 @@ import { axe_exclusions } from '../config/axe-exclusions.config';
 import { loadPlaywrightSetupEnvIntoProcess } from '../config/load-playwright-setup-env';
 
 import { TriggerPageFunctionalTestsAction } from './actions/custom-actions';
+import { resolveLdFlagged } from './actions/custom-actions/launchDarkly.action';
 import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
 import { ActionRegistry, ValidationRegistry } from './registry';
 import {
@@ -158,9 +159,11 @@ function isPage(actionResult: unknown): actionResult is Page {
 
 export async function performAction(
   action: string,
-  fieldName?: actionData | actionRecord,
-  value?: actionData | actionRecord
+  flaggedFieldName?: actionData | actionRecord,
+  flaggedValue?: actionData | actionRecord
 ): Promise<void> {
+  const fieldName = await resolveLdFlagged(flaggedFieldName);
+  const value = await resolveLdFlagged(flaggedValue);
   const executor = getExecutor();
   if (action === 'reloadPage') {
     await test.step('reloadPage', async () => {
@@ -204,10 +207,12 @@ export async function performAction(
 
 export async function performValidation(
   validation: string,
-  inputFieldName?: validationData | validationRecord,
-  inputData?: validationData | validationRecord
+  flaggedFieldName?: validationData | validationRecord,
+  flaggedData?: validationData | validationRecord
 ): Promise<void> {
   const executor = getExecutor();
+  const inputFieldName = await resolveLdFlagged(flaggedFieldName);
+  const inputData = await resolveLdFlagged(flaggedData);
 
   const [fieldName, data] =
     inputFieldName === undefined
