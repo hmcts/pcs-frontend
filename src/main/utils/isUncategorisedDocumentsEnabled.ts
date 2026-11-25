@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
+import { ENABLE_UNCATEGORISED_DOCUMENTS, RELEASE_1_2_ENABLED } from './featureFlags';
 import { getLaunchDarklyFlag } from './getLaunchDarklyFlag';
-import { ENABLE_UNCATEGORISED_DOCUMENTS, RELEASE_1_2_ENABLED } from './respondToClaimFlags';
 
 /**
  * Dual-gates the Uncategorised documents folder on the view-documents page.
