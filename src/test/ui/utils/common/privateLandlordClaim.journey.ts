@@ -156,10 +156,16 @@ export async function completeAboutYou(page: Page, additionalClaimant = false): 
   }
   await expect(page.getByRole('heading', { level: 1, name: 'Check your answers' })).toBeVisible();
   if (additionalClaimant) {
-    const card = page.locator('#summary-additionalClaimant1');
-    await expect(card.getByText('Additional claimant 1')).toBeVisible();
-    await expect(card.getByText(`${ADDITIONAL_CLAIMANT.firstName} ${ADDITIONAL_CLAIMANT.lastName}`)).toBeVisible();
-    await expect(card.getByText(ADDITIONAL_CLAIMANT.address.postcode)).toBeVisible();
+    const card = page.locator('.govuk-summary-card').filter({ has: page.locator('#summary-additionalClaimant1') });
+    await expect(card.locator('.govuk-summary-card__title')).toHaveText('Additional claimant 1');
+    await expect(
+      card
+        .locator('.govuk-summary-list__value')
+        .filter({ hasText: `${ADDITIONAL_CLAIMANT.firstName} ${ADDITIONAL_CLAIMANT.lastName}` })
+    ).toHaveCount(1);
+    await expect(
+      card.locator('.govuk-summary-list__value').filter({ hasText: ADDITIONAL_CLAIMANT.address.postcode })
+    ).toHaveCount(1);
   }
   await saveAndContinue(page);
   await expectTaskStatus(page, 'About you and your contact preferences', 'Done');
@@ -497,10 +503,15 @@ export async function viewClaimantDashboardAndAccount(page: Page): Promise<void>
   await expect(page.getByRole('link', { name: 'View documents' })).toBeVisible();
   await expect(page.getByText('Contact us for help')).toBeVisible();
 
-  await page.goto(`${process.env.TEST_URL}/claims`);
-  await expect(page.getByRole('heading', { level: 1, name: 'Your property possession account' })).toBeVisible();
-  await expect(page.getByRole('row', { name: new RegExp(`Submitted claim ${caseReference}`) })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Make a housing possession claim' })).toHaveAttribute(
+  // The claim shows as unpaid until Payments' callback reaches pcs-api, which can lag the confirmation page.
+  await expect(async () => {
+    await page.goto(`${process.env.TEST_URL}/claims`);
+    await expect(page.getByRole('heading', { level: 1, name: 'Your property possession account' })).toBeVisible();
+    await expect(page.getByRole('row', { name: new RegExp(`Submitted claim ${caseReference}`) })).toBeVisible({
+      timeout: 2000,
+    });
+  }).toPass({ timeout: 90000, intervals: [5000] });
+  await expect(page.getByRole('button', { name: 'Make a housing possession claim' })).toHaveAttribute(
     'href',
     '/make-a-claim'
   );
