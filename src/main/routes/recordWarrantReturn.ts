@@ -1,4 +1,5 @@
 import { buildFooterModel } from '@hmcts-cft/cft-ui-component-lib';
+import escapeHtml from 'escape-html';
 import { Application, NextFunction, Request, Response } from 'express';
 import { DateTime } from 'luxon';
 
@@ -25,11 +26,13 @@ import {
   formatDefendants,
   interimReturnTypeList,
   isAdditionalDetailsMandatory,
+  returnNameLabel,
   warrantReturnTypeList,
 } from '@utils/warrantReturn';
 import {
   ValidationIssue,
   errorSummary,
+  formatDateTime,
   manageCaseDetailsUrl,
   mapXuiValidation,
   refusedXuiEvent,
@@ -169,6 +172,46 @@ async function caseModel(req: Request, caseReference: string): Promise<CaseModel
     propertyAddressDisplay: formatAddress(ccdCase.propertyAddress),
     caseName: ccdCase.caseNameHmctsInternal,
   };
+}
+
+interface CheckYourAnswersRow {
+  key: { text: string };
+  value: { text?: string; html?: string };
+  actions: { items: { href: string; text: string; visuallyHiddenText: string }[] };
+}
+
+export function checkYourAnswersRows(caseReference: string, warrantReturn: WarrantReturn): CheckYourAnswersRow[] {
+  const changeLink = pageUrl(caseReference, 'warrantReturn');
+  const row = (label: string, value: CheckYourAnswersRow['value']): CheckYourAnswersRow => ({
+    key: { text: label },
+    value,
+    actions: { items: [{ href: changeLink, text: 'Change', visuallyHiddenText: label.toLowerCase() }] },
+  });
+  const isFinal = warrantReturn.returnType === WarrantReturnType.FINAL;
+  const isEvictionSuccessful = isFinal && warrantReturn.evictionOutcome === EvictionOutcome.SUCCESSFUL;
+
+  const rows = [
+    row('Return', { text: warrantReturnTypeList.find(item => item.value === warrantReturn.returnType)?.text }),
+  ];
+  if (isFinal) {
+    rows.push(
+      row('Outcome', { text: evictionOutcomeList.find(item => item.value === warrantReturn.evictionOutcome)?.text })
+    );
+  }
+
+  rows.push(
+    row('Return name', { text: returnNameLabel(warrantReturn) }),
+    row(isEvictionSuccessful ? 'Eviction date and time' : 'Return date and time', {
+      text: formatDateTime(warrantReturn.outcomeDate),
+    })
+  );
+  if (warrantReturn.additionalDetails) {
+    rows.push(
+      row('Additional details', { html: escapeHtml(warrantReturn.additionalDetails).replace(/\r?\n/g, '<br>') })
+    );
+  }
+
+  return rows;
 }
 
 function formModel(

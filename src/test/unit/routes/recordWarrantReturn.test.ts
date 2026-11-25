@@ -20,7 +20,7 @@ import { Application } from 'express';
 import { CallbackRejectedError, HTTPError } from '../../../main/HttpError';
 import { oidcMiddleware } from '../../../main/middleware';
 
-import recordWarrantReturnRoutes from '@routes/recordWarrantReturn';
+import recordWarrantReturnRoutes, { checkYourAnswersRows } from '@routes/recordWarrantReturn';
 import { ccdCaseService } from '@services/ccdCaseService';
 import {
   EvictionOutcome,
@@ -998,6 +998,84 @@ describe('recordWarrantReturnRoutes', () => {
       );
 
       expect(res.render.mock.calls[0][1].answers).toEqual(answers);
+    });
+  });
+
+  describe('checkYourAnswersRows', () => {
+    const change = (visuallyHiddenText: string) => ({
+      items: [{ href: '/case/123/record-warrant-return', text: 'Change', visuallyHiddenText }],
+    });
+
+    it.each([
+      [
+        'a successful eviction',
+        {
+          returnType: WarrantReturnType.FINAL,
+          evictionOutcome: EvictionOutcome.SUCCESSFUL,
+          returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
+          outcomeDate: '2026-07-01T08:05:00.000',
+          additionalDetails: 'Keys handed over\nLocks changed',
+        },
+        [
+          { key: { text: 'Return' }, value: { text: 'Final' }, actions: change('return') },
+          { key: { text: 'Outcome' }, value: { text: 'Eviction successful' }, actions: change('outcome') },
+          { key: { text: 'Return name' }, value: { text: 'Eviction successful' }, actions: change('return name') },
+          {
+            key: { text: 'Eviction date and time' },
+            value: { text: '1 Jul 2026, 8:05:00 AM' },
+            actions: change('eviction date and time'),
+          },
+          {
+            key: { text: 'Additional details' },
+            value: { html: 'Keys handed over<br>Locks changed' },
+            actions: change('additional details'),
+          },
+        ],
+      ],
+      [
+        'a cancelled eviction',
+        {
+          returnType: WarrantReturnType.FINAL,
+          evictionOutcome: EvictionOutcome.CANCELLED,
+          returnName: EvictionUnsuccessfulReturnName.WARRANT_WITHDRAWN,
+          outcomeDate: '2026-01-15T13:05:00.000',
+        },
+        [
+          { key: { text: 'Return' }, value: { text: 'Final' }, actions: change('return') },
+          { key: { text: 'Outcome' }, value: { text: 'Eviction cancelled' }, actions: change('outcome') },
+          { key: { text: 'Return name' }, value: { text: 'Warrant withdrawn' }, actions: change('return name') },
+          {
+            key: { text: 'Return date and time' },
+            value: { text: '15 Jan 2026, 1:05:00 PM' },
+            actions: change('return date and time'),
+          },
+        ],
+      ],
+      [
+        'an interim return',
+        {
+          returnType: WarrantReturnType.INTERIM,
+          returnName: InterimReturnName.CROWDS_OR_PROTESTS,
+          outcomeDate: '2026-03-01T00:00:00.000',
+          additionalDetails: 'Crowd at the door',
+        },
+        [
+          { key: { text: 'Return' }, value: { text: 'Interim' }, actions: change('return') },
+          { key: { text: 'Return name' }, value: { text: 'Crowds or protests' }, actions: change('return name') },
+          {
+            key: { text: 'Return date and time' },
+            value: { text: '1 Mar 2026, 12:00:00 AM' },
+            actions: change('return date and time'),
+          },
+          {
+            key: { text: 'Additional details' },
+            value: { html: 'Crowd at the door' },
+            actions: change('additional details'),
+          },
+        ],
+      ],
+    ])('lists the answers for %s', (_name, warrantReturn, rows) => {
+      expect(checkYourAnswersRows('123', warrantReturn)).toEqual(rows);
     });
   });
 });
