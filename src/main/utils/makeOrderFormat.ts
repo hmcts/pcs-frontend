@@ -79,14 +79,6 @@ export function formatTime({ hours, minutes }: TimeOfDay): string {
   return minutes ? `${hour}:${String(minutes).padStart(2, '0')}${suffix}` : `${hour}${suffix}`;
 }
 
-const DISTRICT_REGISTRY = 'district registry';
-
-/** A District Registry as the judge named it, without "District Registry" if they typed it after the name. */
-export function registryName(typed: string): string {
-  const name = typed.trim();
-  return name.toLowerCase().endsWith(DISTRICT_REGISTRY) ? name.slice(0, -DISTRICT_REGISTRY.length).trim() : name;
-}
-
 /** A hearing's time estimate as HMC and List Assist give it: days, hours and minutes. */
 export const TIME_ESTIMATE_PARTS = ['days', 'hours', 'minutes'] as const;
 export type TimeEstimatePart = (typeof TIME_ESTIMATE_PARTS)[number];

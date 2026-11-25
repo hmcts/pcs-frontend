@@ -30,7 +30,6 @@ describe('make an order: drafting', () => {
     const page = await openPage((await app.get(PAGE)).text);
     type('hearing-1-notes', 'Defendant asked for time to pay');
     check('transfer-enforcement', 'yes');
-    check('transfer-enforcement-court', 'kings-bench');
 
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
@@ -52,9 +51,9 @@ describe('make an order: drafting', () => {
 
     const restored = await openPage((await app.get(PAGE)).text);
     expect(control<HTMLTextAreaElement>('[name="hearing-1-notes"]').value).toBe('Defendant asked for time to pay');
-    expect(control('[name="transfer-enforcement-court"][value="kings-bench"]').checked).toBe(true);
+    expect(control<HTMLInputElement>('[name="transfer-enforcement"]').checked).toBe(true);
     expect(restored.orderText()).toContain(
-      "Enforcement of the Order of Possession is transferred to the High Court, King's Bench Division, pursuant to section 42 of the County Courts Act 1984."
+      'Enforcement of the Order of Possession is transferred to the High Court pursuant to section 42 of the County Courts Act 1984.'
     );
   });
 

@@ -106,23 +106,9 @@
   whether or not it is made at a hearing. Last on the form, as the judges seldom need it.
 #}
 <div>
-  {% set registryHtml %}
-    {{ compact.text("transfer-enforcement-registry", {
-      label: "District Registry",
-      hint: "For example, Bristol",
-      classes: "govuk-input--width-20"
-    }) }}
-  {% endset %}
   <h2 class="govuk-heading-l govuk-!-margin-top-6">Enforcement</h2>
 
   {% set transferHtml %}
-    {{ compact.radios("transfer-enforcement-court", {
-      legend: "Transfer enforcement to",
-      items: [
-        { value: "kings-bench", text: "King's Bench Division" },
-        { value: "district-registry", text: "A District Registry", conditional: { html: registryHtml } }
-      ]
-    }) }}
     {{ compact.checkboxes("transfer-enforcement-costs", {
       items: [{ value: "bailiff", text: "Limit recoverable costs to bailiffs’ fees" }]
     }) }}

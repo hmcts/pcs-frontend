@@ -7,7 +7,6 @@ import {
   parseDate,
   parseMoney,
   parseTime,
-  registryName,
   timeEstimateOf,
 } from './makeOrderFormat';
 
@@ -493,32 +492,6 @@ function validateStaffMessage(formData: Record<string, unknown>): MakeOrderValid
   return validateText(formData, 'staff-message-text', 'Staff message');
 }
 
-const MAX_REGISTRY_LENGTH = 60;
-
-/** Where enforcement of the possession order goes, when the order transfers it. */
-function validateEnforcementTransfer(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
-  const { issues, add, maxLength } = validation(formData);
-  const court = value(formData, 'transfer-enforcement-court');
-  add(
-    ['kings-bench', 'district-registry'].includes(court),
-    'transfer-enforcement-court',
-    "Select King's Bench Division or a District Registry"
-  );
-  if (court === 'district-registry') {
-    // The order adds "District Registry" after the name, so that alone names no registry.
-    if (!registryName(value(formData, 'transfer-enforcement-registry'))) {
-      add(false, 'transfer-enforcement-registry', 'Enter the District Registry');
-    } else {
-      maxLength(
-        'transfer-enforcement-registry',
-        MAX_REGISTRY_LENGTH,
-        `District Registry must be ${MAX_REGISTRY_LENGTH} characters or less`
-      );
-    }
-  }
-  return issues;
-}
-
 /** The checks particular to one kind of order. A switch, so an order type from the request only reaches these. */
 function validateOrderType(orderType: MakeOrderType, formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   switch (orderType) {
@@ -576,7 +549,6 @@ export function validateMakeOrder(
     // No one attended an order made without a hearing, whose parties the caller leaves out.
     ...validateAttendance(formData, parties),
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
-    ...(chosen('transfer-enforcement') ? validateEnforcementTransfer(formData) : []),
     ...validateOrderType(orderType, formData),
     ...validateApplications(formData, applications, withoutHearing, upcomingHearingIds),
     ...validateNotice(formData),

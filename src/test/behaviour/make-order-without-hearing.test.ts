@@ -75,43 +75,22 @@ describe('make an order: without a hearing or an application', () => {
     const headings = [...document.querySelectorAll('h2.govuk-heading-l')].map(heading => heading.textContent?.trim());
     expect(headings.slice(-3)).toEqual(['Own initiative or without notice', 'Enforcement', 'Order preview']);
     check('transfer-enforcement', 'yes');
-
-    const unchosen = page.body();
-    unchosen.set('action', 'SUBMIT_FOR_REVIEW');
-    const noCourt = await app.post(PAGE, unchosen);
-    expect(noCourt.status).toBe(400);
-    expect(noCourt.text).toContain('Select King&#39;s Bench Division or a District Registry');
-
-    check('transfer-enforcement-court', 'district-registry');
-    const unnamed = page.body();
-    unnamed.set('action', 'SUBMIT_FOR_REVIEW');
-    const noRegistry = await app.post(PAGE, unnamed);
-    expect(noRegistry.status).toBe(400);
-    expect(noRegistry.text).toContain('Enter the District Registry');
-
-    type('transfer-enforcement-registry', 'District Registry');
-    const suffixOnly = page.body();
-    suffixOnly.set('action', 'SUBMIT_FOR_REVIEW');
-    expect((await app.post(PAGE, suffixOnly)).text).toContain('Enter the District Registry');
-
-    type('transfer-enforcement-registry', 'Bristol District Registry');
     expect(page.orderText().split('\n').slice(2)).toEqual([
-      'Enforcement of the Order of Possession is transferred to the High Court, Bristol District Registry, pursuant to section 42 of the County Courts Act 1984.',
+      'Enforcement of the Order of Possession is transferred to the High Court pursuant to section 42 of the County Courts Act 1984.',
     ]);
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
     expect((await app.post(PAGE, body)).status).toBe(302);
     const [submitted] = submittedOrders() as { order: { formData: Record<string, unknown> } }[];
-    expect(submitted.order.formData['transfer-enforcement-registry']).toBe('Bristol District Registry');
+    expect(submitted.order.formData['transfer-enforcement']).toEqual('yes');
 
     // The transfer follows the judge to another order type.
     selectTab('tab-strike-out');
     check('strike-subjects', 'claim');
     check('strike-claim-outcome', 'dismissed');
-    check('transfer-enforcement-court', 'kings-bench');
     expect(page.orderText().split('\n').slice(2)).toEqual([
       'The claim is dismissed.',
-      "Enforcement of the Order of Possession is transferred to the High Court, King's Bench Division, pursuant to section 42 of the County Courts Act 1984.",
+      'Enforcement of the Order of Possession is transferred to the High Court pursuant to section 42 of the County Courts Act 1984.',
     ]);
   });
 
@@ -122,9 +101,8 @@ describe('make an order: without a hearing or an application', () => {
     check('strike-subjects', 'claim');
     check('strike-claim-outcome', 'dismissed');
     check('transfer-enforcement', 'yes');
-    check('transfer-enforcement-court', 'kings-bench');
     const transfer =
-      "Enforcement of the Order of Possession is transferred to the High Court, King's Bench Division, pursuant to section 42 of the County Courts Act 1984.";
+      'Enforcement of the Order of Possession is transferred to the High Court pursuant to section 42 of the County Courts Act 1984.';
     const limit =
       'But the Claimant shall not be entitled to recover from the Defendant any costs of enforcement by a High Court Enforcement Officer insofar as they exceed the costs of enforcement by a County Court bailiff.';
     expect(control<HTMLInputElement>('[name="transfer-enforcement-costs"]').checked).toBe(false);
@@ -146,9 +124,8 @@ describe('make an order: without a hearing or an application', () => {
     const page = await openPage((await app.get(PAGE)).text);
     check('order-notice', 'none');
     check('transfer-enforcement', 'yes');
-    check('transfer-enforcement-court', 'kings-bench');
     const transfer =
-      "Enforcement of the Order of Possession is transferred to the High Court, King's Bench Division, pursuant to section 42 of the County Courts Act 1984.";
+      'Enforcement of the Order of Possession is transferred to the High Court pursuant to section 42 of the County Courts Act 1984.';
     expect(page.documentText()).toContain(transfer);
 
     check('claim-order', 'yes');
