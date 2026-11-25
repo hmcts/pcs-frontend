@@ -135,6 +135,49 @@ describe('before a claim exists', () => {
     expect((await app.get('/make-a-claim/trespass')).location).toBe('/login');
   });
 
+  it('shows the claim fee from the fees register, asked for with only the service token', async () => {
+    app = await bootMakeAClaim({ signedIn: false });
+    ccd.claimIssueFee = { amount: '404.00', code: 'FEE0412', version: 4 };
+    const start = text((await app.get('/make-a-claim')).text);
+    expect(start).toContain('It costs £404 to make a claim. You can pay using a debit or credit card.');
+    expect(ccd.claimIssueFeeRequests).toEqual(['Bearer s2s-token']);
+  });
+
+  it('shows pence when the fee is not a whole number of pounds', async () => {
+    app = await bootMakeAClaim({ signedIn: false });
+    ccd.claimIssueFee = { amount: '404.50', code: 'FEE0412', version: 5 };
+    expect(text((await app.get('/make-a-claim')).text)).toContain('It costs £404.50 to make a claim.');
+  });
+
+  it('asks the fees register once for the following visits', async () => {
+    app = await bootMakeAClaim({ signedIn: false });
+    await app.get('/make-a-claim');
+    ccd.claimIssueFee = { amount: '500.00', code: 'FEE0412', version: 5 };
+    expect(text((await app.get('/make-a-claim')).text)).toContain('It costs £404 to make a claim.');
+    expect(ccd.claimIssueFeeRequests).toHaveLength(1);
+  });
+
+  it('shows no amount, and still the page, when the fee cannot be looked up', async () => {
+    app = await bootMakeAClaim({ signedIn: false });
+    ccd.claimIssueFee = 503;
+    const start = await app.get('/make-a-claim');
+    expect(start.status).toBe(200);
+    const shown = text(start.text);
+    expect(shown).toContain('There is a fee to make a claim. You can pay using a debit or credit card.');
+    expect(shown).not.toContain('£');
+    expect(shown).toContain('Start now');
+  });
+
+  it('shows the Welsh text, and tries again after a failed lookup', async () => {
+    app = await bootMakeAClaim({ signedIn: false });
+    ccd.claimIssueFee = 503;
+    await app.get('/make-a-claim');
+    ccd.claimIssueFee = { amount: '404.00', code: 'FEE0412', version: 4 };
+    expect(text((await app.get('/make-a-claim?lang=cy')).text)).toContain(
+      'cyIt costs £404 to make a claim. You can pay using a debit or credit card.'
+    );
+  });
+
   it('turns away claimants who are not private landlords', async () => {
     app = await bootMakeAClaim({ signedIn: false });
     const answered = await app.post('/make-a-claim/claimant-type', { claimantType: 'MORTGAGE_LENDER' });

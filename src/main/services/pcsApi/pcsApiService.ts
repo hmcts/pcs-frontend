@@ -125,3 +125,21 @@ export const getClaimantClaims = async (accessToken: string): Promise<ClaimantCl
   }
   return response.data;
 };
+
+/** The fee to issue a possession claim, as the fees register holds it. */
+export interface ClaimIssueFee {
+  /** Pounds with two decimal places, e.g. 404.00. */
+  amount: string;
+  code: string;
+  version: number;
+}
+
+/** Needs only the service token, so it works before the citizen signs in. */
+export const getClaimIssueFee = async (): Promise<ClaimIssueFee> => {
+  const response = await http.get<Partial<ClaimIssueFee>>(`${getBaseUrl()}/fees/claim-issue`);
+  const { amount, code, version } = response.data ?? {};
+  if (typeof amount !== 'string' || !/^\d+(\.\d+)?$/.test(amount) || typeof code !== 'string') {
+    throw new Error('Unexpected response from claim-issue fee endpoint');
+  }
+  return { amount, code, version: Number(version) };
+};

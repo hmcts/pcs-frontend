@@ -1,8 +1,9 @@
 {
   "pageTitle": "Make a property possession claim online",
   "heading": "Make a property possession claim online",
+  "feeKnown": "It costs {{fee}} to make a claim. You can pay using a debit or credit card.",
+  "feeUnknown": "There is a fee to make a claim. You can pay using a debit or credit card.",
   "paragraphs": [
-    "It costs £404 to make a claim. You can pay using a debit or credit card.",
     "If you’re on a low income, have limited savings or are claiming benefits, you may be able to get help with your fee. If you meet the criteria, you may get support to pay some or all of the fee. <a class=\"govuk-link\" href=\"https://www.gov.uk/get-help-with-court-fees\" target=\"_blank\" rel=\"noopener noreferrer\">Check if you can get help with fees (opens in new tab)</a>."
   ],
   "welshAvailable": "This service is also available <a class=\"govuk-link\" href=\"?lang=cy\">in Welsh (Cymraeg)</a>.",

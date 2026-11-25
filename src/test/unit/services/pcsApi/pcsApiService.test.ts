@@ -2,6 +2,7 @@ import config from 'config';
 
 import {
   getCitizenClaims,
+  getClaimIssueFee,
   getPropertyEligibility,
   getRootGreeting,
   validateAccessCode,
@@ -163,6 +164,28 @@ describe('pcsApiService', () => {
       await expect(getPropertyEligibility('token', 'LU1 1AB')).rejects.toThrow(
         'Unexpected response from property-eligibility endpoint'
       );
+    });
+  });
+
+  describe('getClaimIssueFee', () => {
+    test('reads the fee from pcs-api with no user token', async () => {
+      mockHttp.get.mockResolvedValue({ data: { amount: '404.00', code: 'FEE0412', version: 4 } });
+
+      await expect(getClaimIssueFee()).resolves.toEqual({ amount: '404.00', code: 'FEE0412', version: 4 });
+      expect(mockHttp.get).toHaveBeenCalledWith(`${testApiBase}/fees/claim-issue`);
+    });
+
+    test.each([[{}], [{ amount: 404, code: 'FEE0412', version: 4 }], [{ amount: 'free', code: 'FEE0412' }]])(
+      'refuses the response %o',
+      async data => {
+        mockHttp.get.mockResolvedValue({ data });
+        await expect(getClaimIssueFee()).rejects.toThrow('Unexpected response from claim-issue fee endpoint');
+      }
+    );
+
+    test('lets a failed request through', async () => {
+      mockHttp.get.mockRejectedValue(new Error('Network error'));
+      await expect(getClaimIssueFee()).rejects.toThrow('Network error');
     });
   });
 });

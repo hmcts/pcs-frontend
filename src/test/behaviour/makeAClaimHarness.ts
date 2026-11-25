@@ -30,6 +30,10 @@ export const ccd = {
   /** pcs-api's answer to the property eligibility check, or an HTTP error code it fails with. */
   propertyEligibility: { status: 'ELIGIBLE', legislativeCountry: 'England' } as Record<string, string> | number,
   eligibilityChecks: [] as Record<string, unknown>[],
+  /** pcs-api's answer to the claim issue fee lookup, or an HTTP error code it fails with. */
+  claimIssueFee: { amount: '404.00', code: 'FEE0412', version: 4 } as Record<string, unknown> | number,
+  /** The service tokens the claim issue fee was asked with. */
+  claimIssueFeeRequests: [] as (string | undefined)[],
   searches: [] as Record<string, unknown>[],
   /** Whether CCD's case search fails rather than answering. */
   searchFails: false,
@@ -64,6 +68,12 @@ function ccdStub(): Express {
     return typeof ccd.propertyEligibility === 'number'
       ? res.status(ccd.propertyEligibility).json({ message: 'Unavailable' })
       : res.json(ccd.propertyEligibility);
+  });
+  stub.get('/fees/claim-issue', (req: Request, res: Response) => {
+    ccd.claimIssueFeeRequests.push(req.header('ServiceAuthorization'));
+    return typeof ccd.claimIssueFee === 'number'
+      ? res.status(ccd.claimIssueFee).json({ message: 'Unavailable' })
+      : res.json(ccd.claimIssueFee);
   });
   stub.get('/cases/citizen-claims', (_req: Request, res: Response) => {
     res.json(ccd.claimsAgainst);
@@ -238,6 +248,8 @@ export async function bootMakeAClaim(
   ccd.cardPaymentStatus = 'Success';
   ccd.propertyEligibility = { status: 'ELIGIBLE', legislativeCountry: 'England' };
   ccd.eligibilityChecks = [];
+  ccd.claimIssueFee = { amount: '404.00', code: 'FEE0412', version: 4 };
+  ccd.claimIssueFeeRequests = [];
   ccd.searches = [];
   ccd.searchFails = false;
   ccd.claimsAgainst = [];
@@ -267,6 +279,7 @@ export async function bootMakeAClaim(
     { default: viewDocumentsRoutes },
     { default: reasonableAdjustmentsCallbackRoutes },
     middleware,
+    { clearClaimIssueFeeCache },
   ] = await Promise.all([
     import('../../main/modules/nunjucks'),
     import('../../main/modules/i18n'),
@@ -280,7 +293,9 @@ export async function bootMakeAClaim(
     import('../../main/routes/viewDocuments'),
     import('../../main/routes/makeAClaimReasonableAdjustmentsCallback'),
     import('../../main/middleware'),
+    import('../../main/steps/make-a-claim/start/claimFee'),
   ]);
+  clearClaimIssueFeeCache();
   httpService.setToken('s2s-token', Date.now() + 60 * 60 * 1000);
 
   const app = express();
