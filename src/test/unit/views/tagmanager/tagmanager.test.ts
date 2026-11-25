@@ -13,8 +13,13 @@ const t = (key: string): string => `t(${key})`;
 const enabled = { enabled: true, gtmContainerId: 'GTM-TEST123' };
 const disabled = { ...enabled, enabled: false };
 
-function render(template: string, tracking?: typeof enabled, cspNonce = 'test-nonce-123'): string {
-  return environment.render(template, { t, cspNonce, tracking });
+function render(
+  template: string,
+  tracking?: typeof enabled,
+  cspNonce = 'test-nonce-123',
+  analyticsConsent = true
+): string {
+  return environment.render(template, { t, cspNonce, tracking, analyticsConsent });
 }
 
 describe.each(['tagmanager/head.njk', 'tagmanager/body.njk', 'cookies-banner.njk'])('%s', template => {
@@ -36,13 +41,49 @@ describe('tagmanager/head.njk', () => {
   it('leaves the nonce off when there is none', () => {
     expect(render('tagmanager/head.njk', enabled, '')).toContain('<script>');
   });
+
+  it('loads Google Tag Manager straight away once the user has accepted analytics cookies', () => {
+    expect(render('tagmanager/head.njk', enabled)).toContain('window.loadGoogleTagManager();');
+  });
+
+  it('only defines the loader, without calling it, before the user accepts analytics cookies', () => {
+    const html = render('tagmanager/head.njk', enabled, 'test-nonce-123', false);
+
+    expect(html).toContain('window.loadGoogleTagManager=function(){');
+    expect(html).not.toContain('window.loadGoogleTagManager();');
+  });
+
+  it('loads the container once, however often the loader is called', () => {
+    const script = render('tagmanager/head.njk', enabled, 'test-nonce-123', false).match(
+      /<script[^>]*>([\s\S]*?)<\/script>/
+    )?.[1];
+    const inserted: { src: string }[] = [];
+    const element = { setAttribute: jest.fn() } as unknown as { src: string };
+    const fakeWindow: Record<string, unknown> = {};
+    const fakeDocument = {
+      getElementsByTagName: () => [{ parentNode: { insertBefore: (el: { src: string }) => inserted.push(el) } }],
+      createElement: () => ({ ...element }),
+      querySelector: () => null,
+    };
+
+    new Function('window', 'document', script as string)(fakeWindow, fakeDocument);
+    (fakeWindow.loadGoogleTagManager as () => void)();
+    (fakeWindow.loadGoogleTagManager as () => void)();
+
+    expect(inserted).toHaveLength(1);
+    expect(inserted[0].src).toBe('https://www.googletagmanager.com/gtm.js?id=GTM-TEST123');
+  });
 });
 
 describe('tagmanager/body.njk', () => {
-  it('renders the Google Tag Manager noscript fallback', () => {
+  it('renders the Google Tag Manager noscript fallback once the user has accepted analytics cookies', () => {
     expect(render('tagmanager/body.njk', enabled)).toContain(
       '<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TEST123"'
     );
+  });
+
+  it('renders nothing before the user accepts analytics cookies', () => {
+    expect(render('tagmanager/body.njk', enabled, 'test-nonce-123', false).trim()).toBe('');
   });
 });
 

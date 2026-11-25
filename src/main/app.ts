@@ -10,6 +10,7 @@ import favicon from 'serve-favicon';
 import { setupDev } from './development';
 import { publicRouter } from './guidance';
 import {
+  analyticsConsentMiddleware,
   caseReferenceParamMiddleware,
   formBodyMiddleware,
   judgeXuiRedirectMiddleware,
@@ -36,6 +37,7 @@ app.locals.tracking = {
 setupDev(app, developmentMode);
 
 app.use(cookieParser());
+app.use(analyticsConsentMiddleware);
 app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
 app.use(bodyParser.json());
 app.use(formBodyMiddleware);

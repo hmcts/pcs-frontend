@@ -15,10 +15,11 @@ const environment = new nunjucks.Environment(
   { autoescape: true }
 );
 
-function renderLayout(layout: string, enabled: boolean): string {
+function renderLayout(layout: string, enabled: boolean, analyticsConsent = true): string {
   return environment.renderString(`{% extends "${layout}" %}`, {
     t: (key: string) => key,
     cspNonce: 'test-nonce',
+    analyticsConsent,
     tracking: { enabled, gtmContainerId: 'GTM-TEST123' },
     sessionTimeout: {},
     headerModel: {},
@@ -43,6 +44,14 @@ describe.each(['template.njk', 'stepsTemplate.njk', 'journeyTemplate.njk', 'publ
 
       expect(html).not.toContain('govuk-cookie-banner');
       expect(html).not.toContain('googletagmanager');
+    });
+
+    it('renders the banner but does not load GTM before the user accepts analytics cookies', () => {
+      const html = renderLayout(layout, true, false);
+
+      expect(html.match(/class="govuk-cookie-banner /g)).toHaveLength(1);
+      expect(html).not.toContain('googletagmanager.com/ns.html');
+      expect(html).not.toContain('window.loadGoogleTagManager();');
     });
   }
 );

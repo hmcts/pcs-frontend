@@ -1,4 +1,4 @@
-{% if tracking and tracking.enabled %}
+{% if tracking and tracking.enabled and analyticsConsent %}
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ tracking.gtmContainerId | urlencode }}"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
