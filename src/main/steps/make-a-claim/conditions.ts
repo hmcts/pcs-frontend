@@ -43,7 +43,8 @@ export const asksOtherGrounds = (req: Request): boolean => {
   );
 };
 
-export const asksEnglandRentArrearsGrounds = (req: Request): boolean => isEnglandClaim(req) && hasRentArrearsGrounds(req);
+export const asksEnglandRentArrearsGrounds = (req: Request): boolean =>
+  isEnglandClaim(req) && hasRentArrearsGrounds(req);
 
 export const asksEnglandOtherGrounds = (req: Request): boolean => isEnglandClaim(req) && asksOtherGrounds(req);
 

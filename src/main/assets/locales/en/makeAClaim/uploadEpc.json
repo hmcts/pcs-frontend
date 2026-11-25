@@ -1,9 +1,7 @@
 {
   "pageTitle": "Upload energy performance certificate",
   "heading": "Upload energy performance certificate",
-  "paragraphs": [
-    "Upload a copy of the energy performance certificate."
-  ],
+  "paragraphs": ["Upload a copy of the energy performance certificate."],
   "beforeUploadHeading": "Before you upload your documents",
   "beforeUploadText": "Give your document a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
   "uploadLabel": "Upload files",

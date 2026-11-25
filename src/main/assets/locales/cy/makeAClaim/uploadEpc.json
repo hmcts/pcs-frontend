@@ -1,9 +1,7 @@
 {
   "pageTitle": "cyUpload energy performance certificate",
   "heading": "cyUpload energy performance certificate",
-  "paragraphs": [
-    "cyUpload a copy of the energy performance certificate."
-  ],
+  "paragraphs": ["cyUpload a copy of the energy performance certificate."],
   "beforeUploadHeading": "cyBefore you upload your documents",
   "beforeUploadText": "cyGive your document a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
   "uploadLabel": "cyUpload files",

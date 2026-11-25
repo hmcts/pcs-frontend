@@ -7,8 +7,10 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 export const step: StepDefinition = createMakeAClaimStep({
   stepName: 'recovery-steps',
   stepDir: __dirname,
-  fields: [pageHeadingLongText('recoverySteps', {
+  fields: [
+    pageHeadingLongText('recoverySteps', {
       required: true,
       maxLength: FIELD_LIMITS.recoverySteps,
-    })],
+    }),
+  ],
 });

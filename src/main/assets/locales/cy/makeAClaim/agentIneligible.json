@@ -1,8 +1,6 @@
 {
   "pageTitle": "cyYou cannot use this service",
   "heading": "cyYou cannot use this service",
-  "paragraphs": [
-    "cyAgents cannot make claims on behalf of a landlord. The landlord must make the claim instead."
-  ],
+  "paragraphs": ["cyAgents cannot make claims on behalf of a landlord. The landlord must make the claim instead."],
   "exitText": "cyClose and return to GOV.UK"
 }

@@ -1,9 +1,7 @@
 {
   "pageTitle": "cyUpload occupation contract or licence agreement",
   "heading": "cyUpload occupation contract or licence agreement",
-  "paragraphs": [
-    "cyUpload a signed copy of the occupation contract or licence agreement."
-  ],
+  "paragraphs": ["cyUpload a signed copy of the occupation contract or licence agreement."],
   "beforeUploadHeading": "cyBefore you upload your file",
   "beforeUploadText": "cyGive your file a name that explains what it is. For example, 'licence agreement - 15 Garden Drive'",
   "uploadLabel": "cyUpload files",

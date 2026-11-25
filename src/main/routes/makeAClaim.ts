@@ -240,7 +240,9 @@ function registerSubmittedClaimRoutes(app: Application): void {
         'claimSubmitted'
       );
       const t = content.t as ReturnType<typeof getTranslationFunction>;
-      const panelTitle = t(`makeAClaim:claimSubmitted.${SUBMITTED_PANEL_TITLES.get(String(req.query.status)) ?? 'submittedTitle'}`);
+      const panelTitle = t(
+        `makeAClaim:claimSubmitted.${SUBMITTED_PANEL_TITLES.get(String(req.query.status)) ?? 'submittedTitle'}`
+      );
       const fee = await claimFeeFor(req, caseReference);
       const paymentReference = req.session.claimFeePayments?.[caseReference];
       const dashboardUrl = (await isClaimantOfCase(req, caseReference))
