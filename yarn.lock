@@ -2230,38 +2230,38 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@launchdarkly/eventsource@npm:0.2.4":
-  version: 0.2.4
-  resolution: "@launchdarkly/eventsource@npm:0.2.4"
-  checksum: 10/021f58c5611a2de7a7b67d688678420b1e4cbfec300cbea39b913d043b92fa5028228fdcbecde5e92bffb391017e64cc95ebfd184b10f7939be5b25a16beb3c5
+"@launchdarkly/eventsource@npm:0.2.5":
+  version: 0.2.5
+  resolution: "@launchdarkly/eventsource@npm:0.2.5"
+  checksum: 10/d622e2b0a212749c86fcd12957353ab3c05d169103f9f3e4d89e7739d6088c5dbc005921327ff17c7295673ba827b899051d8969c13f6fd536f0f9e61e426941
   languageName: node
   linkType: hard
 
-"@launchdarkly/js-sdk-common@npm:2.32.2":
-  version: 2.32.2
-  resolution: "@launchdarkly/js-sdk-common@npm:2.32.2"
-  checksum: 10/3dc1fc2f2c0d8d47fb2f3092117f8ef6b05500cde8030ce0d39f342dafd8b159838641a860cb0e19132db1c288784ce9ca475ea4f347237a91d2f91ac2125e22
+"@launchdarkly/js-sdk-common@npm:2.32.3":
+  version: 2.32.3
+  resolution: "@launchdarkly/js-sdk-common@npm:2.32.3"
+  checksum: 10/f164b921a4f9416c21685ec97721dffcc6be93186b17055c72bf7316043a113475475a57cd98ca69447b3be11f4b3b5c737c58717c29d3000312486cf55f90e2
   languageName: node
   linkType: hard
 
-"@launchdarkly/js-server-sdk-common@npm:2.26.6":
-  version: 2.26.6
-  resolution: "@launchdarkly/js-server-sdk-common@npm:2.26.6"
+"@launchdarkly/js-server-sdk-common@npm:2.26.8":
+  version: 2.26.8
+  resolution: "@launchdarkly/js-server-sdk-common@npm:2.26.8"
   dependencies:
-    "@launchdarkly/js-sdk-common": "npm:2.32.2"
+    "@launchdarkly/js-sdk-common": "npm:2.32.3"
     semver: "npm:7.5.4"
-  checksum: 10/1d4b243323713c3a894d1099a7a9ab35520e76be3c65eee440fbb5bf5efec54a5d46e2b730b4dbfe9292a3c6f1931679b94ec6fe19c7a07422f2a15f7c73cae2
+  checksum: 10/ed056dc1cea5e1dd912a023cbacc6e99c7168b2eed3a8ce697a155d5c087e4d81586aebdad096c312586803cea95faf9f0547894be064fbaa6bb112eed3e71b7
   languageName: node
   linkType: hard
 
-"@launchdarkly/node-server-sdk@npm:9.16.6":
-  version: 9.16.6
-  resolution: "@launchdarkly/node-server-sdk@npm:9.16.6"
+"@launchdarkly/node-server-sdk@npm:9.17.1":
+  version: 9.17.1
+  resolution: "@launchdarkly/node-server-sdk@npm:9.17.1"
   dependencies:
-    "@launchdarkly/eventsource": "npm:0.2.4"
-    "@launchdarkly/js-server-sdk-common": "npm:2.26.6"
+    "@launchdarkly/eventsource": "npm:0.2.5"
+    "@launchdarkly/js-server-sdk-common": "npm:2.26.8"
     https-proxy-agent: "npm:^7.0.6"
-  checksum: 10/4b241ea5785ca82e8998b1dacaf1223825b0d8e12346ff1010d908f7eb1413da9234c654d4c97a4ec7e0f8aa2f12c41be39dc1ee3bc2d5e9b0f88624abd55600
+  checksum: 10/8661653529fa9584d93fa7349564e288b997e1ea397d3e086a570634ecfd167fafde7b5b09a3df5f4eaf7643c870f52d1609eeca1808f2739826ed512143534a
   languageName: node
   linkType: hard
 
@@ -12122,7 +12122,7 @@ __metadata:
     "@hmcts/nodejs-healthcheck": "npm:1.8.6"
     "@hmcts/playwright-common": "npm:1.1.7"
     "@hmcts/properties-volume": "npm:1.4.1"
-    "@launchdarkly/node-server-sdk": "npm:9.16.6"
+    "@launchdarkly/node-server-sdk": "npm:9.17.1"
     "@ministryofjustice/frontend": "npm:^11.0.0"
     "@opentelemetry/api": "npm:1.9.1"
     "@opentelemetry/winston-transport": "npm:0.31.0"
@@ -12771,12 +12771,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prosemirror-transform@npm:1.12.6":
-  version: 1.12.6
-  resolution: "prosemirror-transform@npm:1.12.6"
+"prosemirror-transform@npm:1.12.7":
+  version: 1.12.7
+  resolution: "prosemirror-transform@npm:1.12.7"
   dependencies:
     prosemirror-model: "npm:^1.21.0"
-  checksum: 10/d0980bdb1e5d6a6a9cb58b06af4b3acf90d3cba0ea1a990e06af28f17f4799d71ba05976e544e7cbd4057fd0e1ae16e6964d4d3b0b4a9c9171b498f39fd26b7e
+  checksum: 10/b7e4ca063fcf8441de0fecef14b0e184336c0c1d5205d894384eff23707431a2d4f3d76806fc21671e6f24226eac83df9469d93e6991bb7ee2db8e00b46f8c6e
   languageName: node
   linkType: hard
 
