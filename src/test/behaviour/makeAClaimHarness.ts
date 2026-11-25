@@ -302,7 +302,9 @@ export async function bootMakeAClaim(
   app.use(middleware.formBodyMiddleware);
   new Nunjucks(false).enableFor(app);
   app.locals.nunjucksEnv.addGlobal('sessionTimeout', {});
-  new I18n().enableFor(app);
+  const i18n = new I18n();
+  i18n.enableFor(app);
+  await i18n.ready;
   // LaunchDarkly as the Test environment is set up: the journey on.
   app.locals.launchDarklyClient = {
     variation: async (flag: string, _context: unknown, fallback: unknown) =>
