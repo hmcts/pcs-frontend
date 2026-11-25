@@ -73,7 +73,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
           {
             sectionHeader: dashboard.iWantToHeader,
             fieldName: dashboard.askTheCourtToMakeAnOrderLink,
-            header: chooseAnApplication.mainHeaderR2,
+            header: chooseAnApplication.mainHeaderR2Dynamic,
           },
         ],
         [
@@ -164,7 +164,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       await performAction('clickLinkAndVerifySameTabTitle', {
         sectionHeader: dashboard.applicationsSubHeader,
         fieldName: dashboard.askTheCourtToMakeAnOrderLink,
-        header: chooseAnApplication.mainHeaderR2,
+        header: chooseAnApplication.mainHeaderR2Dynamic,
       });
       await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
       await performAction('reloadPage');
@@ -185,7 +185,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
           {
             sectionHeader: dashboard.iWantToHeader,
             fieldName: dashboard.askTheCourtToMakeAnOrderLink,
-            header: chooseAnApplication.mainHeader,
+            header: chooseAnApplication.mainHeaderDynamic,
           },
         ],
         [
@@ -276,7 +276,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       await performAction('clickLinkAndVerifySameTabTitle', {
         sectionHeader: dashboard.applicationsSubHeader,
         fieldName: dashboard.askTheCourtToMakeAnOrderLink,
-        header: chooseAnApplication.mainHeader,
+        header: chooseAnApplication.mainHeaderDynamic,
       });
       await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
       await performAction('reloadPage');

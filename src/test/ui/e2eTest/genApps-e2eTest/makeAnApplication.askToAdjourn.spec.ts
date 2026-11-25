@@ -52,7 +52,7 @@ test.describe('Make an Application - e2e Journey - R2 flag on @nightly', async (
   test.beforeEach(async ({ page }) => {
     initializeExecutor(page);
     await performAction('skipTestIfLdFlagDisabled', DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG);
-    await openChooseAnApplication(chooseAnApplication.mainHeaderR2);
+    await openChooseAnApplication(chooseAnApplication.mainHeaderR2Dynamic);
   });
 
   test('Select an Application - Ask to Adjourn journey - Court hearing in 14 days[Yes] - R2 flag on @regression @healthCheck', async () => {
@@ -179,7 +179,7 @@ test.describe('Make an Application - e2e Journey - R2 flag off @nightly', async 
   test.beforeEach(async ({ page }) => {
     initializeExecutor(page);
     await performAction('skipTestIfLdFlagEnabled', DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG);
-    await openChooseAnApplication(chooseAnApplication.mainHeader);
+    await openChooseAnApplication(chooseAnApplication.mainHeaderDynamic);
   });
 
   test('Select an Application - Ask to Adjourn journey - Court hearing in 14 days[Yes] - R2 flag off @regression @healthCheck', async () => {

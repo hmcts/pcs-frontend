@@ -57,7 +57,7 @@ test.describe('Make an Application - e2e Journey - R2 flag on @nightly', async (
   test.beforeEach(async ({ page }) => {
     initializeExecutor(page);
     await performAction('skipTestIfLdFlagDisabled', DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG);
-    await openChooseAnApplication(chooseAnApplication.mainHeaderR2);
+    await openChooseAnApplication(chooseAnApplication.mainHeaderR2Dynamic);
   });
 
   test(
@@ -75,7 +75,7 @@ test.describe('Make an Application - e2e Journey - R2 flag on @nightly', async (
       await test.step(`Given the user selects Suspend the eviction`, async () => {
         await performAction('chooseAnApplication', {
           question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
-          option: chooseAnApplication.suspendApplicationRadioOption,
+          option: chooseAnApplication.suspendApplicationRadioOptionDynamic,
         });
         await performValidation('mainHeader', applyToStopOrDelayEviction.mainHeader);
         await performAction('clickButton', applyToStopOrDelayEviction.startNowButton);
@@ -163,7 +163,7 @@ test.describe('Make an Application - e2e Journey - R2 flag on @nightly', async (
       await test.step('Given the user selects Suspend the eviction', async () => {
         await performAction('chooseAnApplication', {
           question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
-          option: chooseAnApplication.suspendApplicationRadioOption,
+          option: chooseAnApplication.suspendApplicationRadioOptionDynamic,
         });
         await performValidation('mainHeader', applyToStopOrDelayEviction.mainHeader);
         await performAction('clickButton', applyToStopOrDelayEviction.startNowButton);
@@ -253,7 +253,7 @@ test.describe('Make an Application - e2e Journey - R2 flag off @nightly', async 
   test.beforeEach(async ({ page }) => {
     initializeExecutor(page);
     await performAction('skipTestIfLdFlagEnabled', DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG);
-    await openChooseAnApplication(chooseAnApplication.mainHeader);
+    await openChooseAnApplication(chooseAnApplication.mainHeaderDynamic);
   });
 
   test(
@@ -267,16 +267,19 @@ test.describe('Make an Application - e2e Journey - R2 flag off @nightly', async 
     async () => {
       await performValidation('textNotVisible', {
         elementType: 'label',
-        text: chooseAnApplication.suspendApplicationRadioOption,
+        text: chooseAnApplication.suspendApplicationRadioOptionDynamic,
       });
       await performValidation('text', {
         elementType: 'paragraphWithLink',
-        text: chooseAnApplication.postOnlyNoticeParagraph,
+        text: chooseAnApplication.postOnlyNoticeParagraphDynamic,
       });
-      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyGuidanceLink });
-      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyFillInFormLink });
-      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyFindCourtLink });
-      await performValidation('text', { elementType: 'listItem', text: chooseAnApplication.postOnlySendFormListItem });
+      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyGuidanceLinkDynamic });
+      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyFillInFormLinkDynamic });
+      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyFindCourtLinkDynamic });
+      await performValidation('text', {
+        elementType: 'listItem',
+        text: chooseAnApplication.postOnlySendFormListItemDynamic,
+      });
     }
   );
 });
