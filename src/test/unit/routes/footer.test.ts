@@ -9,6 +9,7 @@ import { legalRepresentativeHeaderMiddleware } from '../../../main/middleware';
 import footerPagesRoutes from '@routes/footer';
 
 jest.mock('config', () => ({
+  has: jest.fn(),
   get: jest.fn(),
 }));
 
@@ -17,11 +18,11 @@ jest.mock('../../../main/middleware', () => ({
 }));
 
 const footerPages = [
-  ['/accessibility', 'footer/accessibility', '/accessibility'],
-  ['/privacy-policy', 'footer/privacy-policy', '/privacy-policy'],
-  ['/cookies', 'footer/cookies', '/cookies'],
-  ['/terms-and-conditions', 'footer/terms-and-conditions', '/legacy-terms-and-conditions'],
-  ['/get-help', 'footer/get-help', '/get-help'],
+  ['/accessibility', 'footer/accessibility'],
+  ['/privacy-policy', 'footer/privacy-policy'],
+  ['/cookies', 'footer/cookies'],
+  ['/terms-and-conditions', 'footer/terms-and-conditions'],
+  ['/get-help', 'footer/get-help'],
 ] as const;
 
 const viewsRoot = nodePath.resolve(__dirname, '../../../main/views');
@@ -50,7 +51,7 @@ function buildApp(): Application {
 describe('footer page routes', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (config.get as jest.Mock).mockReturnValue('https://manage-case.test');
+    (config.has as jest.Mock).mockReturnValue(false);
   });
 
   it('registers the legal representative header middleware for every footer path', () => {
@@ -100,11 +101,32 @@ describe('footer page routes', () => {
     await handler({} as Request, fallbackRes, jest.fn());
     const viewModel = (fallbackRes.render as jest.Mock).mock.calls[0][1];
     expect(viewModel.t('footer.example')).toBe('footer.example');
+
+    const directT = jest.fn((key: string) => `direct:${key}`);
+    const partialReq = {
+      i18n: {
+        getFixedT: jest.fn().mockReturnValue(undefined),
+        t: directT,
+        loadNamespaces,
+      },
+    } as unknown as Request;
+    const partialRes = {
+      locals: { isLegalRepresentative: false },
+      render: jest.fn(),
+      redirect: jest.fn(),
+    } as unknown as Response;
+
+    await handler(partialReq, partialRes, jest.fn());
+    expect(partialRes.render).toHaveBeenCalledWith(template, {
+      t: directT,
+      ns: template,
+      isLegalRepresentative: false,
+    });
   });
 
-  it.each(footerPages)('redirects %s to EXUI for legal representatives', async (path, _template, exuiPath) => {
+  it.each(footerPages)('redirects %s to AAT for legal representatives on a different host', async path => {
     const app = buildApp();
-    const req = {} as Request;
+    const req = { hostname: 'pcs-frontend-pr-2324.preview.platform.hmcts.net' } as unknown as Request;
     const res = {
       locals: { isLegalRepresentative: true },
       render: jest.fn(),
@@ -117,8 +139,50 @@ describe('footer page routes', () => {
     const handler = route[1] as RequestHandler;
     await handler(req, res, jest.fn());
 
-    expect(res.redirect).toHaveBeenCalledWith(`https://manage-case.test${exuiPath}`);
+    expect(res.redirect).toHaveBeenCalledWith(`https://pcs.aat.platform.hmcts.net${path}`);
     expect(res.render).not.toHaveBeenCalled();
+  });
+
+  it('uses configured pcsFrontend.aatUri when present', async () => {
+    (config.has as jest.Mock).mockReturnValue(true);
+    (config.get as jest.Mock).mockReturnValue('https://pcs.custom-aat.platform.hmcts.net');
+
+    const app = buildApp();
+    const req = { hostname: 'pcs-frontend-pr-2324.preview.platform.hmcts.net' } as unknown as Request;
+    const res = {
+      locals: { isLegalRepresentative: true },
+      render: jest.fn(),
+      redirect: jest.fn(),
+    } as unknown as Response;
+
+    footerPagesRoutes(app);
+
+    const handler = (app.get as jest.Mock).mock.calls[0][1] as RequestHandler;
+    await handler(req, res, jest.fn());
+
+    expect(res.redirect).toHaveBeenCalledWith('https://pcs.custom-aat.platform.hmcts.net/accessibility');
+  });
+
+  it('renders locally without redirecting when legal representative is already on the AAT host', async () => {
+    const app = buildApp();
+    const req = { hostname: 'pcs.aat.platform.hmcts.net' } as unknown as Request;
+    const res = {
+      locals: { isLegalRepresentative: true },
+      render: jest.fn(),
+      redirect: jest.fn(),
+    } as unknown as Response;
+
+    footerPagesRoutes(app);
+
+    const handler = (app.get as jest.Mock).mock.calls[0][1] as RequestHandler;
+    await handler(req, res, jest.fn());
+
+    expect(res.redirect).not.toHaveBeenCalled();
+    expect(res.render).toHaveBeenCalledWith('footer/accessibility', {
+      t: expect.any(Function),
+      ns: 'footer/accessibility',
+      isLegalRepresentative: true,
+    });
   });
 
   it('renders the citizen footer when the user is not a legal representative', async () => {
@@ -149,9 +213,9 @@ describe('footer page routes', () => {
     });
   });
 
-  it('redirects to EXUI and sets HMCTS footer locals when legal representative is true', async () => {
+  it('redirects to AAT and sets HMCTS footer locals when legal representative is true', async () => {
     const app = buildApp();
-    const req = {} as Request;
+    const req = { hostname: 'pcs-frontend-pr-2324.preview.platform.hmcts.net' } as unknown as Request;
     const render = jest.fn();
     const redirect = jest.fn();
     const res = {
@@ -175,7 +239,7 @@ describe('footer page routes', () => {
     const handler = (app.get as jest.Mock).mock.calls[0][1] as RequestHandler;
     await handler(req, res, next);
 
-    expect(redirect).toHaveBeenCalledWith('https://manage-case.test/accessibility');
+    expect(redirect).toHaveBeenCalledWith('https://pcs.aat.platform.hmcts.net/accessibility');
     expect(render).not.toHaveBeenCalled();
 
     const html = environment.renderString(
