@@ -7,6 +7,14 @@
   <span class="govuk-label govuk-label--s pcs-inline-date__label" aria-hidden="true">Possession by</span>
   {{ compact.date({ id: "suspended-by-date", legend: "Possession by", legendHidden: true }) }}
 </div>
+{{ compact.text("suspended-by-time", {
+  label: "Time (optional)",
+  hint: "For example, 16:00. Clear it to give no time.",
+  classes: "govuk-input--width-5",
+  spellcheck: false,
+  optional: true,
+  default: "16:00"
+}) }}
 
 {{ conditions.paymentConditions("suspended", "Suspended on condition of") }}
 
