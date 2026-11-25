@@ -4,9 +4,9 @@ jest.mock('@utils/getLaunchDarklyFlag', () => ({
   getLaunchDarklyFlag: jest.fn(),
 }));
 
+import { ENABLE_UNCATEGORISED_DOCUMENTS, RELEASE_1_2_ENABLED } from '@utils/featureFlags';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isUncategorisedDocumentsEnabled } from '@utils/isUncategorisedDocumentsEnabled';
-import { ENABLE_UNCATEGORISED_DOCUMENTS, RELEASE_1_2_ENABLED } from '@utils/respondToClaimFlags';
 
 const mockGetLaunchDarklyFlag = getLaunchDarklyFlag as jest.MockedFunction<typeof getLaunchDarklyFlag>;
 
