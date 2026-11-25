@@ -299,6 +299,7 @@ describe('recordWarrantReturnRoutes', () => {
           caseReferenceDisplay: '1794-2315-4611-5667',
           propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
           caseName: 'Housing Ltd vs Sam Smith',
+          answerRows: checkYourAnswersRows('1794231546115667', answers),
         })
       );
     });

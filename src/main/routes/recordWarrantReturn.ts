@@ -282,8 +282,9 @@ export default function recordWarrantReturnRoutes(app: Application): void {
 
   app.get(route('checkYourAnswers'), ...journey, (req: Request, res: Response) => {
     const caseReference = caseReferenceOf(req);
+    const warrantReturn = req.session.warrantReturn?.[caseReference];
     const caseDetails = req.session.warrantReturnCaseDetails?.[caseReference];
-    if (!req.session.warrantReturn?.[caseReference] || !caseDetails) {
+    if (!warrantReturn || !caseDetails) {
       return res.redirect(pageUrl(caseReference, 'warrantReturn'));
     }
 
@@ -291,6 +292,7 @@ export default function recordWarrantReturnRoutes(app: Application): void {
       ...pageModel(req),
       caseReferenceDisplay: caseNumberFormatter(caseReference),
       ...caseDetails,
+      answerRows: checkYourAnswersRows(caseReference, warrantReturn),
     });
   });
 
