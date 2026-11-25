@@ -1,3 +1,4 @@
+import { type DocWeaveSnapshot, describeChanges } from '@hmcts-cft/docweave';
 import { DateTime } from 'luxon';
 
 import {
@@ -451,6 +452,26 @@ function validateApplications(
     }
   }
   return issues;
+}
+
+/**
+ * A freeform decision generates no wording, leaving the judge to write it: an order deciding an application that way
+ * needs a clause someone wrote, or it would dispose of the application without saying how.
+ */
+export function validateFreeformWording(
+  formData: Record<string, unknown>,
+  applications: readonly ApplicationToDecide[],
+  snapshot: DocWeaveSnapshot | null
+): MakeOrderValidationIssue[] {
+  if (!snapshot || describeChanges(snapshot).inserted > 0) {
+    return [];
+  }
+  return applications
+    .filter(application => value(formData, `${applicationPrefix(application)}-decision`) === 'freeform')
+    .map(application => ({
+      id: `${applicationPrefix(application)}-decision`,
+      message: `Write the decision on application ${application.reference} in the order`,
+    }));
 }
 
 /**

@@ -13,6 +13,7 @@ import {
   type,
   typeDate,
   uncheck,
+  writeInPreview,
 } from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
@@ -260,6 +261,21 @@ describe('make an order: deciding applications', () => {
         'Error: Select what you decide about application GA1',
         'Error: Select what you decide about application GA2',
       ]);
+    });
+
+    it('needs the decision written in the order when the judge decides an application freeform', async () => {
+      const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
+      check(`${P}-decision`, 'freeform');
+      const rejected = await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'));
+      expect(rejected.status).toBe(400);
+      const again = await openPage(rejected.text);
+      expect([...document.querySelectorAll('.govuk-error-message')].map(error => error.textContent?.trim())).toEqual([
+        'Error: Write the decision on application GA1 in the order',
+      ]);
+
+      writeInPreview('The hearing on 14 October is adjourned to the first open date after 28 days.');
+      expect((await app.post(TASK_PAGE, again.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
     });
 
     it("takes the applicant's draft order as the application's clauses, before the costs", async () => {

@@ -14,7 +14,12 @@ import {
   upcomingHearings,
   withoutUnchosenNoticeDates,
 } from '@utils/makeOrderForm';
-import { APPLY_BY_PASSED, MAKE_ORDER_TYPES, validateMakeOrder } from '@utils/makeOrderValidation';
+import {
+  APPLY_BY_PASSED,
+  MAKE_ORDER_TYPES,
+  validateFreeformWording,
+  validateMakeOrder,
+} from '@utils/makeOrderValidation';
 import {
   COSTS,
   FREQUENCIES,
@@ -50,6 +55,7 @@ import {
   orderDetailsRows,
   validateOrderDetails,
 } from '@utils/orderDetails';
+import { applicationDecisions } from '@utils/orderOutcome';
 import {
   MAX_QUERY_LENGTH,
   MAX_REVIEW_DATES,
@@ -439,6 +445,20 @@ const APPLY_BY_PASSED_REVIEW =
 
 /** What stops the order being issued as the review page last sent it, by the rules the judge's order met. */
 export const NO_WORDING = "The order's wording did not load. Reload the page and review the order again";
+export const DECIDED_SINCE =
+  'An application the Judge decided in this order has closed or been decided by another order since. Return the ' +
+  'order to the Judge with a query';
+
+/**
+ * The Judge's order decides an application the review no longer has, as it is no longer open: the page would issue
+ * it without that decision, so court staff return it to the Judge.
+ */
+function decidedSince(review: OrderReviewSession): ValidationIssue[] {
+  const open = new Set(review.caseContext.applications.map(({ id }) => id));
+  return applicationDecisions(review.order.formData).some(({ genAppId }) => !open.has(genAppId))
+    ? [{ id: 'make-order-form', message: DECIDED_SINCE }]
+    : [];
+}
 
 function orderIssues(review: OrderReviewSession): ValidationIssue[] {
   const { order } = review.answers;
@@ -449,14 +469,19 @@ function orderIssues(review: OrderReviewSession): ValidationIssue[] {
   if (!order.orderDocumentJson) {
     return [{ id: 'make-order-form', message: NO_WORDING }];
   }
-  return validateMakeOrder(
-    order.orderType,
-    order.formData,
-    review.hearing ? attendanceParties(review) : [],
-    !review.hearing,
-    applicationsToDecide(review),
-    upcomingHearings(review).map(({ id }) => id)
-  ).map(issue =>
+  const applications = applicationsToDecide(review);
+  return [
+    ...decidedSince(review),
+    ...validateMakeOrder(
+      order.orderType,
+      order.formData,
+      review.hearing ? attendanceParties(review) : [],
+      !review.hearing,
+      applications,
+      upcomingHearings(review).map(({ id }) => id)
+    ),
+    ...validateFreeformWording(order.formData, applications, postedSnapshot(order.orderDocumentJson)),
+  ].map(issue =>
     // Court staff may not know what date the Judge would give instead, which they can ask with a query.
     issue.message === APPLY_BY_PASSED ? { ...issue, message: `${APPLY_BY_PASSED}. ${APPLY_BY_PASSED_REVIEW}` } : issue
   );

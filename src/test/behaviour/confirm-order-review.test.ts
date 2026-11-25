@@ -24,6 +24,9 @@ import {
 
 // The routes read config as they load, so the test does not import them for the message.
 const NO_WORDING = "The order's wording did not load. Reload the page and review the order again";
+const DECIDED_SINCE =
+  'An application the Judge decided in this order has closed or been decided by another order since. Return the ' +
+  'order to the Judge with a query';
 const MAKE_ORDER = `/case/${CASE_REFERENCE}/make-order`;
 const BASE = `/case/${CASE_REFERENCE}/confirm-order-review`;
 const INTRO = `${BASE}?orderId=order-awaiting-review&taskId=task-1`;
@@ -53,11 +56,14 @@ async function judgesOrder(
     applications?: (Record<string, unknown> & { id: string })[];
     hearings?: (Record<string, unknown> & { id: number; date: string })[];
     decide?: () => void;
+    /** The application of the task the judge opened the order from. */
+    task?: string;
   } = {}
 ): Promise<Order> {
   const judgeApp = await bootApp({ applications: options.applications, hearings: options.hearings });
   try {
-    const page = await openPage((await judgeApp.get(MAKE_ORDER)).text);
+    const link = options.task ? `${MAKE_ORDER}?genAppId=${options.task}` : MAKE_ORDER;
+    const page = await openPage((await judgeApp.get(link)).text);
     if (options.decide) {
       options.decide();
     } else if (options.tab) {
@@ -196,6 +202,42 @@ describe('confirm order review', () => {
   afterEach(() => app?.close());
 
   describe('an order on the applications alone', () => {
+    it('words the applications in the order they were made, whichever task the Judge opened the order from', async () => {
+      const decideBoth = () => {
+        check('app-gen-app-1-decision', 'dismiss');
+        check('app-gen-app-2-decision', 'dismiss');
+      };
+      app = await caseworkerReviewing(
+        await judgesOrder({ applications: APPLICATIONS, task: 'gen-app-2', decide: decideBoth }),
+        APPLICATIONS
+      );
+      const page = await openReview(app);
+
+      const wording = page.orderText();
+      expect(wording.indexOf('application dated 19 October 2026 is dismissed')).toBeLessThan(
+        wording.indexOf('application dated 21 October 2026 is dismissed')
+      );
+      expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(RECORD);
+    });
+
+    it('refuses to issue an order deciding an application that has closed since the Judge sent it', async () => {
+      app = await caseworkerReviewing(
+        await judgesOrder({
+          applications: APPLICATIONS,
+          decide: () => {
+            check('app-gen-app-1-decision', 'dismiss');
+            check('app-gen-app-2-decision', 'dismiss');
+          },
+        }),
+        // Another order has decided the first since.
+        [APPLICATIONS[1]]
+      );
+      const page = await openReview(app);
+
+      const refused = await app.post(REVIEW, page.body('ISSUE'));
+      expect(errors(refused.text)).toEqual([DECIDED_SINCE]);
+    });
+
     it("shows the applications first with the claim untouched, the judge's inserted wording, and issues", async () => {
       app = await caseworkerReviewing(
         await judgesOrder({
@@ -1074,6 +1116,7 @@ describe('confirm order review', () => {
             check('order-notice', 'without-notice');
             typeDate('without-notice-by', judgeDate.day, judgeDate.month, judgeDate.year);
           },
+          edit: () => writeInPreview("The claimant's application is granted."),
         }),
         MIXED
       );

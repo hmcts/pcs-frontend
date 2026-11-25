@@ -22,7 +22,12 @@ import {
   withoutHearingRecords,
   withoutUnchosenNoticeDates,
 } from '@utils/makeOrderForm';
-import { type MakeOrderValidationIssue, validateHearingRecord, validateMakeOrder } from '@utils/makeOrderValidation';
+import {
+  type MakeOrderValidationIssue,
+  validateFreeformWording,
+  validateHearingRecord,
+  validateMakeOrder,
+} from '@utils/makeOrderValidation';
 import {
   type FormData,
   type OrderStart,
@@ -235,6 +240,9 @@ export default function makeOrderRoutes(app: Application): void {
               applicationsToDecide(started.envelope),
               upcomingHearings(started.envelope).map(({ id }) => id)
             )
+          : []),
+        ...(action === 'SUBMIT_FOR_REVIEW'
+          ? validateFreeformWording(answers, applicationsToDecide(started.envelope), postedSnapshot(orderDocument))
           : []),
       ];
       if (validationIssues.length) {

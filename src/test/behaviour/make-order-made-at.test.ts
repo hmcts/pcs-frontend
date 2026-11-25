@@ -14,6 +14,7 @@ import {
   startClientContexts,
   submittedOrders,
   type,
+  writeInPreview,
 } from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
@@ -119,6 +120,7 @@ describe('make an order: choosing when it is made', () => {
     recordAttendance();
     check('app-gen-app-2-decision', 'dismiss');
     expect(page.orderText()).toContain("The defendant's application dated 5 October 2026 is dismissed.");
+    writeInPreview("The claimant's application is granted.");
 
     expect((await app.post(taskPage, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
     const [sent] = submittedOrders() as { taskId: string; hearing: { id: number }; order: Record<string, unknown> }[];

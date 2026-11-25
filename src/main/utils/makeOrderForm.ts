@@ -422,19 +422,19 @@ function listedAtHearings(formData: FormData): unknown[] {
 }
 
 /**
- * The case's open applications the order can decide, the one the judge's task asked them to decide first: that
- * one they must decide, and the others they may leave as they are.
+ * The case's open applications the order can decide: the one the judge's task asked them to decide they must decide,
+ * and the others they may leave as they are.
  */
 export function applicationsToDecide({
   caseContext,
   taskGenAppId,
 }: Pick<OrderStart, 'caseContext' | 'taskGenAppId'>): (OrderApplication & ApplicationToDecide)[] {
-  const applications = caseContext.applications.map(application => ({
+  // In the order they were made, as the order words them, wherever the page was opened from.
+  return caseContext.applications.map(application => ({
     ...application,
     required: application.id === taskGenAppId,
     applicantWording: Boolean(application.draftOrderWording),
   }));
-  return [...applications.filter(a => a.required), ...applications.filter(a => !a.required)];
 }
 
 export function attendanceParties({ caseContext }: OrderStart): AttendanceRow[] {
@@ -546,7 +546,10 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
       items.map(item => ({ ...item, selected: item.value === (draft[name] ?? defaultValue) })),
     attendanceParties: attendanceParties(start),
     openCounterclaim: caseContext.openCounterclaim,
-    applications: applications.map(application => applicationModel(application, caseContext.caseReference)),
+    // The form puts the one the judge's task asks them to decide first.
+    applications: [...applications.filter(a => a.required), ...applications.filter(a => !a.required)].map(application =>
+      applicationModel(application, caseContext.caseReference)
+    ),
     upcomingHearings: upcomingHearings(start, listedAtHearings(draft)),
     orderContext: orderContext(start, draft),
     // As the judges agreed: neither at a hearing or on applications to suspend enforcement, which are ordinarily on
