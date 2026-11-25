@@ -18,6 +18,7 @@ import {
   madeAtModel,
   orderFormModel,
   recordPrefix,
+  upcomingHearings,
   withoutHearingRecords,
   withoutUnchosenNoticeDates,
 } from '@utils/makeOrderForm';
@@ -231,7 +232,8 @@ export default function makeOrderRoutes(app: Application): void {
               answers,
               hearing ? attendanceParties(started.envelope) : [],
               !hearing,
-              applicationsToDecide(started.envelope)
+              applicationsToDecide(started.envelope),
+              upcomingHearings(started.envelope).map(({ id }) => id)
             )
           : []),
       ];

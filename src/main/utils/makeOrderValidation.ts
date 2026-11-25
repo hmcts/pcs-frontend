@@ -406,7 +406,8 @@ export function applicationPrefix(application: { id: string }): string {
 function validateApplications(
   formData: Record<string, unknown>,
   applications: readonly ApplicationToDecide[],
-  withoutHearing: boolean
+  withoutHearing: boolean,
+  upcomingHearingIds: readonly string[]
 ): MakeOrderValidationIssue[] {
   const { issues, add } = validation(formData);
   for (const application of applications) {
@@ -422,9 +423,16 @@ function validateApplications(
       !(decision === 'strike-out' && (!withoutHearing || application.enforcementSuspension));
     add(allowed, `${prefix}-decision`, `Select what you decide about application ${application.reference}`);
     // Listed at one of the case's hearings, the order only says which, so only a new hearing asks when.
-    if (decision === 'list' && (value(formData, `${prefix}-list-at`) || 'new') === 'new') {
+    const listAt = value(formData, `${prefix}-list-at`) || 'new';
+    if (decision === 'list' && listAt === 'new') {
       issues.push(...validateListing(formData, `${prefix}-list`, 'Enter a valid hearing date'));
     }
+    // A hearing the order was drafted to list it at that has passed since is not one it can be heard at.
+    add(
+      decision !== 'list' || listAt === 'new' || upcomingHearingIds.includes(listAt),
+      `${prefix}-list-at`,
+      `The hearing application ${application.reference} is listed at has passed. Select another hearing`
+    );
     if (decision === 'suspend') {
       issues.push(...validatePaymentConditions(formData, `${prefix}-suspension`));
     }
@@ -559,7 +567,8 @@ export function validateMakeOrder(
   formData: Record<string, unknown>,
   parties: readonly AttendanceParty[],
   withoutHearing = false,
-  applications: readonly ApplicationToDecide[] = []
+  applications: readonly ApplicationToDecide[] = [],
+  upcomingHearingIds: readonly string[] = []
 ): MakeOrderValidationIssue[] {
   const chosen = (name: string): boolean => values(formData, name).includes('yes');
   // In the order the page asks, so the error summary follows the page.
@@ -569,7 +578,7 @@ export function validateMakeOrder(
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
     ...(chosen('transfer-enforcement') ? validateEnforcementTransfer(formData) : []),
     ...validateOrderType(orderType, formData),
-    ...validateApplications(formData, applications, withoutHearing),
+    ...validateApplications(formData, applications, withoutHearing, upcomingHearingIds),
     ...validateNotice(formData),
     ...(chosen('staff-message') ? validateStaffMessage(formData) : []),
   ];

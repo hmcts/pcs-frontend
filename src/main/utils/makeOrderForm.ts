@@ -397,16 +397,28 @@ interface AttendanceRow extends AttendanceParty {
 
 /**
  * The case's hearings still to come, at any of which the order can list an application to be heard, by id with when
- * each is. The page leaves out the one the order is made at.
+ * each is, and any the order already lists one at, which stay for its wording to name even once they have passed. The
+ * page leaves out the one the order is made at.
  */
 export function upcomingHearings(
   { caseContext }: Pick<OrderStart, 'caseContext'>,
+  listedAt: readonly unknown[] = [],
   now: DateTime = DateTime.now()
 ): { id: string; text: string }[] {
   const today = now.setZone('Europe/London').startOf('day');
   return caseContext.hearings
-    .filter(option => DateTime.fromISO(option.date, { zone: 'Europe/London' }) >= today)
+    .filter(
+      option =>
+        DateTime.fromISO(option.date, { zone: 'Europe/London' }) >= today || listedAt.includes(String(option.id))
+    )
     .map(option => ({ id: String(option.id), text: hearingTime(option.date) }));
+}
+
+/** The hearings the order's answers list applications at, by id. */
+function listedAtHearings(formData: FormData): unknown[] {
+  return Object.entries(formData)
+    .filter(([field]) => field.endsWith('-list-at'))
+    .map(([, value]) => value);
 }
 
 /**
@@ -467,7 +479,7 @@ export interface OrderContext {
   bankHolidays: string[];
 }
 
-export function orderContext(start: OrderStart, now = DateTime.now()): OrderContext {
+export function orderContext(start: OrderStart, formData: FormData = {}, now = DateTime.now()): OrderContext {
   return {
     propertyAddress: formatAddress(start.caseContext.propertyAddress),
     before: { judge: start.judge, court: start.caseContext.court },
@@ -483,7 +495,7 @@ export function orderContext(start: OrderStart, now = DateTime.now()): OrderCont
       enforcementSuspension: application.enforcementSuspension,
       draftOrder: draftClauses(application.draftOrderWording ? draftOrderHtml(application.draftOrderWording) : ''),
     })),
-    upcomingHearings: upcomingHearings(start),
+    upcomingHearings: upcomingHearings(start, listedAtHearings(formData), now),
     bankHolidays: start.bankHolidays,
   };
 }
@@ -533,8 +545,8 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     attendanceParties: attendanceParties(start),
     openCounterclaim: caseContext.openCounterclaim,
     applications: applications.map(application => applicationModel(application, caseContext.caseReference)),
-    upcomingHearings: upcomingHearings(start),
-    orderContext: orderContext(start),
+    upcomingHearings: upcomingHearings(start, listedAtHearings(draft)),
+    orderContext: orderContext(start, draft),
     // As the judges agreed: neither at a hearing or on applications to suspend enforcement, which are ordinarily on
     // notice; without notice on other applications; otherwise the court's own initiative.
     orderNoticeDefault: hearing

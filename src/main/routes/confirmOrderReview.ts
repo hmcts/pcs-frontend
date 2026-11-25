@@ -11,6 +11,7 @@ import {
   applicationsToDecide,
   attendanceParties,
   orderFormModel,
+  upcomingHearings,
   withoutUnchosenNoticeDates,
 } from '@utils/makeOrderForm';
 import { APPLY_BY_PASSED, MAKE_ORDER_TYPES, validateMakeOrder } from '@utils/makeOrderValidation';
@@ -453,7 +454,8 @@ function orderIssues(review: OrderReviewSession): ValidationIssue[] {
     order.formData,
     review.hearing ? attendanceParties(review) : [],
     !review.hearing,
-    applicationsToDecide(review)
+    applicationsToDecide(review),
+    upcomingHearings(review).map(({ id }) => id)
   ).map(issue =>
     // Court staff may not know what date the Judge would give instead, which they can ask with a query.
     issue.message === APPLY_BY_PASSED ? { ...issue, message: `${APPLY_BY_PASSED}. ${APPLY_BY_PASSED_REVIEW}` } : issue

@@ -51,10 +51,11 @@ async function judgesOrder(
     staffMessage?: string;
     edit?: () => void;
     applications?: (Record<string, unknown> & { id: string })[];
+    hearings?: (Record<string, unknown> & { id: number; date: string })[];
     decide?: () => void;
   } = {}
 ): Promise<Order> {
-  const judgeApp = await bootApp({ applications: options.applications });
+  const judgeApp = await bootApp({ applications: options.applications, hearings: options.hearings });
   try {
     const page = await openPage((await judgeApp.get(MAKE_ORDER)).text);
     if (options.decide) {
@@ -230,6 +231,34 @@ describe('confirm order review', () => {
 
       // The caseworker can go on to issue it as it is.
       expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(RECORD);
+    });
+  });
+
+  describe('an application listed at a hearing that has passed since the judge sent the order', () => {
+    it('keeps the hearing in the wording, and asks for another before issuing', async () => {
+      const order = await judgesOrder({
+        applications: APPLICATIONS,
+        hearings: [{ id: 7, date: '2099-01-12T10:00:00' }],
+        decide: () => {
+          check('app-gen-app-2-decision', 'list');
+          check('app-gen-app-2-list-at', '7');
+        },
+      });
+      app = await bootApp({
+        caseworker: true,
+        order: await awaitingReview(order),
+        applications: APPLICATIONS,
+        hearings: [{ id: 7, date: '2026-09-22T10:00:00' }],
+      });
+      const page = await openReview(app);
+
+      expect(control('[name="app-gen-app-2-list-at"][value="7"]').checked).toBe(true);
+      expect(page.documentText()).toContain(
+        "The claimant's application dated 21 October 2026 shall be heard at the hearing on 22 September 2026 at 10:00am."
+      );
+      expect(errors((await app.post(REVIEW, page.body('ISSUE'))).text)).toEqual([
+        'The hearing application GA2 is listed at has passed. Select another hearing',
+      ]);
     });
   });
 
