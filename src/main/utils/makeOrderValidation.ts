@@ -440,7 +440,11 @@ function validateApplications(
     }
     if (decision === 'adjourn') {
       const adjournment = value(formData, `${prefix}-adjourn-type`);
-      add(['further-hearing', 'generally'].includes(adjournment), `${prefix}-adjourn-type`, 'Select an adjournment type');
+      add(
+        ['further-hearing', 'generally'].includes(adjournment),
+        `${prefix}-adjourn-type`,
+        'Select an adjournment type'
+      );
       if (adjournment === 'further-hearing') {
         issues.push(...validateListing(formData, `${prefix}-adjourn`, 'Enter a valid hearing date'));
       }
