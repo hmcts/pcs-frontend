@@ -22,7 +22,7 @@ const home_url = process.env.TEST_URL;
 
 let doYouNeedHelpPayingTheFeeSuspend: ReturnType<typeof doYouNeedHelpPayingTheFee>;
 
-async function openChooseAnApplication(mainHeader: string) {
+async function openChooseAnApplication() {
   FieldsStore.clear();
 
   await test.step('Create and submit case, update payment and create new citizen user', async () => {
@@ -43,7 +43,7 @@ async function openChooseAnApplication(mainHeader: string) {
     });
     await performValidation('mainHeader', dashboard.mainHeader);
     await performAction('clickLink', dashboard.askTheCourtToMakeAnOrderLink);
-    await performValidation('mainHeader', mainHeader);
+    await performValidation('mainHeader', chooseAnApplication.mainHeader);
   });
 
   doYouNeedHelpPayingTheFeeSuspend = doYouNeedHelpPayingTheFee(test.info().title);
@@ -57,15 +57,15 @@ test.describe('Make an Application - e2e Journey - R2 flag on @nightly', async (
   test.beforeEach(async ({ page }) => {
     initializeExecutor(page);
     await performAction('skipTestIfLdFlagDisabled', DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG);
-    await openChooseAnApplication(chooseAnApplication.mainHeaderR2Dynamic);
-    await performValidation('text', { elementType: 'inlineText', text: chooseAnApplication.captionR2Dynamic });
+    await openChooseAnApplication();
+    await performValidation('text', { elementType: 'inlineText', text: chooseAnApplication.caption });
     await performValidation('text', {
       elementType: 'label',
-      text: chooseAnApplication.suspendApplicationRadioOptionDynamic,
+      text: chooseAnApplication.suspendApplicationRadioOption,
     });
     await performValidation('text', {
       elementType: 'hintText',
-      text: chooseAnApplication.suspendApplicationHintTextDynamic,
+      text: chooseAnApplication.suspendApplicationHintText,
     });
   });
 
@@ -84,7 +84,7 @@ test.describe('Make an Application - e2e Journey - R2 flag on @nightly', async (
       await test.step(`Given the user selects Suspend the eviction`, async () => {
         await performAction('chooseAnApplication', {
           question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
-          option: chooseAnApplication.suspendApplicationRadioOptionDynamic,
+          option: chooseAnApplication.suspendApplicationRadioOption,
         });
         await performValidation('mainHeader', applyToStopOrDelayEviction.mainHeader);
         await performAction('clickButton', applyToStopOrDelayEviction.startNowButton);
@@ -172,7 +172,7 @@ test.describe('Make an Application - e2e Journey - R2 flag on @nightly', async (
       await test.step('Given the user selects Suspend the eviction', async () => {
         await performAction('chooseAnApplication', {
           question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
-          option: chooseAnApplication.suspendApplicationRadioOptionDynamic,
+          option: chooseAnApplication.suspendApplicationRadioOption,
         });
         await performValidation('mainHeader', applyToStopOrDelayEviction.mainHeader);
         await performAction('clickButton', applyToStopOrDelayEviction.startNowButton);
@@ -262,32 +262,28 @@ test.describe('Make an Application - e2e Journey - R2 flag off @nightly', async 
   test.beforeEach(async ({ page }) => {
     initializeExecutor(page);
     await performAction('skipTestIfLdFlagEnabled', DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG);
-    await openChooseAnApplication(chooseAnApplication.mainHeaderDynamic);
+    await openChooseAnApplication();
   });
 
   test(
     'As a Defendant, I cannot apply to Suspend eviction online and am directed to apply by post - R2 flag off',
     { tag: ['@regression'] },
     async () => {
-      await performValidation('text', { elementType: 'inlineText', text: chooseAnApplication.captionDynamic });
+      await performValidation('text', { elementType: 'inlineText', text: chooseAnApplication.caption });
       await performValidation('textNotVisible', {
         elementType: 'label',
-        text: chooseAnApplication.suspendApplicationRadioOptionDynamic,
+        text: chooseAnApplication.suspendApplicationRadioOption.on as string,
       });
       await performValidation('text', {
         elementType: 'paragraphWithLink',
-        text: chooseAnApplication.postOnlyNoticeParagraphDynamic,
+        text: chooseAnApplication.postOnlyNoticeParagraph,
       });
-      await performValidation('text', {
-        elementType: 'paragraphWithLink',
-        text: chooseAnApplication.postOnlyByPostLineDynamic,
-      });
-      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyGuidanceLinkDynamic });
-      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyFillInFormLinkDynamic });
-      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyFindCourtLinkDynamic });
+      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyGuidanceLink });
+      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyFillInFormLink });
+      await performValidation('text', { elementType: 'link', text: chooseAnApplication.postOnlyFindCourtLink });
       await performValidation('text', {
         elementType: 'listItem',
-        text: chooseAnApplication.postOnlySendFormListItemDynamic,
+        text: chooseAnApplication.postOnlySendFormListItem,
       });
     }
   );
