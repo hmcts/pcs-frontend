@@ -2,8 +2,8 @@ import type { Request } from 'express';
 
 import { getUserType } from '../steps/utils';
 
+import { ENABLE_CUI_PCQ, RELEASE_1_3_ENABLED } from './featureFlags';
 import { getLaunchDarklyFlag } from './getLaunchDarklyFlag';
-import { ENABLE_CUI_PCQ, RELEASE_1_3_ENABLED } from './respondToClaimFlags';
 
 /**
  * Gates the PCQ (Equality and Diversity questionnaire) hand-off.
