@@ -3,6 +3,7 @@ import {
   MANAGE_CASE_URL,
   type Page,
   type TestApp,
+  before,
   bootApp,
   check,
   control,
@@ -250,6 +251,16 @@ describe('confirm order review', () => {
       expect(page.querySelector('.govuk-warning-text')).toBeNull();
       await app.get(REVIEW);
       expect(eventStarts()).toBe(1);
+    });
+
+    it('dates an order made without a hearing the day the judge sent it, not the day it is reviewed', async () => {
+      app = await bootApp({
+        caseworker: true,
+        hearing: null,
+        order: { ...(await awaitingReview()), madeOn: '2026-09-21' },
+      });
+
+      expect((await openReview(app)).openingText()).toBe(before('21 September 2026'));
     });
 
     it('warns that a free form order needs reviewing in full', async () => {

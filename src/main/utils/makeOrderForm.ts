@@ -448,7 +448,7 @@ export interface OrderContext {
   madeAt: string;
   /** The hearings the order can be made at, each with the date an order made at it names. */
   hearings: { id: string; date: string }[];
-  /** The date an order made without a hearing names. */
+  /** The date an order made without a hearing names: the day it was sent for review, or else today. */
   today: string;
   /** Every party, for the wording of an order made without anyone's attendance to name them. */
   parties: { id: string; name: string; kind: AttendanceParty['type'] }[];
@@ -474,7 +474,7 @@ export function orderContext(start: OrderStart, now = DateTime.now()): OrderCont
     madeAt: madeAtValue(start.hearing),
     hearings: hearingChoices(start).map(hearing => ({ id: String(hearing.id), date: displayDate(hearing.date) })),
     // TODO: what date and court an order made without a hearing names, once the Service team have said.
-    today: displayDate(now.setZone('Europe/London').toISO()!),
+    today: displayDate(start.order.madeOn ?? now.setZone('Europe/London').toISO()!),
     parties: attendanceParties(start).map(({ partyId, name, type }) => ({ id: partyId, name, kind: type })),
     applications: applicationsToDecide(start).map(application => ({
       prefix: applicationPrefix(application),

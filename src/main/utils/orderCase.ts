@@ -103,6 +103,8 @@ export interface OrderStart {
     formData: FormData;
     docweaveSnapshot?: DocWeaveSnapshot | null;
     queryFromCaseworker?: string | null;
+    /** The day an order sent for review is made (ISO), which its wording names; none while the judge makes it. */
+    madeOn?: string | null;
   };
   caseContext: OrderCaseContext;
   /**
