@@ -10,7 +10,7 @@ import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../u
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { release14RadioWording } from '@utils/respondToClaimFlags';
+import { release14RadioWording } from '@utils/featureFlags';
 
 type FrequencyFormValue = Lowercase<FrequencyValue>;
 const FREQUENCY_MAP: Record<FrequencyValue, FrequencyFormValue> = {
