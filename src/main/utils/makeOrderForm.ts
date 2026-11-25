@@ -470,6 +470,7 @@ export interface OrderContext {
     applicant: string;
     submittedOn: string;
     enforcementSuspension: boolean;
+    adjournment: boolean;
     /** The applicant's draft order as plain clauses, which the order takes as its wording if the judge chooses. */
     draftOrder: DraftClause[];
   }[];
@@ -493,6 +494,7 @@ export function orderContext(start: OrderStart, formData: FormData = {}, now = D
       applicant: application.applicant,
       submittedOn: displayDate(application.submittedOn),
       enforcementSuspension: application.enforcementSuspension,
+      adjournment: application.adjournment,
       draftOrder: draftClauses(application.draftOrderWording ? draftOrderHtml(application.draftOrderWording) : ''),
     })),
     upcomingHearings: upcomingHearings(start, listedAtHearings(formData), now),

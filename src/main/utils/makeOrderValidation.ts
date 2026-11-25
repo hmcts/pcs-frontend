@@ -374,6 +374,7 @@ function validateAttendance(formData: Record<string, unknown>, parties: readonly
 export const APPLICATION_DECISIONS = [
   'none',
   'applicant-wording',
+  'adjourn',
   'suspend',
   'dismiss',
   'strike-out',
@@ -386,6 +387,7 @@ export interface ApplicationToDecide {
   id: string;
   reference: string;
   enforcementSuspension?: boolean;
+  adjournment?: boolean;
   /** Whether the applicant gave a draft order, which the order can take as its wording. */
   applicantWording?: boolean;
   /** The application the judge's task asked them to decide, which the order may not leave as it is. */
@@ -418,6 +420,7 @@ function validateApplications(
       // Only an applicant who gave a draft order has wording to take, and only enforcement is suspended on conditions.
       !(decision === 'applicant-wording' && !application.applicantWording) &&
       !(decision === 'suspend' && !application.enforcementSuspension) &&
+      !(decision === 'adjourn' && !application.adjournment) &&
       // Striking out is a decision on the papers, and never one on an application to suspend enforcement.
       !(decision === 'strike-out' && (!withoutHearing || application.enforcementSuspension));
     add(allowed, `${prefix}-decision`, `Select what you decide about application ${application.reference}`);
@@ -434,6 +437,13 @@ function validateApplications(
     );
     if (decision === 'suspend') {
       issues.push(...validatePaymentConditions(formData, `${prefix}-suspension`));
+    }
+    if (decision === 'adjourn') {
+      const adjournment = value(formData, `${prefix}-adjourn-type`);
+      add(['further-hearing', 'generally'].includes(adjournment), `${prefix}-adjourn-type`, 'Select an adjournment type');
+      if (adjournment === 'further-hearing') {
+        issues.push(...validateListing(formData, `${prefix}-adjourn`, 'Enter a valid hearing date'));
+      }
     }
   }
   return issues;

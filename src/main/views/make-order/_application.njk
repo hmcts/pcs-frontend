@@ -8,11 +8,12 @@
 
   Each decision but freeform puts its own wording in the order, which says what was decided: there is no bare
   "granted". Taking the applicant's wording, offered only when they gave a draft order, makes it the application's
-  clauses in plain text, which the judge edits in the order preview as any other. Suspending enforcement, offered on an
-  application to suspend it, does so on the conditions a suspended possession order has. Listing it for a hearing asks
-  when, as the adjournment tab does, and leaves the application open, as not dealing with it does; any other decision
-  closes it. Inline radios can't reveal a question, so what follows a decision is on its own rows, shown while it is
-  chosen (initApplicationDecisions in make-order.ts).
+  clauses in plain text, which the judge edits in the order preview as any other. Adjourning, offered on an application
+  to adjourn a hearing, adjourns it to a further hearing or generally, as the adjournment tab does. Suspending
+  enforcement, offered on an application to suspend it, does so on the conditions a suspended possession order has.
+  Listing it for a hearing asks when, as the adjournment tab does, and leaves the application open, as not dealing with
+  it does; any other decision closes it. Inline radios can't reveal a question, so what follows a decision is on its own
+  rows, shown while it is chosen (initApplicationDecisions in make-order.ts).
 #}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
@@ -88,6 +89,9 @@
   {% if application.applicantWording %}
     {% set items = items.concat([{ value: "applicant-wording", text: "Applicant’s wording" }]) %}
   {% endif %}
+  {% if application.adjournment %}
+    {% set items = items.concat([{ value: "adjourn", text: "Adjourned" }]) %}
+  {% endif %}
   {% if application.enforcementSuspension %}
     {% set items = items.concat([{ value: "suspend", text: "Suspended on conditions" }]) %}
   {% endif %}
@@ -110,6 +114,30 @@
     default: none if application.required else "none",
     items: items
   }) }}
+
+  {#
+    Adjourning a hearing on an application to adjourn it asks, as the adjournment tab does, whether it is adjourned
+    to another hearing, and when, or generally.
+  #}
+  {% if application.adjournment %}
+    {% set furtherHearingHtml %}
+      {{ listing.listing(prefix + "-adjourn", "When the hearing is", [
+        "Adjourned to next available possession list after",
+        "Adjourned to next available date (non-possession list) after",
+        "Adjourned to specific date"
+      ]) }}
+    {% endset %}
+    <div data-decision-shows="adjourn" {%- if not draftChecked(name, "adjourn") %} hidden{% endif %}>
+      {{ compact.radios(prefix + "-adjourn-type", {
+        legend: "Adjournment type",
+        classes: "govuk-radios--small",
+        items: [
+          { value: "further-hearing", text: "Adjourned for further hearing", conditional: { html: furtherHearingHtml } },
+          { value: "generally", text: "Adjourned generally" }
+        ]
+      }) }}
+    </div>
+  {% endif %}
 
   {% if application.enforcementSuspension %}
     <div data-decision-shows="suspend" {%- if not draftChecked(name, "suspend") %} hidden{% endif %}>

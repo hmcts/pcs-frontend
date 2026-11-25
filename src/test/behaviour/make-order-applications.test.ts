@@ -31,6 +31,7 @@ const ADJOURN = {
   id: 'gen-app-1',
   reference: 'GA1',
   type: 'Adjourn the hearing',
+  adjournment: true,
   applicant: 'Alex Example (Defendant 1)',
   submittedOn: '2026-10-01',
   within14Days: 'YES',
@@ -132,7 +133,7 @@ describe('make an order: deciding applications', () => {
       const decisions = [...document.querySelectorAll<HTMLInputElement>(`[name="${P}-decision"]:enabled`)].map(
         input => input.value
       );
-      expect(decisions).toEqual(['none', 'applicant-wording', 'dismiss', 'list', 'freeform']);
+      expect(decisions).toEqual(['none', 'applicant-wording', 'adjourn', 'dismiss', 'list', 'freeform']);
       expect(
         control(`[name="${P}-decision"][value="strike-out"]`).closest<HTMLElement>('.govuk-radios__item')!.hidden
       ).toBe(true);
@@ -367,6 +368,62 @@ describe('make an order: deciding applications', () => {
         "The defendant's application dated 1 October 2026 shall be listed for a hearing on notice to all parties on 2 November 2026 at 10:30am with a time estimate of 30 minutes.",
         'The defendant must by 4pm on 20 October 2026 submit to the court and all other parties a defence.',
       ]);
+    });
+  });
+
+  describe('on an application to adjourn a hearing', () => {
+    beforeEach(async () => {
+      app = await bootApp({ application: ADJOURN, applications: [WARRANT] });
+    });
+
+    it('adjourns the hearing generally or to a further hearing, asking when as the adjournment tab does', async () => {
+      const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
+      const adjournment = control<HTMLElement>('[data-application-reference="GA1"] [data-decision-shows="adjourn"]');
+      expect(adjournment.hidden).toBe(true);
+      check(`${P}-decision`, 'adjourn');
+      expect(adjournment.hidden).toBe(false);
+      expect((await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'))).text).toContain('Select an adjournment type');
+
+      check(`${P}-adjourn-type`, 'generally');
+      expect(ordered(page.orderText()).slice(1)).toEqual([
+        'The hearing is adjourned generally with liberty to restore by application by any party on notice to all other parties.',
+      ]);
+
+      check(`${P}-adjourn-type`, 'further-hearing');
+      expect((await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'))).text).toContain('Enter a valid hearing date');
+      check(`${P}-adjourn-when`, 'specific');
+      typeDate(`${P}-adjourn-hearing-date-specific`, '2', '11', '2026');
+      type(`${P}-adjourn-specific-time`, '10:30');
+      type(`${P}-adjourn-time-estimate-minutes`, '30');
+      expect(ordered(page.orderText()).slice(1)).toEqual([
+        'The hearing shall be adjourned to be heard on 2 November 2026 at 10:30am with a time estimate of 30 minutes.',
+      ]);
+      expect((await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
+      const [submitted] = submittedOrders() as { order: Record<string, unknown> }[];
+      expect(submitted.order.applicationDecisions).toEqual([{ genAppId: 'gen-app-1', decision: 'DISPOSED' }]);
+    });
+
+    it('offers adjourning only on an application to adjourn, and refuses it on another', async () => {
+      const page = await openPage((await app.get(TASK_PAGE)).text);
+      const decisions = (name: string): string[] =>
+        [...document.querySelectorAll<HTMLInputElement>(`[name="${name}"]`)].map(input => input.value);
+      expect(decisions(`${P}-decision`)).toEqual([
+        'none',
+        'applicant-wording',
+        'adjourn',
+        'dismiss',
+        'strike-out',
+        'list',
+        'freeform',
+      ]);
+      expect(decisions('app-gen-app-2-decision')).not.toContain('adjourn');
+      const body = page.body('SUBMIT_FOR_REVIEW');
+      body.set(`${P}-decision`, 'dismiss');
+      body.set('app-gen-app-2-decision', 'adjourn');
+      const rejected = await app.post(TASK_PAGE, body);
+      expect(rejected.status).toBe(400);
+      expect(rejected.text).toContain('Select what you decide about application GA2');
     });
   });
 

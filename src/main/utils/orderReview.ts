@@ -283,6 +283,7 @@ const NOTICE_STATEMENTS: Record<string, string> = {
 // The make order form's decision on an application, as the judge's form words it.
 const DECISION_LABELS: Record<string, string> = {
   'applicant-wording': 'Applicant’s wording',
+  adjourn: 'Adjourned',
   suspend: 'Enforcement suspended on conditions',
   dismiss: 'Dismissed',
   'strike-out': 'Struck out',

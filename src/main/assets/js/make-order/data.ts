@@ -23,6 +23,8 @@ export interface OrderApplication {
   submittedOn: string;
   /** An application to suspend enforcement, which an order can suspend on conditions. */
   enforcementSuspension: boolean;
+  /** An application to adjourn a hearing, which an order can adjourn. */
+  adjournment: boolean;
   /** The applicant's draft order as plain clauses, which the order takes as its wording if the judge chooses. */
   draftOrder: readonly DraftClause[];
   /** What the judge decides about it: "none" while they leave it as it is. */

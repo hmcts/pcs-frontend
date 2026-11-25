@@ -3,7 +3,7 @@ import { type DocBuilder, type OrderedListBuilder } from '@hmcts-cft/docweave';
 import type { DraftClause } from '../../../../utils/makeOrderForm';
 import { type OrderApplication, type OrderData } from '../data';
 
-import { sentenceCase } from './common';
+import { sentenceCase, value } from './common';
 import { addListing } from './listing';
 import { addPaymentConditions } from './payment-conditions';
 
@@ -45,11 +45,25 @@ function addDraftClauses(list: OrderedListBuilder, id: string, clauses: readonly
   });
 }
 
+/** Adjourning the hearing an application to adjourn asks about: to a further hearing, or generally. */
+function addHearingAdjournment(list: OrderedListBuilder, data: OrderData, prefix: string): void {
+  const adjournment = value(data, `${prefix}-adjourn-type`);
+  if (adjournment === 'further-hearing') {
+    addListing(list, data, `${prefix}-adjourn`, `${prefix}-adjourn`, 'The hearing shall be adjourned to be heard');
+  } else if (adjournment === 'generally') {
+    list.item(
+      `${prefix}-adjourn-generally`,
+      'The hearing is adjourned generally with liberty to restore by application by any party on notice to all other parties.'
+    );
+  }
+}
+
 /**
  * The clauses the decision on an application generates; none says it is granted, as the order says what it grants.
  * Taking the applicant's wording makes their draft order the application's clauses, which the judge edits as any
  * other; a freeform decision generates none, for the judge's own wording. Listing it for a new hearing says when, as an adjournment does, and
- * whether the other parties are given notice; listing it at one of the case's hearings says which. Suspending
+ * whether the other parties are given notice; listing it at one of the case's hearings says which. Adjourning an
+ * application to adjourn adjourns the hearing as the adjournment tab adjourns the claim. Suspending
  * enforcement sets the suspension's conditions as a suspended possession order does.
  */
 function addApplicationClauses(list: OrderedListBuilder, data: OrderData, application: OrderApplication): void {
@@ -58,6 +72,8 @@ function addApplicationClauses(list: OrderedListBuilder, data: OrderData, applic
   const described = sentenceCase(describeApplication(data, application)) + suspension;
   if (decision === 'applicant-wording') {
     addDraftClauses(list, `${prefix}-draft`, application.draftOrder);
+  } else if (decision === 'adjourn') {
+    addHearingAdjournment(list, data, prefix);
   } else if (decision === 'suspend') {
     addPaymentConditions(
       list,

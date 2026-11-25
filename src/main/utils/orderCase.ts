@@ -47,6 +47,8 @@ export interface OrderApplication {
   id: string;
   /** An application to suspend enforcement, which an order can suspend on conditions. */
   enforcementSuspension: boolean;
+  /** An application to adjourn a hearing, which an order can adjourn. */
+  adjournment: boolean;
   /** Whether an issued order has listed it for a hearing, where it is still to be decided. */
   listed: boolean;
   reference: string;
