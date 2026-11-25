@@ -54,9 +54,10 @@ describe('tagmanager/head.njk', () => {
   });
 
   it('loads the container once, however often the loader is called', () => {
-    const script = render('tagmanager/head.njk', enabled, 'test-nonce-123', false).match(
-      /<script[^>]*>([\s\S]*?)<\/script>/
-    )?.[1];
+    const html = render('tagmanager/head.njk', enabled, 'test-nonce-123', false);
+    const openingTag = '<script nonce="test-nonce-123">';
+    const start = html.indexOf(openingTag) + openingTag.length;
+    const script = html.slice(start, html.indexOf('</script>', start));
     const inserted: { src: string }[] = [];
     const element = { setAttribute: jest.fn() } as unknown as { src: string };
     const fakeWindow: Record<string, unknown> = {};
