@@ -88,6 +88,19 @@ interface ValidationResult {
   warrantReturn?: WarrantReturn;
 }
 
+interface CheckYourAnswersRow {
+  key: { text: string };
+  value: { text?: string; html?: string };
+  actions: { items: { href: string; text: string; visuallyHiddenText: string }[] };
+}
+
+interface CaseModel {
+  evictionData: EvictionSummaryData;
+  caseReferenceDisplay: string;
+  propertyAddressDisplay?: string;
+  caseName?: string;
+}
+
 function route(page: Page): string {
   return `${RECORD_WARRANT_RETURN_ROUTE}${PAGES[page]}`;
 }
@@ -149,13 +162,6 @@ function evictionSummary(ccdCase: CcdCaseData): EvictionSummaryData {
   };
 }
 
-interface CaseModel {
-  evictionData: EvictionSummaryData;
-  caseReferenceDisplay: string;
-  propertyAddressDisplay?: string;
-  caseName?: string;
-}
-
 async function caseModel(req: Request, caseReference: string): Promise<CaseModel> {
   const started = await ccdCaseService.startCaseEvent(
     req.session.user!.accessToken,
@@ -172,12 +178,6 @@ async function caseModel(req: Request, caseReference: string): Promise<CaseModel
     propertyAddressDisplay: formatAddress(ccdCase.propertyAddress),
     caseName: ccdCase.caseNameHmctsInternal,
   };
-}
-
-interface CheckYourAnswersRow {
-  key: { text: string };
-  value: { text?: string; html?: string };
-  actions: { items: { href: string; text: string; visuallyHiddenText: string }[] };
 }
 
 export function checkYourAnswersRows(caseReference: string, warrantReturn: WarrantReturn): CheckYourAnswersRow[] {
