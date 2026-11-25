@@ -214,6 +214,21 @@ export function checkYourAnswersRows(caseReference: string, warrantReturn: Warra
   return rows;
 }
 
+function checkYourAnswersModel(req: Request): Record<string, unknown> | undefined {
+  const caseReference = caseReferenceOf(req);
+  const warrantReturn = req.session.warrantReturn?.[caseReference];
+  const caseDetails = req.session.warrantReturnCaseDetails?.[caseReference];
+  if (!warrantReturn || !caseDetails) {
+    return undefined;
+  }
+
+  return {
+    caseReferenceDisplay: caseNumberFormatter(caseReference),
+    ...caseDetails,
+    answerRows: checkYourAnswersRows(caseReference, warrantReturn),
+  };
+}
+
 function formModel(
   req: Request,
   answers: WarrantReturnAnswers,
@@ -281,19 +296,12 @@ export default function recordWarrantReturnRoutes(app: Application): void {
   });
 
   app.get(route('checkYourAnswers'), ...journey, (req: Request, res: Response) => {
-    const caseReference = caseReferenceOf(req);
-    const warrantReturn = req.session.warrantReturn?.[caseReference];
-    const caseDetails = req.session.warrantReturnCaseDetails?.[caseReference];
-    if (!warrantReturn || !caseDetails) {
-      return res.redirect(pageUrl(caseReference, 'warrantReturn'));
+    const model = checkYourAnswersModel(req);
+    if (!model) {
+      return res.redirect(pageUrl(caseReferenceOf(req), 'warrantReturn'));
     }
 
-    res.render('record-warrant-return/check-your-answers', {
-      ...pageModel(req),
-      caseReferenceDisplay: caseNumberFormatter(caseReference),
-      ...caseDetails,
-      answerRows: checkYourAnswersRows(caseReference, warrantReturn),
-    });
+    res.render('record-warrant-return/check-your-answers', { ...pageModel(req), ...model });
   });
 
   app.post(route('checkYourAnswers'), ...journey, async (req: Request, res: Response, next: NextFunction) => {
@@ -322,10 +330,18 @@ export default function recordWarrantReturnRoutes(app: Application): void {
         warrantReturn: submittedWarrantReturn,
       });
     } catch (error) {
-      return refusedXuiEvent(res, next, error, rejected => void showFailedSubmit(req, res, next, rejected));
+      return refusedXuiEvent(res, next, error, rejected => showFailedSubmit(req, res, rejected));
     }
 
     delete req.session.warrantReturn![caseReference];
+    req.session.warrantReturnConfirmation = {
+      ...req.session.warrantReturnConfirmation,
+      [caseReference]: {
+        returnType: warrantReturn.returnType,
+        evictionOutcome: warrantReturn.evictionOutcome,
+        returnName: warrantReturn.returnName,
+      },
+    };
     req.session.save(error => (error ? next(error) : res.redirect(pageUrl(caseReference, 'confirmed'))));
   });
 
@@ -342,21 +358,14 @@ export default function recordWarrantReturnRoutes(app: Application): void {
   });
 }
 
-async function showFailedSubmit(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-  error: CallbackRejectedError
-): Promise<void> {
-  try {
-    const issues = error.reasons.map(message => ({ id: 'record-warrant-return-form', message }));
-    res.status(error.status).render('record-warrant-return/check-your-answers', {
-      ...pageModel(req, issues),
-      ...(await caseModel(req, caseReferenceOf(req))),
-    });
-  } catch (renderError) {
-    next(renderError);
+function showFailedSubmit(req: Request, res: Response, error: CallbackRejectedError): void {
+  const model = checkYourAnswersModel(req);
+  if (!model) {
+    return res.redirect(pageUrl(caseReferenceOf(req), 'warrantReturn'));
   }
+
+  const issues = error.reasons.map(message => ({ id: 'record-warrant-return-form', message }));
+  res.status(error.status).render('record-warrant-return/check-your-answers', { ...pageModel(req, issues), ...model });
 }
 
 function text(body: Record<string, unknown> | undefined, name: string): string {

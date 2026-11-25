@@ -27,6 +27,7 @@ import {
   EvictionSuccessfulReturnName,
   EvictionUnsuccessfulReturnName,
   InterimReturnName,
+  WarrantReturn,
   WarrantReturnType,
   evictionOutcomeList,
   evictionSuccessfulReturnTypeList,
@@ -703,6 +704,10 @@ describe('recordWarrantReturnRoutes', () => {
       outcomeDate: '2026-07-01T08:05:00.000',
       additionalDetails: 'Keys handed over',
     };
+    const caseDetails = {
+      propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
+      caseName: 'Housing Ltd vs Sam Smith',
+    };
 
     const post = async (body: Record<string, unknown>, warrantReturn?: Record<string, unknown>) => {
       const res = { status: jest.fn().mockReturnThis(), render: jest.fn(), redirect: jest.fn() };
@@ -713,6 +718,7 @@ describe('recordWarrantReturnRoutes', () => {
         session: {
           user: { accessToken: 'token' },
           warrantReturn: warrantReturn ? { '123': warrantReturn, '456': { returnType: 'INTERIM' } } : undefined,
+          warrantReturnCaseDetails: { '123': caseDetails },
           save: jest.fn((callback: (error?: Error) => void) => callback()),
         },
       };
@@ -723,11 +729,12 @@ describe('recordWarrantReturnRoutes', () => {
       return { req, res, next };
     };
 
-    it('goes back to the warrant return page for previous', async () => {
-      const { res } = await post({ action: 'previous' }, successful);
+    it('goes back to the warrant return page for previous and keeps the answers', async () => {
+      const { req, res } = await post({ action: 'previous' }, successful);
 
       expect(res.redirect).toHaveBeenCalledWith('/case/123/record-warrant-return');
       expect(mockStartAndSubmitEvent).not.toHaveBeenCalled();
+      expect(req.session.warrantReturn).toEqual({ '123': successful, '456': { returnType: 'INTERIM' } });
     });
 
     it('asks for the answers again when the session has none', async () => {
@@ -744,6 +751,17 @@ describe('recordWarrantReturnRoutes', () => {
         warrantReturn: { ...successful, outcomeDate: '2026-07-01T07:05:00.000' },
       });
       expect(req.session.warrantReturn).toEqual({ '456': { returnType: 'INTERIM' } });
+      expect(req.session).toEqual(
+        expect.objectContaining({
+          warrantReturnConfirmation: {
+            '123': {
+              returnType: WarrantReturnType.FINAL,
+              evictionOutcome: EvictionOutcome.SUCCESSFUL,
+              returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
+            },
+          },
+        })
+      );
       expect(req.session.save).toHaveBeenCalled();
       expect(res.redirect).toHaveBeenCalledWith('/case/123/record-warrant-return/confirmed');
     });
@@ -773,6 +791,9 @@ describe('recordWarrantReturnRoutes', () => {
         expect.objectContaining({
           validationErrors: { 'record-warrant-return-form': { text: 'There is no warrant on this case' } },
           caseReferenceDisplay: '123',
+          propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
+          caseName: 'Housing Ltd vs Sam Smith',
+          answerRows: checkYourAnswersRows('123', successful as WarrantReturn),
         })
       );
       expect(req.session.warrantReturn?.['123']).toEqual(successful);
@@ -790,16 +811,24 @@ describe('recordWarrantReturnRoutes', () => {
       expect(res.redirect).not.toHaveBeenCalled();
     });
 
-    it('passes a failure to load the case after a refusal to the error handler', async () => {
-      const failure = new HTTPError('CCD is down', 502);
+    it('goes back to the start of the event when a refused return has no case details', async () => {
       mockStartAndSubmitEvent.mockRejectedValueOnce(
         new CallbackRejectedError(['There is no warrant on this case'], 422)
       );
-      (ccdCaseService.startCaseEvent as jest.Mock).mockRejectedValueOnce(failure);
+      const res = { status: jest.fn().mockReturnThis(), render: jest.fn(), redirect: jest.fn() };
 
-      const { res, next } = await post({ action: 'continue' }, successful);
+      await postHandler(path)(
+        {
+          params: { caseReference: '123' },
+          body: { action: 'continue' },
+          session: { user: { accessToken: 'token' }, warrantReturn: { '123': successful } },
+        } as unknown as Request,
+        res as unknown as Response,
+        jest.fn()
+      );
+      await new Promise(setImmediate);
 
-      expect(next).toHaveBeenCalledWith(failure);
+      expect(res.redirect).toHaveBeenCalledWith('/case/123/record-warrant-return');
       expect(res.render).not.toHaveBeenCalled();
     });
 

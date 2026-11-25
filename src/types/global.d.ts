@@ -48,6 +48,7 @@ interface CustomSessionData extends SessionData {
   orderReviews?: Record<string, import('../main/utils/orderReview').OrderReviewSession>;
   warrantReturn?: Record<string, WarrantReturn>;
   warrantReturnCaseDetails?: Record<string, { propertyAddressDisplay?: string; caseName?: string }>;
+  warrantReturnConfirmation?: Record<string, Pick<WarrantReturn, 'returnType' | 'evictionOutcome' | 'returnName'>>;
   payment?: PaymentSessionState;
   destroy(callback: (err?: Error) => void): void;
   clientContext?: ClientContextHeaders;
