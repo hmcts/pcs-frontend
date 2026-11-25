@@ -3,8 +3,10 @@ import { randomUUID } from 'crypto';
 import { type Page, expect } from '@playwright/test';
 
 import { formatCaseReferenceForDisplay } from '../../../../main/utils/caseReference';
+import { ENABLE_CUI_YOUR_SUPPORT } from '../../../../main/utils/cuiYourSupportFlags';
+import { ENABLE_CUI_PCQ, RELEASE_1_3_ENABLED } from '../../../../main/utils/featureFlags';
 import { paymentDetails } from '../../data/page-data/paymentDetails.page.data';
-import { LaunchDarklyAction } from '../actions/custom-actions/launchDarkly.action';
+import { getLdFlag } from '../actions/custom-actions/launchDarkly.action';
 import { performAction, performValidation } from '../controller';
 
 export const MAKE_A_CLAIM_FLAG = 'private-landlord-make-a-claim-enabled';
@@ -15,13 +17,19 @@ export const WELSH_PROPERTY = { line1: '1 Test Street', town: 'Betws-y-Coed', po
 /** Outside England and Wales, so never claimable however pcs-api maps it. */
 export const SCOTTISH_PROPERTY = { line1: '1 Union Street', town: 'Aberdeen', postcode: 'AB10 1XG' };
 
-/** Whether the private landlord journey is switched on for the environment under test. */
+/** Whether the private landlord journey is switched on for the environment under test; throws when that is unknown. */
 export async function isMakeAClaimEnabled(): Promise<boolean> {
-  return new LaunchDarklyAction().getFlagValue(MAKE_A_CLAIM_FLAG);
+  return getLdFlag(MAKE_A_CLAIM_FLAG);
 }
 
 export async function createLandlord(): Promise<void> {
   await performAction('createUser', `pl-${randomUUID()}`, ['citizen']);
+}
+
+/** "You're eligible" ends the start questions with a Start now button, which creates the claim. */
+export async function startClaim(page: Page): Promise<void> {
+  await expect(page.getByRole('heading', { level: 1, name: 'You’re eligible to use this service' })).toBeVisible();
+  await page.getByRole('button', { name: 'Start now', exact: true }).click();
 }
 
 export async function saveAndContinue(page: Page): Promise<void> {
@@ -102,7 +110,33 @@ export async function becomeEligible(page: Page, startUrl: string, property = EN
   await continueOn(page);
 }
 
-export async function completeAboutYou(page: Page): Promise<void> {
+export const ADDITIONAL_CLAIMANT = {
+  firstName: 'Alex',
+  lastName: 'Morgan',
+  address: { line1: '3 Mill Lane', town: 'Leeds', postcode: 'LS1 4AB' },
+};
+
+/** Adds an individual as a further claimant, then says there are no more, ending on the About you summary. */
+async function addAdditionalClaimant(page: Page): Promise<void> {
+  const heading = (name: string) => page.getByRole('heading', { level: 1, name });
+  await expect(heading('Is the next claimant an individual or a registered company?')).toBeVisible();
+  await answer(page, 'An individual');
+  await page.getByLabel('First name').fill(ADDITIONAL_CLAIMANT.firstName);
+  await page.getByLabel('Last name').fill(ADDITIONAL_CLAIMANT.lastName);
+  await saveAndContinue(page);
+  await expect(heading('What is their postal address?')).toBeVisible();
+  await enterAddress(page, 'additionalClaimant', ADDITIONAL_CLAIMANT.address);
+  await saveAndContinue(page);
+  await expect(heading('What is their email address?')).toBeVisible();
+  await saveAndContinue(page);
+  await answer(page, 'No');
+  await answer(page, 'No');
+  await expect(heading('Do you want to add another claimant to this claim?')).toBeVisible();
+  await answer(page, 'No');
+}
+
+/** Answers the About you questions as an individual; with `additionalClaimant`, adds a second claimant too. */
+export async function completeAboutYou(page: Page, additionalClaimant = false): Promise<void> {
   await openTask(page, 'About you and your contact preferences');
   await continueOn(page);
   await answer(page, 'An individual');
@@ -114,8 +148,19 @@ export async function completeAboutYou(page: Page): Promise<void> {
   await answer(page, 'Yes');
   await answer(page, 'No');
   await answer(page, 'No');
-  await answer(page, 'No');
+  if (additionalClaimant) {
+    await answer(page, 'Yes');
+    await addAdditionalClaimant(page);
+  } else {
+    await answer(page, 'No');
+  }
   await expect(page.getByRole('heading', { level: 1, name: 'Check your answers' })).toBeVisible();
+  if (additionalClaimant) {
+    const card = page.locator('#summary-additionalClaimant1');
+    await expect(card.getByText('Additional claimant 1')).toBeVisible();
+    await expect(card.getByText(`${ADDITIONAL_CLAIMANT.firstName} ${ADDITIONAL_CLAIMANT.lastName}`)).toBeVisible();
+    await expect(card.getByText(ADDITIONAL_CLAIMANT.address.postcode)).toBeVisible();
+  }
   await saveAndContinue(page);
   await expectTaskStatus(page, 'About you and your contact preferences', 'Done');
 }
@@ -186,7 +231,6 @@ async function completeMandatoryDocuments(page: Page): Promise<void> {
   await expect(page.getByRole('heading', { level: 1, name: 'Mandatory documents' })).toBeVisible();
   await continueOn(page);
   await answer(page, 'Yes');
-  await saveAndContinue(page);
   await expect(page.getByRole('heading', { level: 1, name: 'Upload energy performance certificate' })).toBeVisible();
   await performAction('uploadFile', 'NoticeServiceJurisdiction.docx');
   await saveAndContinue(page);
@@ -196,7 +240,6 @@ async function completeMandatoryDocuments(page: Page): Promise<void> {
     .fill('The property has no gas supply');
   await saveAndContinue(page);
   await answer(page, 'Yes');
-  await saveAndContinue(page);
   await expect(
     page.getByRole('heading', { level: 1, name: 'Upload Electrical Installation Condition Report (EICR)' })
   ).toBeVisible();
@@ -364,20 +407,37 @@ export async function answerFinalQuestions(page: Page): Promise<void> {
   await continueOn(page);
   await answer(page, 'No');
   await answer(page, 'No');
+  await expect(page.getByRole('heading', { level: 1, name: 'Tell us if you need support' })).toBeVisible();
+  const startSupport = page.getByRole('button', { name: 'Continue to the questions', exact: true });
+  await expect(startSupport).toHaveCount((await getLdFlag(ENABLE_CUI_YOUR_SUPPORT)) ? 1 : 0);
   await page.getByRole('button', { name: 'I do not need any support at this time' }).click();
+  await skipEqualityQuestions(page);
+  await answer(page, 'English');
+}
+
+/**
+ * The equality questions are offered only when both PCQ flags are on and the PCQ service is up, which the flags cannot
+ * say, so with both on either page may follow; with either off the language question must.
+ */
+async function skipEqualityQuestions(page: Page): Promise<void> {
   const equality = page.getByRole('heading', { level: 1, name: 'Equality and diversity questions' });
   const language = page.getByRole('heading', { level: 1, name: 'Which language did you use to complete this claim?' });
+  const pcqOn = (await getLdFlag(RELEASE_1_3_ENABLED)) && (await getLdFlag(ENABLE_CUI_PCQ));
+  if (!pcqOn) {
+    await expect(language).toBeVisible();
+    await expect(equality).toHaveCount(0);
+    return;
+  }
   await expect(equality.or(language)).toBeVisible();
   if (await equality.isVisible()) {
     await page.getByRole('button', { name: 'I do not want to answer these questions' }).click();
   }
-  await answer(page, 'English');
 }
 
 /** Signs the statement of truth and submits, ending on the claim fee page. */
 export async function submitClaim(page: Page): Promise<void> {
   await expect(page.getByRole('heading', { level: 1, name: 'Check your answers' })).toBeVisible();
-  await expect(page.getByText('Billy Wright')).toBeVisible();
+  await expect(page.getByText('Billy Wright').first()).toBeVisible();
   await page.getByRole('checkbox', { name: /^I understand that proceedings for contempt of court/ }).check();
   await page.getByRole('checkbox', { name: 'I believe that the facts stated in this claim form are true.' }).check();
   await page.getByLabel('Your full name').fill('Billy Wright');
@@ -426,7 +486,11 @@ export async function viewClaimantDashboardAndAccount(page: Page): Promise<void>
   await expect(page).toHaveURL(new RegExp(`/case/${caseReference}/claimant-dashboard$`));
   await expect(page.getByText(`Case number: ${formatCaseReferenceForDisplay(caseReference)}`)).toBeVisible();
   await expect(page.getByText('You’ve made a property possession claim')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'View the claim' })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'Find out about mediation' })).toHaveAttribute(
+    'href',
+    'https://www.gov.uk/guidance/a-guide-to-civil-mediation'
+  );
+  await expect(page.getByRole('link', { name: 'View the claim', exact: true })).toHaveAttribute(
     'href',
     `/case/${caseReference}/view-documents`
   );

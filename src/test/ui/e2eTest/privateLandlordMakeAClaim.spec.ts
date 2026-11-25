@@ -5,7 +5,6 @@ import {
   GROUND_1A_AND_14,
   SCOTTISH_PROPERTY,
   WELSH_PROPERTY,
-  answer,
   answerFinalQuestions,
   becomeEligible,
   completeAboutYou,
@@ -23,9 +22,9 @@ import {
   enterAddress,
   giveProperty,
   isMakeAClaimEnabled,
-  openTask,
   payClaimFee,
   startAsPrivateLandlord,
+  startClaim,
   submitClaim,
   viewClaimantDashboardAndAccount,
 } from '../utils/common/privateLandlordClaim.journey';
@@ -46,7 +45,7 @@ test.describe('Private landlord makes a possession claim @privateLandlord', () =
   test('Rent arrears claim with a rent statement uploaded', async ({ page }) => {
     await createLandlord();
     await becomeEligible(page, startUrl);
-    await continueOn(page);
+    await startClaim(page);
     await completeAboutYou(page);
     await completeDefendants(page);
     await completeTenancyAndGrounds(page, GROUND_1A_AND_14);
@@ -65,7 +64,7 @@ test.describe('Private landlord makes a possession claim @privateLandlord', () =
   }) => {
     await createLandlord();
     await becomeEligible(page, startUrl, WELSH_PROPERTY);
-    await continueOn(page);
+    await startClaim(page);
     await completeAboutYou(page);
     await completeDefendants(page);
     await completeOccupationContractAndGrounds(page);
@@ -78,10 +77,17 @@ test.describe('Private landlord makes a possession claim @privateLandlord', () =
     await payClaimFee(page);
   });
 
+  test('A claim with a second claimant shows them on the About you check your answers', async ({ page }) => {
+    await createLandlord();
+    await becomeEligible(page, startUrl);
+    await startClaim(page);
+    await completeAboutYou(page, true);
+  });
+
   test('Rent arrears claim with a rent statement created', async ({ page }) => {
     await createLandlord();
     await becomeEligible(page, startUrl);
-    await continueOn(page);
+    await startClaim(page);
     await completeAboutYou(page);
     await completeDefendants(page);
     await completeTenancyAndGrounds(page);
@@ -104,7 +110,7 @@ test.describe('Private landlord claim fee card declined @privateLandlord', () =>
   test('A declined card returns to the claim fee page to try again', async ({ page }) => {
     await createLandlord();
     await becomeEligible(page, startUrl);
-    await continueOn(page);
+    await startClaim(page);
     await completeAboutYou(page);
     await completeDefendants(page);
     await completeTenancyAndGrounds(page);
@@ -171,24 +177,6 @@ test.describe('Private landlord cannot use the service @privateLandlord', () => 
     await expect(
       page.getByText('If you’re a registered community landlord or a mortgage provider, use MyHMCTS instead.')
     ).toBeVisible();
-  });
-
-  test('A claim with more than one claimant cannot be made yet', async ({ page }) => {
-    await createLandlord();
-    await becomeEligible(page, startUrl);
-    await continueOn(page);
-    await openTask(page, 'About you and your contact preferences');
-    await continueOn(page);
-    await answer(page, 'A registered company');
-    await page.getByLabel('Company or organisation’s name').fill('Wright Lettings Ltd');
-    await page.getByRole('button', { name: 'Save and continue', exact: true }).click();
-    await enterAddress(page, 'claimant', { line1: '12 High Street', town: 'London', postcode: 'NW1 1AA' });
-    await page.getByRole('button', { name: 'Save and continue', exact: true }).click();
-    await answer(page, 'Yes');
-    await answer(page, 'No');
-    await answer(page, 'No');
-    await answer(page, 'Yes');
-    await expect(page.getByText('You cannot make a claim with other claimants using this service yet.')).toBeVisible();
   });
 });
 
