@@ -5,8 +5,8 @@ import { type OrderData } from '../data';
 import {
   SAME_TERMS_COSTS,
   addCosts,
+  addPossessionDeadline,
   caseManCosts,
-  date,
   hasCosts,
   joinList,
   money,
@@ -28,9 +28,9 @@ export function addSuspendedClauses(list: OrderedListBuilder, data: OrderData): 
     content
       .text(`${sentenceCase(defendant)} must give up possession of `)
       .fact('suspended-address', address)
-      .text(` to ${claimant} on or before `)
-      .fact('suspended-deadline', date(data, 'suspended-by-date'), { sourceId: 'suspended-by-date' })
-      .text('.');
+      .text(` to ${claimant} on or before `);
+    addPossessionDeadline(content, data, 'suspended-deadline', 'suspended-by-date', 'suspended-by-time');
+    content.text('.');
   });
 
   if (options.includes('money-claim-adjourned')) {
