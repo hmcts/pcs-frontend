@@ -61,15 +61,16 @@ describe('scheduleEviction', () => {
   it.each([
     ['yesterday', answers('24', '6', '2027', '12', '00')],
     ['earlier today', answers('25', '6', '2027', '10', '29')],
-  ])('refuses a date and time in the past: %s', (_, given) => {
+    ['now', answers('25', '6', '2027', '10', '30')],
+  ])('refuses a date and time that is not in the future: %s', (_, given) => {
     expect(dateError(given, NOW)).toBe(DATE_IN_PAST);
   });
 
   it.each([
-    ['now', answers('25', '6', '2027', '10', '30')],
+    ['next minute', answers('25', '6', '2027', '10', '31')],
     ['later today', answers('25', '6', '2027', '17', '30')],
     ['a later day', answers('1', '7', '2027', '09', '00')],
-  ])('takes today or a later date and time: %s', (_, given) => {
+  ])('takes a later date and time: %s', (_, given) => {
     expect(dateError(given, NOW)).toBeUndefined();
   });
 

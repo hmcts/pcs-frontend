@@ -1,6 +1,5 @@
 import { DateTime } from 'luxon';
 
-/** What pcs-api sends when the schedule eviction event starts. */
 export interface ScheduleEvictionStart {
   enforcementApplicationId: string;
   caseNumber: string;
@@ -11,7 +10,6 @@ export interface ScheduleEvictionStart {
   defendantNames: string[];
 }
 
-/** The bailiff's answers, kept as typed so the page can show them back. */
 export interface EvictionAnswers {
   dispenseWithService: 'YES' | 'NO';
   day: string;
@@ -32,7 +30,6 @@ export const DATE_REQUIRED = 'Enter the date and time you want to schedule the e
 export const DATE_INVALID = 'Enter a real date and time for the eviction';
 export const DATE_IN_PAST = 'The date and time of the eviction must be in the future';
 
-/** The dispense with service question starts on No (AC02), and a radio cannot be unset, so it is always answered. */
 export const NEW_ANSWERS: EvictionAnswers = {
   dispenseWithService: 'NO',
   day: '',
@@ -55,7 +52,7 @@ export function postedAnswers(body: Record<string, unknown>): EvictionAnswers {
   };
 }
 
-/** The date and time in UK time, or undefined if the answers are not a real one. */
+/** The date and time in UK time, or undefined if the answers are not a valid date and time */
 export function evictionDateTime({ day, month, year, hour, minute }: EvictionAnswers): DateTime | undefined {
   const dateTime = DateTime.fromFormat(`${day}/${month}/${year} ${hour}:${minute}`, 'd/M/yyyy H:m', {
     zone: 'Europe/London',
@@ -76,7 +73,7 @@ export function dateError(answers: EvictionAnswers, now: DateTime = DateTime.now
   if (!dateTime) {
     return DATE_INVALID;
   }
-  if (dateTime < now.startOf('minute')) {
+  if (dateTime <= now.startOf('minute')) {
     return DATE_IN_PAST;
   }
   return undefined;
