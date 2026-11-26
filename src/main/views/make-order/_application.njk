@@ -17,6 +17,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% import "make-order/_compact.njk" as compact with context %}
 {% import "make-order/_listing.njk" as listing with context %}
 {% import "make-order/_payment-conditions.njk" as conditions with context %}
@@ -188,6 +189,14 @@
       classes: "govuk-!-margin-bottom-3",
       attributes: { id: prefix + "-more" }
     }) }}
+    {% if (application.draftOrderWording or "") | trim %}
+      {{ govukButton({
+        html: "Add the applicant's draft order to the order<span class=\"govuk-visually-hidden\"> from application " + (application.reference | escape) + "</span>",
+        type: "button",
+        classes: "govuk-button--secondary govuk-!-margin-bottom-3",
+        attributes: { "data-draft-order": application.draftOrderWording }
+      }) }}
+    {% endif %}
     {{ decision(application) }}
   </section>
 {% endmacro %}

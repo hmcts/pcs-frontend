@@ -362,6 +362,15 @@ export function initMakeOrder(): void {
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   form.addEventListener('submit', followTab);
+  // The applicant's draft order goes in as the judge's own clauses, after "IT IS ORDERED THAT:", which no decision
+  // takes away.
+  form.addEventListener('click', ({ target }) => {
+    const button = (target as Element).closest<HTMLElement>('[data-draft-order]');
+    if (button && editor.insertHtml(button.dataset.draftOrder!, { at: { after: 'paragraph:ordered-that' } })) {
+      const reference = button.closest<HTMLElement>('[data-application]')!.dataset.applicationReference;
+      mount.querySelector('[role="status"]')!.textContent = `The draft order from application ${reference} is added.`;
+    }
+  });
   // Keep JSON in the editor field; encode only the outgoing value.
   form.addEventListener('formdata', ({ formData }) => {
     formData.set(
