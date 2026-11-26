@@ -38,9 +38,9 @@ withPipeline(type, product, component) {
   syncBranchesWithMaster(['ithc', 'perftest', 'demo'])
 
   env.NODE_CONFIG_ENV = 'test'
-  env.PCS_API_URL = "http://pcs-api-aat.service.core-compute-aat.internal"
-  env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-  env.CDAM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
+  env.PCS_API_URL = "${internalUrl('pcs-api', 'aat')}"
+  env.DATA_STORE_URL_BASE = "${internalUrl('ccd-data-store-api', 'aat')}"
+  env.CDAM_URL = "${internalUrl('ccd-case-document-am-api', 'aat')}"
   env.XUI_BASE_URI = "https://manage-case.aat.platform.hmcts.net"
   env.REDIRECTS_MANAGE_CASE_RETURN_URL = "https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS"
   env.CASE_TYPE_ID = "PCS"
@@ -93,6 +93,10 @@ withPipeline(type, product, component) {
       AppPipelineDsl.PactRoles.CONSUMER,
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
     ])
+    before('smoketest:preview') {
+      // Playwright S2S lease URL; set from smoke onwards so unit and pact tests keep their own s2s config.
+      env.S2S_URL = internalUrl('rpe-service-auth-provider', 'aat', '/testing-support/lease')
+    }
     before('functionalTest:preview') {
       sh 'rm -rf allure-results allure-report'
     }
@@ -121,6 +125,10 @@ withPipeline(type, product, component) {
       AppPipelineDsl.PactRoles.CONSUMER,
       AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK
     ])
+    before('smoketest:aat') {
+      // Playwright S2S lease URL; set from smoke onwards so unit and pact tests keep their own s2s config.
+      env.S2S_URL = internalUrl('rpe-service-auth-provider', 'aat', '/testing-support/lease')
+    }
     before('functionalTest:aat') {
       sh 'rm -rf allure-results allure-report'
     }
@@ -173,9 +181,10 @@ def runPerftestSmokeTests(yarnBuilder, Map secrets, String product) {
       withEnv([
         "ENVIRONMENT=perftest",
         "TEST_URL=https://pcs.perftest.platform.hmcts.net/",
-        "PCS_API_URL=http://pcs-api-perftest.service.core-compute-perftest.internal",
-        "CDAM_URL=http://ccd-case-document-am-api-perftest.service.core-compute-perftest.internal",
-        "DATA_STORE_URL_BASE=http://ccd-data-store-api-perftest.service.core-compute-perftest.internal",
+        "PCS_API_URL=${internalUrl('pcs-api', 'perftest')}",
+        "CDAM_URL=${internalUrl('ccd-case-document-am-api', 'perftest')}",
+        "S2S_URL=${internalUrl('rpe-service-auth-provider', 'perftest', '/testing-support/lease')}",
+        "DATA_STORE_URL_BASE=${internalUrl('ccd-data-store-api', 'perftest')}",
         "CASE_TYPE_ID=PCS",
         "NODE_CONFIG_ENV=test"
       ]) {
@@ -199,9 +208,10 @@ def runDemoSmokeTests(yarnBuilder, Map secrets, String product) {
       withEnv([
         "ENVIRONMENT=demo",
         "TEST_URL=https://pcs.demo.platform.hmcts.net/",
-        "PCS_API_URL=http://pcs-api-demo.service.core-compute-demo.internal",
-        "CDAM_URL=http://ccd-case-document-am-api-demo.service.core-compute-demo.internal",
-        "DATA_STORE_URL_BASE=http://ccd-data-store-api-demo.service.core-compute-demo.internal",
+        "PCS_API_URL=${internalUrl('pcs-api', 'demo')}",
+        "CDAM_URL=${internalUrl('ccd-case-document-am-api', 'demo')}",
+        "S2S_URL=${internalUrl('rpe-service-auth-provider', 'demo', '/testing-support/lease')}",
+        "DATA_STORE_URL_BASE=${internalUrl('ccd-data-store-api', 'demo')}",
         "CASE_TYPE_ID=PCS",
         "NODE_CONFIG_ENV=test"
       ]) {
@@ -240,4 +250,10 @@ def sendAllureReportToSlack(String pipelineType, String allureReportPathSuffix) 
   } catch (Exception e) {
     echo "WARNING: Slack notification failed: ${e.message}"
   }
+}
+
+// Internal service URLs are built here rather than written out in full (ITHC HDPI-8694).
+// The parameter is not called "env", which would shadow the pipeline's env global.
+String internalUrl(String svc, String envName, String path = '') {
+  "http://${svc}-${envName}.service.core-compute-${envName}.internal${path}"
 }

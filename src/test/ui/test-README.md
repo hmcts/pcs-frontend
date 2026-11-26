@@ -139,8 +139,10 @@ await performValidationGroup(
 - PCS_API_CHANGE_ID
 - DATA_STORE_URL_BASE
 - PCS_API_URL
+- S2S_URL (the S2S `/testing-support/lease` URL)
+- CDAM_URL
 
-For **Jenkins nightly**, pick `E2E_TARGET_ENV` (`aat`, `demo`, `perftest`, or `ithc`). That drives Azure Key Vault `pcs-<env>`, `ENVIRONMENT` for Playwright, `TEST_URL`, and internal `PCS_API_URL` / `DATA_STORE_URL_BASE`. IdAM and S2S URLs are derived in `global-setup.config.ts` from `ENVIRONMENT`.
+For **Jenkins nightly**, pick `E2E_TARGET_ENV` (`aat`, `demo`, `perftest`, or `ithc`). That drives Azure Key Vault `pcs-<env>`, `ENVIRONMENT` for Playwright, `TEST_URL`, and internal `PCS_API_URL` / `DATA_STORE_URL_BASE` / `CDAM_URL` / `S2S_URL`. Only the public IdAM URLs are derived in `global-setup.config.ts` from `ENVIRONMENT`; internal service URLs are never defaulted in the repo.
 
 ```bash
 yarn test:functional

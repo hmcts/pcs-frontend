@@ -7,24 +7,17 @@ import { uploadTestDocuments } from '../utils/common/uploadDocument.utils';
 /** CNP environment names where IdAM/S2S URLs follow the standard `*.platform.hmcts.net` pattern (matches Jenkins `E2E_TARGET_ENV`). */
 const KNOWN_CNP_ENVIRONMENT_NAMES = new Set(['aat', 'demo', 'perftest', 'ithc']);
 
-/** Derives IdAM / S2S URLs from `ENVIRONMENT` when unset (CNP nightly or local). */
+/**
+ * Derives the public IdAM URLs from `ENVIRONMENT` when unset (CNP nightly or local).
+ * Internal service URLs (`S2S_URL`, `CDAM_URL`) are not defaulted: Jenkins sets them
+ * (Jenkinsfile_CNP / Jenkinsfile_nightly), or export them locally.
+ */
 export function applyPlaywrightServiceUrls(): void {
   const normalizedCnpEnvironment = (process.env.ENVIRONMENT || '').toLowerCase();
+  const idamEnvironment = KNOWN_CNP_ENVIRONMENT_NAMES.has(normalizedCnpEnvironment) ? normalizedCnpEnvironment : 'aat';
 
-  if (KNOWN_CNP_ENVIRONMENT_NAMES.has(normalizedCnpEnvironment)) {
-    process.env.IDAM_WEB_URL ||= `https://idam-api.${normalizedCnpEnvironment}.platform.hmcts.net`;
-    process.env.IDAM_TESTING_SUPPORT_URL ||= `https://idam-testing-support-api.${normalizedCnpEnvironment}.platform.hmcts.net`;
-    process.env.S2S_URL ||= `http://rpe-service-auth-provider-${normalizedCnpEnvironment}.service.core-compute-${normalizedCnpEnvironment}.internal/testing-support/lease`;
-    process.env.DM_STORE_URL ||= `http://dm-store-${normalizedCnpEnvironment}.service.core-compute-${normalizedCnpEnvironment}.internal`;
-    process.env.CDAM_URL ||= `http://ccd-case-document-am-api-${normalizedCnpEnvironment}.service.core-compute-${normalizedCnpEnvironment}.internal`;
-  } else {
-    process.env.IDAM_WEB_URL ||= 'https://idam-api.aat.platform.hmcts.net';
-    process.env.IDAM_TESTING_SUPPORT_URL ||= 'https://idam-testing-support-api.aat.platform.hmcts.net';
-    process.env.S2S_URL ||=
-      'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal/testing-support/lease';
-    process.env.DM_STORE_URL ||= 'http://dm-store-aat.service.core-compute-aat.internal';
-    process.env.CDAM_URL ||= 'http://ccd-case-document-am-api-aat.service.core-compute-aat.internal';
-  }
+  process.env.IDAM_WEB_URL ||= `https://idam-api.${idamEnvironment}.platform.hmcts.net`;
+  process.env.IDAM_TESTING_SUPPORT_URL ||= `https://idam-testing-support-api.${idamEnvironment}.platform.hmcts.net`;
 }
 
 /** Clears PFT lock dir on local runs only (skipped when CI is set). */
@@ -40,9 +33,7 @@ export const getS2SToken = async (): Promise<void> => {
   const { ServiceAuthUtils } = await import('@hmcts/playwright-common');
   applyPlaywrightServiceUrls();
   if (!process.env.S2S_URL) {
-    throw new Error(
-      'S2S_URL is not set (set ENVIRONMENT to aat|demo|perftest|ithc, or export S2S_URL; otherwise AAT defaults apply via applyPlaywrightServiceUrls)'
-    );
+    throw new Error('S2S_URL is not set (Jenkins sets it; locally, export the S2S /testing-support/lease URL)');
   }
 
   let lastError: unknown;
