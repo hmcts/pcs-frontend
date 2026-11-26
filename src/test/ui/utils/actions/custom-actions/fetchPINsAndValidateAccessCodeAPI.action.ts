@@ -44,14 +44,27 @@ export function getSelectedPinUser(): PinUser | undefined {
   return selectedPinUser;
 }
 
+export function getPinUsersInClaimOrder(): PinUser[] {
+  const payload = submitCaseApiData.submitCasePayload;
+  const defendants = [payload.defendant1, ...(payload.additionalDefendants ?? []).map(defendant => defendant.value)];
+
+  return defendants.map(defendant => {
+    const pinUser = pinUsers.find(
+      user => user.firstName === defendant.firstName && user.lastName === defendant.lastName
+    );
+    if (!pinUser) {
+      throw new Error(`Could not find PIN user for defendant ${defendant.firstName} ${defendant.lastName}`);
+    }
+    return pinUser;
+  });
+}
+
 export const getSelectedDefendantNumber = (): number => {
   const selectedUser = getSelectedPinUser();
   if (!selectedUser) {
     throw new Error('No selected PIN user available');
   }
-  const payload = submitCaseApiData.submitCasePayload;
-  const defendants = [payload.defendant1, ...(payload.additionalDefendants ?? []).map(defendant => defendant.value)];
-  const defendantIndex = defendants.findIndex(
+  const defendantIndex = getPinUsersInClaimOrder().findIndex(
     defendant => defendant.firstName === selectedUser.firstName && defendant.lastName === selectedUser.lastName
   );
   if (defendantIndex === -1) {

@@ -58,6 +58,10 @@ export class TextValidation implements IValidation {
       case 'hintText':
         data.elementType = 'div';
         break;
+      case 'summaryListValue': {
+        data.elementType = '.govuk-summary-list__value';
+        break;
+      }
       case 'taskListStatus':
         data.elementType = `li:has(a:has-text("${fieldName}")) .govuk-tag`;
         break;
