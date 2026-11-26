@@ -1,0 +1,15 @@
+export const adjustmentToGetIntoBuilding = {
+  mainHeader: `Rwyf angen addasiadau i allu cyrraedd ein hadeiladau, mynd i mewn iddynt a symud o’u cwmpas`,
+backLink: `Yn ôl`,
+continueButton: `Parhau`,
+cancelLink: `Canslo`,
+differentTypeOfChairCheckbox: `Math gwahanol o gadair`,
+accessibleToiletCheckbox: `Toiled hygyrch`,
+guidingInTheBuildingCheckbox: `Cymorth i fynd o amgylch yr adeilad`,
+helpUsingALiftCheckbox: `Help i ddefnyddio lifft`,
+parkingSpaceCloseToTheVenueCheckbox: `Lle parcio yn agos i'r lleoliad`,
+stepFreeWheelchairAccessCheckbox: `Dim grisiau / mynediad ar gyfer cadair olwyn`,
+useOfVenueWheelchairCheckbox: `Y gallu i ddefnyddio cadair olwyn a geir yn y lleoliad`,
+otherCheckbox: `Arall`,
+noHelpTravellingOrMovingAroundCheckbox: `Nid wyf angen cymorth i deithio i, neu i symud o gwmpas adeiladau'r llys ar hyn o bryd`,
+};
