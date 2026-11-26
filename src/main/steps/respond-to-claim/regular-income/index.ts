@@ -7,7 +7,7 @@ import { noEmojiValidator } from '../../utils/fieldValidators';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { release14RadioWording } from '@utils/respondToClaimFlags';
+import { release14RadioWording } from '@utils/featureFlags';
 
 const validateMoneyFromElsewhereDetails = noEmojiValidator('errors.moneyFromElsewhereDetails.invalidCharacters');
 

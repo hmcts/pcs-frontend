@@ -29,20 +29,31 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
 }
 
 // Match GOV.UK's selector specificity and reserve the sticky panel on the root scrollport.
-.govuk-template.pcs-make-order:not(:has(.govuk-exit-this-page)) {
+// Court staff reviewing an order reserve room for the order panel instead (_confirm-order-review.scss).
+.govuk-template.pcs-make-order:not(:has(.govuk-exit-this-page, .pcs-order-panel)) {
   @include pcs-case-facts-sticky {
     scroll-padding-top: $pcs-case-facts-reserve;
   }
 }
 
-.govuk-template.pcs-make-order:not(:has(.govuk-exit-this-page)):has(.pcs-case-facts--collapsed) {
+.govuk-template.pcs-make-order:not(:has(.govuk-exit-this-page, .pcs-order-panel)):has(.pcs-case-facts--collapsed) {
   @include pcs-case-facts-sticky {
     scroll-padding-top: $pcs-case-facts-collapsed-reserve;
   }
 }
 
+// What the choice of when the order is made takes out of the form. GOV.UK's display rules outrank [hidden].
+[data-made-at][hidden],
+.govuk-radios__item[hidden] {
+  display: none;
+}
+
+// A fieldset, so that a hearing's facts leave the form with it when the order is made elsewhere.
 .pcs-case-facts {
+  min-width: 0;
+  margin: 0;
   padding: govuk-spacing(3) 0;
+  border: 0;
   border-top: 1px solid $govuk-border-colour;
   border-bottom: 1px solid $govuk-border-colour;
   background-color: govuk-colour('black', $variant: 'tint-95');
