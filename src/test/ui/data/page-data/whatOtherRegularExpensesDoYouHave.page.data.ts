@@ -1,4 +1,6 @@
-export const whatOtherRegularExpensesDoYouHave = {
+import { RELEASE_1_4_ENABLED, whenLdFlagPageData } from '../../utils/actions/custom-actions/launchDarkly.action';
+
+const whatOtherRegularExpensesDoYouHaveDefault = {
   mainHeader: `What other regular expenses do you have? (Optional)`,
   selectAllThatApplyHintText: `Select all that apply. Enter total amount in pounds and pence, for example £148 or £148.50. The information you provide must be truthful and accurate.`,
 
@@ -125,3 +127,30 @@ export const whatOtherRegularExpensesDoYouHave = {
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `what-regular-income-do-you-receive`,
 };
+
+const whatOtherRegularExpensesDoYouHaveLegacy = {
+  ...whatOtherRegularExpensesDoYouHaveDefault,
+  householdBillsWeekHiddenRadioOption: `Week`,
+  householdBillsMonthHiddenRadioOption: `Month`,
+  loanPaymentsWeekHiddenRadioOption: `Week`,
+  loanPaymentsMonthHiddenRadioOption: `Month`,
+  childSpousalMaintenanceWeekHiddenRadioOption: `Week`,
+  childSpousalMaintenanceMonthHiddenRadioOption: `Month`,
+  mobilePhoneWeekHiddenRadioOption: `Week`,
+  mobilePhoneMonthHiddenRadioOption: `Month`,
+  groceryShoppingWeekHiddenRadioOption: `Week`,
+  groceryShoppingMonthHiddenRadioOption: `Month`,
+  fuelParkingTransportWeekHiddenRadioOption: `Week`,
+  fuelParkingTransportMonthHiddenRadioOption: `Month`,
+  schoolCostsWeekHiddenRadioOption: `Week`,
+  schoolCostsMonthHiddenRadioOption: `Month`,
+  clothingWeekHiddenRadioOption: `Week`,
+  clothingMonthHiddenRadioOption: `Month`,
+  otherExpensesWeekHiddenRadioOption: `Week`,
+  otherExpensesMonthHiddenRadioOption: `Month`,
+};
+
+export const whatOtherRegularExpensesDoYouHave = whenLdFlagPageData(RELEASE_1_4_ENABLED, {
+  on: whatOtherRegularExpensesDoYouHaveDefault,
+  off: whatOtherRegularExpensesDoYouHaveLegacy,
+});

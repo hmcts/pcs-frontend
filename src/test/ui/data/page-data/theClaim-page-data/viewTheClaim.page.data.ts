@@ -1,3 +1,5 @@
+import { RELEASE_1_4_ENABLED, whenLdFlag } from '../../../utils/actions/custom-actions/launchDarkly.action';
+
 const getCurrentClaimDate = (): string =>
   new Date().toLocaleDateString('en-GB', {
     day: 'numeric',
@@ -21,8 +23,14 @@ export const viewTheClaim = {
 
   claimantDetailsSubHeader: 'Claimant details',
   defendant1SubHeader: 'Defendant 1 details',
-  defendant2SubHeader: 'Defendant 2 details',
-  defendant3SubHeader: 'Defendant 3 details',
+  defendant2SubHeader: whenLdFlag(RELEASE_1_4_ENABLED, {
+    on: 'Defendant 2 details',
+    off: 'Additional defendant 2 details',
+  }),
+  defendant3SubHeader: whenLdFlag(RELEASE_1_4_ENABLED, {
+    on: 'Defendant 3 details',
+    off: 'Additional defendant 3 details',
+  }),
   claimDetailsSubHeader: 'Claim details',
   rentArrearsSubHeader: 'Details of rent arrears',
   actionTakenSubHeader: 'Action already taken by the claimant',

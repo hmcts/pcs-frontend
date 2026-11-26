@@ -8,6 +8,7 @@ import { performAction, performValidation, performValidations } from '../../cont
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 import { getSelectedDefendantNumber, getSelectedPinUser, pinUsers } from './fetchPINsAndValidateAccessCodeAPI.action';
+import { RELEASE_1_4_ENABLED, getLdFlag } from './launchDarkly.action';
 
 export class CitizenDashboardAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
@@ -178,7 +179,11 @@ export class CitizenDashboardAction implements IAction {
       await performAction('reloadPage');
       await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
       await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
-      await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.counterClaimPDFLink });
+      if (await getLdFlag(RELEASE_1_4_ENABLED)) {
+        await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.counterClaimPDFLink });
+      } else {
+        await expect(page.getByRole('link', { name: viewTheResponse.counterClaimPDFLink })).toHaveCount(0);
+      }
     }).toPass({
       timeout: 30_000,
       intervals: [1_000, 2_000, 3_000],
