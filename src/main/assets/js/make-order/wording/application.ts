@@ -2,7 +2,7 @@ import { type DocBuilder, type OrderedListBuilder } from '@hmcts-cft/docweave';
 
 import { type OrderApplication, type OrderData } from '../data';
 
-import { sentenceCase } from './common';
+import { sentenceCase, value } from './common';
 import { addListing } from './listing';
 import { addPaymentConditions } from './payment-conditions';
 
@@ -18,7 +18,7 @@ export function decidedApplications(data: OrderData): OrderApplication[] {
  * party by role, numbered only where the case has more than one of that role, and never the GA reference.
  */
 export function describeApplication(data: OrderData, application: OrderApplication): string {
-  const dated = application.submittedOn ? ` dated ${application.submittedOn}` : '';
+  const dated = ` dated ${application.submittedOn}`;
   const role = /\((Claimant|Defendant)(?: (\d+))?\)\s*$/.exec(application.applicant);
   if (!role) {
     return `the application of ${application.applicant}${dated}`;
@@ -30,42 +30,53 @@ export function describeApplication(data: OrderData, application: OrderApplicati
   return `the ${ordinal}${kind}'s application${dated}`;
 }
 
-/** The generated clauses after which the "Insert applicant's wording" button puts the applicant's wording. */
-export function wordingAnchors(prefix: string): string[] {
-  return [`item:${prefix}-decision`, `item:${prefix}-listing`];
+/** Adjourning the hearing an application to adjourn asks about: to a further hearing, or generally. */
+function addHearingAdjournment(list: OrderedListBuilder, data: OrderData, prefix: string): void {
+  const adjournment = value(data, `${prefix}-adjourn-type`);
+  if (adjournment === 'further-hearing') {
+    addListing(list, data, `${prefix}-adjourn`, `${prefix}-adjourn`, 'The hearing shall be adjourned to be heard');
+  } else if (adjournment === 'generally') {
+    list.item(
+      `${prefix}-adjourn-generally`,
+      'The hearing is adjourned generally with liberty to restore by application by any party on notice to all other parties.'
+    );
+  }
 }
 
 /**
- * The clauses the decision on an application generates, each naming the application. The
- * applicant's wording is never generated: the judge inserts it with a button if they want it. Listing it for a
- * hearing says when, as an adjournment does. For an application to suspend enforcement, granting it sets the
- * suspension's conditions as a suspended possession order does.
+ * The clauses the decision on an application generates; none says it is granted, as the order says what it grants.
+ * A freeform decision generates none, for the judge's own wording. Listing it for a new hearing says when, as an
+ * adjournment does, and whether the other parties are given notice; listing it at one of the case's hearings says
+ * which. Adjourning an application to adjourn adjourns the hearing as the adjournment tab adjourns the claim.
+ * Suspending enforcement sets the suspension's conditions as a suspended possession order does.
  */
 function addApplicationClauses(list: OrderedListBuilder, data: OrderData, application: OrderApplication): void {
   const { decision, prefix } = application;
   const suspension = application.enforcementSuspension ? ' to suspend enforcement' : '';
   const described = sentenceCase(describeApplication(data, application)) + suspension;
-  if (decision === 'grant' && application.enforcementSuspension) {
+  if (decision === 'adjourn') {
+    addHearingAdjournment(list, data, prefix);
+  } else if (decision === 'suspend') {
     addPaymentConditions(
       list,
       data,
       `${prefix}-suspension`,
       'Enforcement of the possession order is suspended on condition that'
     );
-  } else if (decision === 'grant') {
-    list.item(`${prefix}-decision`, `${described} is granted.`);
   } else if (decision === 'dismiss') {
     list.item(`${prefix}-decision`, `${described} is dismissed.`);
   } else if (decision === 'strike-out') {
     list.item(`${prefix}-decision`, `${described} is struck out.`);
+  } else if (decision === 'list' && application.listedAt) {
+    list.item(`${prefix}-listing`, content => {
+      content
+        .text(`${described} shall be heard at the hearing on `)
+        .fact(`${prefix}-hearing-date`, application.listedAt!, { sourceId: `${prefix}-list-at` })
+        .text('.');
+    });
   } else if (decision === 'list') {
-    addListing(
-      list,
-      data,
-      `${prefix}-list`,
-      prefix,
-      `${described} shall be listed for a hearing on notice to all parties`
-    );
+    const notice = application.listWithoutNotice ? 'without notice to the other parties' : 'on notice to all parties';
+    addListing(list, data, `${prefix}-list`, prefix, `${described} shall be listed for a hearing ${notice}`);
   }
 }
 

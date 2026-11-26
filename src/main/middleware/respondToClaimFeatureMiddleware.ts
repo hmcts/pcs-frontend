@@ -4,12 +4,12 @@ import { isLegalRepresentativeUser } from '../steps/utils';
 
 import { handleRespondToClaimDisabled } from './handleRespondToClaimDisabled';
 
+import { RELEASE_1_4_ENABLED } from '@utils/featureFlags';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import {
   isRespondToClaimEnabledForRelease,
   isRespondToClaimEnabledForUser,
 } from '@utils/isRespondToClaimEnabledForUser';
-import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 
 export const respondToClaimFeatureMiddleware: RequestHandler = async (
   req: Request,

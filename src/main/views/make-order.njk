@@ -3,6 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "macros/csrf.njk" import csrfProtection %}
 {% import "make-order/_compact.njk" as compact with context %}
 
@@ -16,19 +17,14 @@
   {% endif %}
 
   {# The explicit action leaves out the tab fragment, so a refused submission opens at the error summary. #}
-  <form method="post" action="{{ formAction }}" novalidate id="make-order-form"
-        data-property-address="{{ propertyAddressDisplay }}"
-        data-parties="{{ orderParties | dump }}"
-        {%- if withoutHearing %} data-without-hearing{% endif %}>
+  <form method="post" action="{{ formAction }}" novalidate id="make-order-form">
+  <script type="application/json" id="order-context">{{ orderContext | jsonScript | safe }}</script>
   <input type="hidden" name="eventToken" value="{{ eventToken }}">
   <input type="hidden" name="orderId" value="{{ order.id }}">
   <input type="hidden" name="taskId" value="{{ taskId }}">
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
-  <input type="hidden" name="hearingVersion" value="{{ hearingVersion }}">
   {{ csrfProtection(csrfToken) }}
-
   <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ pageHeading }}</h1>
-
   <p class="govuk-body govuk-!-margin-bottom-1">
     <span class="govuk-!-font-weight-bold">Case reference:</span> {{ caseReferenceDisplay }}
   </p>
@@ -36,9 +32,23 @@
   <p class="govuk-body govuk-!-font-weight-bold">
     {{ claimantNames }} vs {{ defendantNames }}
   </p>
-
   {% include "make-order/_whole-file.njk" %}
 
+  {# The page has every hearing's facts and notes, and shows what the choice asks for as it is made (showMadeAt). #}
+  {% if madeAtItems | length > 1 %}
+    <h2 class="govuk-heading-l govuk-!-margin-top-6">When the order is made</h2>
+    {{ govukRadios({
+      idPrefix: "made-at",
+      name: "made-at",
+      classes: "govuk-radios--small",
+      fieldset: { legend: { text: "Is this order made at a hearing?", classes: "govuk-fieldset__legend--s" } },
+      hint: { text: "Choose a hearing to record who attended and the case facts and notes for it." },
+      items: madeAtItems,
+      errorMessage: validationErrors["made-at"]
+    }) }}
+  {% else %}
+    <input type="hidden" name="made-at" value="{{ madeAtItems[0].value }}">
+  {% endif %}
 
   {% if order.queryFromCaseworker %}
     {# An order a caseworker returned: their query. #}
@@ -72,5 +82,6 @@
       classes: "govuk-button--secondary"
     }) }}
   </div>
+
   </form>
 {% endblock %}
