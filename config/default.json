@@ -23,16 +23,16 @@
     "deadline": 15000
   },
   "api": {
-    "url": "http://localhost:3206"
+    "url": "http://pcs-api-aat.service.core-compute-aat.internal"
   },
   "s2s": {
     "microservice": "pcs_frontend",
-    "url": "http://localhost:8489",
+    "url": "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal",
     "ttl": 3600,
     "key": "s2s:service-token"
   },
   "ccd": {
-    "url": "http://localhost:4452",
+    "url": "http://ccd-data-store-api-aat.service.core-compute-aat.internal",
 
     "caseTypeId": "PCS"
   },
@@ -40,7 +40,7 @@
     "url": "https://api.os.uk/search/places/v1"
   },
   "feeService": {
-    "url": "http://localhost:8180",
+    "url": "http://fees-register-api-aat.service.core-compute-aat.internal",
     "lookup": {
       "genAppStandardFee": {
         "service": "general",
@@ -131,7 +131,7 @@
     "uri": "https://manage-case.aat.platform.hmcts.net"
   },
   "cdam": {
-    "url": "http://localhost:4455"
+    "url": "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
   },
   "documentUpload": {
     "maxFileSizePerFileMB": 1024,

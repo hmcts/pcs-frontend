@@ -36,7 +36,7 @@ export const submitCaseApiData = {
       claimAgainstTrespassers: 'NO',
       claimantName: 'Possession Claims Solicitor Org',
       isClaimantNameCorrect: 'YES',
-      claimantContactEmail: 'claimant-contact@example.com',
+      claimantContactEmail: 'pcs-solicitor1@test.com',
       isCorrectClaimantContactEmail: 'YES',
       orgAddressFound: 'YES',
       organisationAddress: {
@@ -272,7 +272,7 @@ export const submitCaseApiData = {
       claimantName: 'Possession Claims Solicitor Org',
       isClaimantNameCorrect: 'NO',
       overriddenClaimantName: 'John Doe',
-      claimantContactEmail: 'claimant-contact@example.com',
+      claimantContactEmail: 'pcs-solicitor1@test.com',
       isCorrectClaimantContactEmail: 'YES',
       formattedClaimantContactAddress: '2 Second Avenue<br>London<br>W3 7RX',
       isCorrectClaimantContactAddress: 'YES',
@@ -477,7 +477,7 @@ export const submitCaseApiData = {
         valueCode: 'PROVIDER_OF_SOCIAL_HOUSING',
       },
       claimAgainstTrespassers: 'NO',
-      claimantContactEmail: 'claimant-contact@example.com',
+      claimantContactEmail: 'pcs-solicitor1@test.com',
       isCorrectClaimantContactEmail: 'YES',
       orgAddressFound: 'Yes',
       organisationAddress: {
@@ -583,7 +583,7 @@ export const submitCaseApiData = {
       orgNameFound: 'YES',
       claimantName: 'Possession Claims Solicitor Org',
       isClaimantNameCorrect: 'YES',
-      claimantContactEmail: 'claimant-contact@example.com',
+      claimantContactEmail: 'pcs-solicitor1@test.com',
       isCorrectClaimantContactEmail: 'YES',
       orgAddressFound: 'YES',
       organisationAddress: {
@@ -689,7 +689,7 @@ export const submitCaseApiData = {
       orgNameFound: 'YES',
       claimantName: 'Possession Claims Solicitor Org',
       isClaimantNameCorrect: 'YES',
-      claimantContactEmail: 'claimant-contact@example.com',
+      claimantContactEmail: 'pcs-solicitor1@test.com',
       isCorrectClaimantContactEmail: 'YES',
       orgAddressFound: 'YES',
       organisationAddress: {
@@ -1212,7 +1212,7 @@ export const submitCaseApiData = {
         valueCode: 'PROVIDER_OF_SOCIAL_HOUSING',
       },
       claimAgainstTrespassers: 'NO',
-      claimantContactEmail: 'claimant-contact@example.com',
+      claimantContactEmail: 'pcs-solicitor1@test.com',
       isCorrectClaimantContactEmail: 'YES',
       orgAddressFound: 'Yes',
       organisationAddress: {

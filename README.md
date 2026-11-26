@@ -40,11 +40,6 @@ work, or if you don't have vault access), set `USE_VAULT=false` and populate
 the secrets in `.env` yourself — see `.env.example` for the test-user
 credentials that are still `.env`-only.
 
-Backend service URLs in `config/default.json` point at the local pcs-api stack
-(`./gradlew bootWithCCD`). To run against AAT over the VPN instead, set
-`PCS_API_URL`, `S2S_URL`, `CCD_URL`, `CDAM_URL` and `FEE_SERVICE_URL` in `.env`
-(see `.env.example`).
-
 Install dependencies by executing the following command:
 
 ```bash
