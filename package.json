@@ -130,7 +130,7 @@
     "@types/webpack-env": "1.18.8",
     "@typescript-eslint/eslint-plugin": "8.69.0",
     "@typescript-eslint/parser": "8.69.0",
-    "allure-commandline": "2.46.1",
+    "allure-commandline": "2.46.2",
     "allure-js-commons": "3.15.0",
     "allure-playwright": "3.15.0",
     "chokidar": "5.0.0",
