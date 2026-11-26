@@ -5,6 +5,7 @@ import { DateTime } from 'luxon';
 import { CallbackRejectedError } from '../HttpError';
 import { RECORD_WARRANT_RETURN_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware';
+import { featureFlagMiddleware } from '../middleware/featureFlagMiddleware';
 import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
 
 import { CcdCaseData } from '@services/ccdCase.interface';
@@ -89,7 +90,7 @@ function caseReferenceOf(req: Request): string {
   return req.params.caseReference as string;
 }
 
-const journey = [oidcMiddleware];
+const journey = [oidcMiddleware, featureFlagMiddleware];
 
 function pageModel(req: Request, issues: ValidationIssue[] = []): Record<string, unknown> {
   const caseReference = caseReferenceOf(req);

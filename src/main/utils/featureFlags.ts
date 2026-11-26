@@ -12,6 +12,8 @@ export const ENABLE_DEFENDANT_GENERAL_APPLICATIONS_R2 = 'defendant-general-appli
 
 export const RELEASE_1_4_ENABLED = 'release-1.4-enabled';
 
+export const BAILIFF_MANAGEMENT_ENABLED = 'bailiff-management-enabled';
+
 export const ENABLE_UNCATEGORISED_DOCUMENTS = 'uncategorised-documents-enabled';
 
 export const ENABLE_CUI_PCQ = 'cui-pcq-enabled';

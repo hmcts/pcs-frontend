@@ -4,6 +4,7 @@ import { Application, Request, Response } from 'express';
 import { CallbackRejectedError, HTTPError } from '../HttpError';
 import { MAKE_ORDER_ROUTE, MAKE_ORDER_SENT_FOR_REVIEW_ROUTE } from '../constants/caseRoutes';
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
+import { featureFlagMiddleware } from '../middleware/featureFlagMiddleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
 import {
@@ -122,132 +123,150 @@ function chosen(req: Request): Chosen {
 }
 
 export default function makeOrderRoutes(app: Application): void {
-  app.get(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
-    try {
-      // A new order on the case is under way, so there is no longer one to confirm.
-      delete req.session.ordersSentForReview?.[req.params.caseReference as string];
-      const started = await startOrderEvent(
-        req.session.user!.accessToken,
-        req.params.caseReference as string,
-        chosen(req)
-      );
-      res.render('make-order', pageModel(req, started));
-    } catch (error) {
-      refusedXuiEvent(res, next, error, refusalPage(req, res, ['judge']));
-    }
-  });
-
-  app.post(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
-    const accessToken = req.session.user!.accessToken;
-    const caseReference = req.params.caseReference as string;
-    const {
-      _csrf,
-      action,
-      eventToken,
-      orderId,
-      taskId,
-      orderVersion,
-      // The hearing's record goes to pcs-api apart from the order, so a posted one is never the order's.
-      hearing: _hearing,
-      hearingVersion = '',
-      orderType,
-      orderDocument: encodedDocument,
-      ...formData
-    } = req.body;
-    const orderDocument = decodeOrderDocument(encodedDocument);
-
-    try {
-      // The case comes from a new start rather than the page, which would have to post it as JSON the WAF
-      // blocks, and could change it. The event token, order id and version stay the page's: CCD takes a
-      // repeated submission as the one already made, and pcs-api refuses the change if the order has moved on.
-      const started = await startOrderEvent(accessToken, caseReference, chosen(req));
-      const currentHearing = started.envelope.hearing;
-      const hearingChanged = !!currentHearing && hearingRecordChanged(currentHearing, formData);
-      if (hearingChanged && hearingVersion !== String(currentHearing.version ?? '')) {
-        // Reload stale facts rather than silently applying the judge's edits to a newer version.
-        return res.status(409).render(
-          'make-order',
-          pageModel(req, started, {
-            validationIssues: [
-              {
-                id: 'make-order-form',
-                message: 'The hearing facts or notes have changed. Check the reloaded details before saving again.',
-              },
-            ],
-          })
-        );
-      }
-      // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
-      const validationIssues =
-        action === 'SUBMIT_FOR_REVIEW'
-          ? validateMakeOrder(
-              orderType,
-              formData,
-              currentHearing ? attendanceParties(started.envelope) : [],
-              !currentHearing,
-              applicationsToDecide(started.envelope)
-            )
-          : currentHearing
-            ? validateHearingRecord(formData)
-            : [];
-      if (validationIssues.length) {
-        // Nothing was submitted, so keep the token and versions the answers were made against.
-        const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
-        const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues, hearingVersion };
-        return res
-          .status(400)
-          .render('make-order', pageModel(req, { eventToken, envelope: { ...started.envelope, order } }, submission));
-      }
-      const request = {
-        action,
-        order: {
-          id: orderId || null,
-          version: Number(orderVersion),
-          orderType,
-          formData: withoutHearingRecord(formData),
-          applicationDecisions: applicationDecisions(formData),
-          docweaveSnapshot: postedSnapshot(orderDocument),
-        },
-        taskId: taskId || null,
-        // Only send facts and a note when they differ; pcs-api checks the version again when saving.
-        hearing: currentHearing
-          ? {
-              id: currentHearing.id,
-              version: currentHearing.version ?? null,
-              ...(hearingChanged && {
-                caseFacts: caseFactsFromForm(formData),
-                note: formData['hearing-notes'] || null,
-              }),
-            }
-          : null,
-      };
+  app.get(
+    MAKE_ORDER_ROUTE,
+    oidcMiddleware,
+    makeOrderFeatureMiddleware,
+    featureFlagMiddleware,
+    async (req: Request, res: Response, next) => {
       try {
-        await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, eventToken, {
-          sdkEventPayload: JSON.stringify(request),
-        });
+        // A new order on the case is under way, so there is no longer one to confirm.
+        delete req.session.ordersSentForReview?.[req.params.caseReference as string];
+        const started = await startOrderEvent(
+          req.session.user!.accessToken,
+          req.params.caseReference as string,
+          chosen(req)
+        );
+        res.render('make-order', pageModel(req, started));
       } catch (error) {
-        if (!(error instanceof CallbackRejectedError)) {
-          throw error;
-        }
-        // pcs-api refused the change, e.g. because the draft was saved or sent for review in another
-        // tab: show the judge the order as it now stands, and why.
-        const current = await startOrderEvent(accessToken, caseReference, chosen(req));
-        const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
-        return res.status(error.status).render('make-order', pageModel(req, current, { validationIssues: reasons }));
+        refusedXuiEvent(res, next, error, refusalPage(req, res, ['judge']));
       }
-      if (action === 'SUBMIT_FOR_REVIEW') {
-        // Kept on the session so the confirmation survives a refresh, which cannot resubmit the order.
-        req.session.ordersSentForReview = {
-          ...req.session.ordersSentForReview,
-          [caseReference]: confirmationHeader(caseReference, started.envelope.caseContext),
-        };
-        return res.redirect(MAKE_ORDER_SENT_FOR_REVIEW_ROUTE.replace(':caseReference', caseReference));
-      }
-      return res.redirect(manageCaseDetailsUrl(caseReference));
-    } catch (error) {
-      refusedXuiEvent(res, next, error);
     }
-  });
+  );
+
+  app.post(
+    MAKE_ORDER_ROUTE,
+    oidcMiddleware,
+    makeOrderFeatureMiddleware,
+    featureFlagMiddleware,
+    async (req: Request, res: Response, next) => {
+      const accessToken = req.session.user!.accessToken;
+      const caseReference = req.params.caseReference as string;
+      const {
+        _csrf,
+        action,
+        eventToken,
+        orderId,
+        taskId,
+        orderVersion,
+        // The hearing's record goes to pcs-api apart from the order, so a posted one is never the order's.
+        hearing: _hearing,
+        hearingVersion = '',
+        orderType,
+        orderDocument: encodedDocument,
+        ...formData
+      } = req.body;
+      const orderDocument = decodeOrderDocument(encodedDocument);
+
+      try {
+        // The case comes from a new start rather than the page, which would have to post it as JSON the WAF
+        // blocks, and could change it. The event token, order id and version stay the page's: CCD takes a
+        // repeated submission as the one already made, and pcs-api refuses the change if the order has moved on.
+        const started = await startOrderEvent(accessToken, caseReference, chosen(req));
+        const currentHearing = started.envelope.hearing;
+        const hearingChanged = !!currentHearing && hearingRecordChanged(currentHearing, formData);
+        if (hearingChanged && hearingVersion !== String(currentHearing.version ?? '')) {
+          // Reload stale facts rather than silently applying the judge's edits to a newer version.
+          return res.status(409).render(
+            'make-order',
+            pageModel(req, started, {
+              validationIssues: [
+                {
+                  id: 'make-order-form',
+                  message: 'The hearing facts or notes have changed. Check the reloaded details before saving again.',
+                },
+              ],
+            })
+          );
+        }
+        // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
+        const validationIssues =
+          action === 'SUBMIT_FOR_REVIEW'
+            ? validateMakeOrder(
+                orderType,
+                formData,
+                currentHearing ? attendanceParties(started.envelope) : [],
+                !currentHearing,
+                applicationsToDecide(started.envelope)
+              )
+            : currentHearing
+              ? validateHearingRecord(formData)
+              : [];
+        if (validationIssues.length) {
+          // Nothing was submitted, so keep the token and versions the answers were made against.
+          const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
+          const submission = {
+            orderType,
+            formData,
+            orderDocumentJson: orderDocument,
+            validationIssues,
+            hearingVersion,
+          };
+          return res
+            .status(400)
+            .render('make-order', pageModel(req, { eventToken, envelope: { ...started.envelope, order } }, submission));
+        }
+        const request = {
+          action,
+          order: {
+            id: orderId || null,
+            version: Number(orderVersion),
+            orderType,
+            formData: withoutHearingRecord(formData),
+            applicationDecisions: applicationDecisions(formData),
+            docweaveSnapshot: postedSnapshot(orderDocument),
+          },
+          taskId: taskId || null,
+          // Only send facts and a note when they differ; pcs-api checks the version again when saving.
+          hearing: currentHearing
+            ? {
+                id: currentHearing.id,
+                version: currentHearing.version ?? null,
+                ...(hearingChanged && {
+                  caseFacts: caseFactsFromForm(formData),
+                  note: formData['hearing-notes'] || null,
+                }),
+              }
+            : null,
+        };
+        try {
+          await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, eventToken, {
+            sdkEventPayload: JSON.stringify(request),
+          });
+        } catch (error) {
+          if (!(error instanceof CallbackRejectedError)) {
+            throw error;
+          }
+          // pcs-api refused the change, e.g. because the draft was saved or sent for review in another
+          // tab: show the judge the order as it now stands, and why.
+          const current = await startOrderEvent(accessToken, caseReference, chosen(req));
+          const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
+          return res.status(error.status).render('make-order', pageModel(req, current, { validationIssues: reasons }));
+        }
+        if (action === 'SUBMIT_FOR_REVIEW') {
+          // Kept on the session so the confirmation survives a refresh, which cannot resubmit the order.
+          req.session.ordersSentForReview = {
+            ...req.session.ordersSentForReview,
+            [caseReference]: confirmationHeader(caseReference, started.envelope.caseContext),
+          };
+          return res.redirect(MAKE_ORDER_SENT_FOR_REVIEW_ROUTE.replace(':caseReference', caseReference));
+        }
+        return res.redirect(manageCaseDetailsUrl(caseReference));
+      } catch (error) {
+        refusedXuiEvent(res, next, error);
+      }
+    }
+  );
 
   app.get(
     MAKE_ORDER_SENT_FOR_REVIEW_ROUTE,

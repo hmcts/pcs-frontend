@@ -19,6 +19,7 @@ import { Application } from 'express';
 
 import { CallbackRejectedError, HTTPError } from '../../../main/HttpError';
 import { oidcMiddleware } from '../../../main/middleware';
+import { featureFlagMiddleware } from '../../../main/middleware/featureFlagMiddleware';
 
 import recordWarrantReturnRoutes from '@routes/recordWarrantReturn';
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -47,7 +48,7 @@ describe('recordWarrantReturnRoutes', () => {
       throw new Error(`No handler registered for ${path}`);
     }
 
-    return call[2] as RouteHandler;
+    return call[3] as RouteHandler;
   };
 
   const postHandler = (path: string): RouteHandler => {
@@ -57,7 +58,7 @@ describe('recordWarrantReturnRoutes', () => {
       throw new Error(`No handler registered for ${path}`);
     }
 
-    return call[2] as RouteHandler;
+    return call[3] as RouteHandler;
   };
 
   const basePath = '/case/:caseReference/record-warrant-return';
@@ -82,14 +83,14 @@ describe('recordWarrantReturnRoutes', () => {
       ['confirmation', `${basePath}/confirmed`],
       ['cancel', `${basePath}/cancel`],
     ])('registers the %s GET route', (_name, path) => {
-      expect(app.get).toHaveBeenCalledWith(path, oidcMiddleware, expect.any(Function));
+      expect(app.get).toHaveBeenCalledWith(path, oidcMiddleware, featureFlagMiddleware, expect.any(Function));
     });
 
     it.each([
       ['warrant return', basePath],
       ['check your answers', `${basePath}/check-your-answers`],
     ])('registers the %s POST route', (_name, path) => {
-      expect(app.post).toHaveBeenCalledWith(path, oidcMiddleware, expect.any(Function));
+      expect(app.post).toHaveBeenCalledWith(path, oidcMiddleware, featureFlagMiddleware, expect.any(Function));
     });
   });
 
@@ -112,7 +113,7 @@ describe('recordWarrantReturnRoutes', () => {
         },
         eventToken: 'event-token',
       });
-      const res = { render: jest.fn() };
+      const res = { render: jest.fn(), locals: {} };
 
       await getHandler(basePath)(
         {
@@ -171,7 +172,7 @@ describe('recordWarrantReturnRoutes', () => {
 
     it('leaves the case details blank when CCD returns none', async () => {
       mockStartCaseEvent.mockReturnValueOnce({ data: {}, eventToken: 'event-token' });
-      const res = { render: jest.fn() };
+      const res = { render: jest.fn(), locals: {} };
 
       await getHandler(basePath)(
         { params: { caseReference: '123' }, session: { user: { accessToken: 'token' } } } as unknown as Request,
@@ -196,7 +197,7 @@ describe('recordWarrantReturnRoutes', () => {
     });
 
     const get = async () => {
-      const res = { status: jest.fn().mockReturnThis(), render: jest.fn(), send: jest.fn() };
+      const res = { status: jest.fn().mockReturnThis(), render: jest.fn(), send: jest.fn(), locals: {} };
       const next = jest.fn();
       await getHandler(basePath)(
         { params: { caseReference: '123' }, session: { user: { accessToken: 'token' } } } as unknown as Request,
@@ -231,7 +232,7 @@ describe('recordWarrantReturnRoutes', () => {
     it('passes a failure to load the case to the error handler', async () => {
       const failure = new HTTPError('CCD is down', 502);
       (ccdCaseService.startCaseEvent as jest.Mock).mockRejectedValueOnce(failure);
-      const res = { render: jest.fn() };
+      const res = { render: jest.fn(), locals: {} };
       const next = jest.fn();
 
       await getHandler('/case/:caseReference/record-warrant-return/check-your-answers')(
@@ -251,7 +252,7 @@ describe('recordWarrantReturnRoutes', () => {
           caseNameHmctsInternal: 'Housing Ltd vs Sam Smith',
         },
       });
-      const res = { render: jest.fn() };
+      const res = { render: jest.fn(), locals: {} };
 
       await getHandler('/case/:caseReference/record-warrant-return/check-your-answers')(
         {
@@ -722,7 +723,7 @@ describe('recordWarrantReturnRoutes', () => {
 
   describe('GET confirmed', () => {
     it('renders the confirmation page', () => {
-      const res = { render: jest.fn() };
+      const res = { render: jest.fn(), locals: {} };
 
       void getHandler('/case/:caseReference/record-warrant-return/confirmed')(
         {
@@ -857,7 +858,7 @@ describe('recordWarrantReturnRoutes', () => {
         },
       ],
     ])('shows the answers saved in the session for %s', async (_name, saved, answers) => {
-      const res = { render: jest.fn() };
+      const res = { render: jest.fn(), locals: {} };
 
       await getHandler(basePath)(
         {
