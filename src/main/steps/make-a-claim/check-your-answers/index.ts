@@ -151,7 +151,7 @@ export const step: StepDefinition = createMakeAClaimStep({
       if (submitted) {
         return req.res?.redirect(303, submitted);
       }
-      const outcome = submitRefusalOutcome(error, caseId);
+      const outcome = submitRefusalOutcome(error);
       return req.res?.redirect(
         303,
         'redirect' in outcome

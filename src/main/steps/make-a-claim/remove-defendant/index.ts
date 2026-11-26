@@ -1,28 +1,13 @@
-import { readClaim } from '../claimDraft';
-import { itemIndexOf } from '../claimMapping';
-import { yesNoQuestion } from '../fieldBuilders';
-import { flowConfig } from '../flow.config';
-import { createMakeAClaimStep } from '../formStep';
+import { createRemoveItemStep } from '../removeItemStep';
 import { defendantDisplayName } from '../summary';
 
-import { getStepUrl } from '@modules/steps/flow';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-export const step: StepDefinition = createMakeAClaimStep({
+export const step: StepDefinition = createRemoveItemStep({
   stepName: 'remove-defendant',
   stepDir: __dirname,
-  interstitial: true,
-  fields: [yesNoQuestion('confirmRemove')],
-  redirectWhen: req =>
-    itemIndexOf(req, readClaim(req).defendants, 'index') === undefined
-      ? getStepUrl('defendant-cya', flowConfig, req.res?.locals.validatedCase?.id)
-      : undefined,
-  extendGetContent: req => ({
-    defendantName: defendantDisplayName(
-      readClaim(req).defendants?.[itemIndexOf(req, readClaim(req).defendants, 'index') ?? -1]?.value,
-      req
-    ),
-    backUrl: getStepUrl('defendant-cya', flowConfig, req.res?.locals.validatedCase?.id),
-  }),
-  resolveRedirectAfterPost: async req => getStepUrl('defendant-cya', flowConfig, req.res?.locals.validatedCase?.id),
+  summaryStep: 'defendant-cya',
+  items: claim => claim.defendants,
+  nameKey: 'defendantName',
+  displayName: (defendant, _index, req) => defendantDisplayName(defendant, req),
 });

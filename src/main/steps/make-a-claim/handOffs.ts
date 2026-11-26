@@ -25,7 +25,7 @@ const CLAIMANT_ROLE_ON_CASE = 'Claimant';
 /** Where Your Support (cui-ra) sends the claimant back to; cui-ra fills in the id of the payload it holds. */
 export const REASONABLE_ADJUSTMENTS_CALLBACK_PATH = 'make-a-claim/reasonable-adjustments/callback';
 
-export function claimantNameOf(claim: CitizenPossessionClaim): string {
+function claimantNameOf(claim: CitizenPossessionClaim): string {
   const claimant = claim.claimant ?? {};
   return claimant.individualOrOrganisation === 'ORGANISATION'
     ? (claimant.organisationName ?? '')
@@ -71,14 +71,14 @@ export async function startClaimantYourSupport(req: Request): Promise<string> {
 }
 
 /** Whether the PCQ questions can be offered: the feature is on and the service is up. */
-export async function isPcqAvailable(req: Request): Promise<boolean> {
+async function isPcqAvailable(req: Request): Promise<boolean> {
   if (!(await isPcqEnabled(req))) {
     return false;
   }
   return isPcqHealthy();
 }
 
-export interface PcqHandOff {
+interface PcqHandOff {
   pcqId: string;
   url: string;
 }

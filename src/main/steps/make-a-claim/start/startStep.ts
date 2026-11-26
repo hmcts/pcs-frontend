@@ -13,6 +13,11 @@ type StartStepConfig = Omit<FormBuilderConfig, 'journeyFolder' | 'flowConfig' | 
   invalidates?: string[];
 };
 
+export const INFO_TEMPLATE = 'make-a-claim/templates/info.njk';
+
+/** Where the exit page of a claimant who cannot use the service sends them. */
+export const EXIT_URL = 'https://www.gov.uk';
+
 const answerBefore = new WeakMap<Request, string>();
 
 function answerOf(req: Request, config: StartStepConfig): string {
@@ -60,7 +65,7 @@ export function createIneligibleStep(stepName: string, stepDir: string): StepDef
     stepName,
     stepDir,
     fields: [],
-    customTemplate: 'make-a-claim/templates/info.njk',
-    extendGetContent: () => ({ exitUrl: 'https://www.gov.uk' }),
+    customTemplate: INFO_TEMPLATE,
+    extendGetContent: () => ({ exitUrl: EXIT_URL }),
   });
 }

@@ -105,3 +105,18 @@ export function pageHeadingLongText(name: string, extra: Partial<FormFieldConfig
     ...extra,
   });
 }
+
+/** A Yes / No question whose No answer asks, in a required text box, why not. */
+export function yesNoWithReason(name: string, reasonName: string, maxLength: number): FormFieldConfig {
+  return yesNoQuestion(name, {
+    subFields: {
+      no: {
+        [reasonName]: longTextField(reasonName, {
+          required: true,
+          maxLength,
+          errorMessage: `errors.${reasonName}`,
+        }),
+      },
+    },
+  });
+}

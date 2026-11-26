@@ -3,7 +3,7 @@ import type { Request } from 'express';
 import { formatCcdAddress } from '../../utils/ccdAddress';
 import { ADDRESS_TEMPLATE, addressContent, addressFields } from '../addressFields';
 import { readClaim } from '../claimDraft';
-import { defendantIndexOf, propertyAddressOf } from '../claimMapping';
+import { itemIndexFromQuery, propertyAddressOf } from '../claimMapping';
 import { radioQuestion } from '../fieldBuilders';
 import { flowConfig } from '../flow.config';
 import { createMakeAClaimStep } from '../formStep';
@@ -14,7 +14,7 @@ import { getStepUrl } from '@modules/steps/flow';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 function defendantNameForQuestion(req: Request): string {
-  const defendant = readClaim(req).defendants?.[defendantIndexOf(req)]?.value;
+  const defendant = readClaim(req).defendants?.[itemIndexFromQuery(req)]?.value;
   return defendant?.nameKnown === 'YES'
     ? defendantDisplayName(defendant, req)
     : getTranslationFunction(req)('theDefendant');
@@ -36,15 +36,15 @@ export const step: StepDefinition = createMakeAClaimStep({
     addressQuestion: 'sameAsProperty',
     defendantName: defendantNameForQuestion(req),
     propertyAddress: formatCcdAddress(propertyAddressOf(req)),
-    ...(defendantIndexOf(req) > 0
+    ...(itemIndexFromQuery(req) > 0
       ? {
-          backUrl: `${getStepUrl('defendant-name', flowConfig, req.res?.locals.validatedCase?.id)}?index=${defendantIndexOf(req)}`,
+          backUrl: `${getStepUrl('defendant-name', flowConfig, req.res?.locals.validatedCase?.id)}?index=${itemIndexFromQuery(req)}`,
         }
       : {}),
   }),
   keepsOwnRedirectOnReturn: () => false,
   resolveRedirectAfterPost: async req =>
-    defendantIndexOf(req) > 0
+    itemIndexFromQuery(req) > 0
       ? getStepUrl('additional-defendants', flowConfig, req.res?.locals.validatedCase?.id)
       : undefined,
 });

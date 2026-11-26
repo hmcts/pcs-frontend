@@ -1,20 +1,13 @@
 import type { Request } from 'express';
 
+import { SECTION_SUMMARY_STEPS } from './sections.config';
 import type { SummaryCard } from './summary';
 
 /**
  * The summary pages a Change link can return to. `?returnTo=` names one of these steps, never a URL, so it cannot
  * send the claimant anywhere outside the journey.
  */
-export const RETURN_TO_STEPS = [
-  'claimant-cya',
-  'defendant-cya',
-  'tenancy-cya',
-  'notice-cya',
-  'arrears-cya',
-  'situation-cya',
-  'check-your-answers',
-] as const;
+const RETURN_TO_STEPS = [...SECTION_SUMMARY_STEPS, 'check-your-answers'] as const;
 
 export type ReturnToStep = (typeof RETURN_TO_STEPS)[number];
 

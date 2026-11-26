@@ -30,11 +30,11 @@ describe('submitRefusalOutcome', () => {
     ['CLAIM_AGAINST_TRESPASSERS_NOT_ELIGIBLE', '/make-a-claim/trespass-ineligible'],
     ['WHO_IS_CLAIMING_NOT_ELIGIBLE', '/make-a-claim/not-litigant-in-person'],
   ])('sends %s to %s', (code, redirect) => {
-    expect(submitRefusalOutcome(refused(code), CASE)).toEqual({ redirect });
+    expect(submitRefusalOutcome(refused(code))).toEqual({ redirect });
   });
 
   it('sends a property outside England and Wales to the property ineligible page', () => {
-    expect(submitRefusalOutcome(refused('PROPERTY_NOT_IN_ENGLAND_OR_WALES'), CASE)).toEqual({
+    expect(submitRefusalOutcome(refused('PROPERTY_NOT_IN_ENGLAND_OR_WALES'))).toEqual({
       redirect: '/make-a-claim/property-ineligible',
     });
   });
@@ -42,8 +42,7 @@ describe('submitRefusalOutcome', () => {
   it('keeps the answer and message refusals for the page to explain', () => {
     expect(
       submitRefusalOutcome(
-        refused('REQUIRED:defendants[1].address', 'TOO_LONG:claimant.organisationName', 'DRAFT_NOT_FOUND', 'OTHER'),
-        CASE
+        refused('REQUIRED:defendants[1].address', 'TOO_LONG:claimant.organisationName', 'DRAFT_NOT_FOUND', 'OTHER')
       )
     ).toEqual({ codes: ['REQUIRED:defendants[1].address', 'TOO_LONG:claimant.organisationName', 'DRAFT_NOT_FOUND'] });
   });
@@ -51,7 +50,7 @@ describe('submitRefusalOutcome', () => {
   it.each(['OTHER_GROUND_NOT_ALLOWED', 'MULTIPLE_CLAIMANTS_NOT_ELIGIBLE'])(
     'treats %s, which pcs-api no longer sends, as an unexplained refusal',
     code => {
-      expect(submitRefusalOutcome(refused(code), CASE)).toEqual({ codes: ['failed'] });
+      expect(submitRefusalOutcome(refused(code))).toEqual({ codes: ['failed'] });
       expect(submitErrorCodes(code)).toEqual([]);
     }
   );
@@ -60,7 +59,7 @@ describe('submitRefusalOutcome', () => {
     ['an unexplained refusal', refused('This service is not available')],
     ['a failure', new HTTPError('CCD down', 502)],
   ])('falls back to a general failure for %s', (_case, error) => {
-    expect(submitRefusalOutcome(error, CASE)).toEqual({ codes: ['failed'] });
+    expect(submitRefusalOutcome(error)).toEqual({ codes: ['failed'] });
   });
 });
 
@@ -169,7 +168,7 @@ describe('submitErrorItems', () => {
         href: withReturnTo(claimPage('rent-arrears-grounds'), 'check-your-answers'),
       },
     ]);
-    expect(submitRefusalOutcome(refused('RENT_ARREARS_GROUND_NOT_ALLOWED'), CASE)).toEqual({
+    expect(submitRefusalOutcome(refused('RENT_ARREARS_GROUND_NOT_ALLOWED'))).toEqual({
       codes: ['RENT_ARREARS_GROUND_NOT_ALLOWED'],
     });
   });

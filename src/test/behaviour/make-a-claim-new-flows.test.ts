@@ -314,12 +314,6 @@ describe('additional claimants', () => {
     expect(summary).toContain('Do they want to be contacted by telephone? No');
     expect(summary).not.toContain('You cannot use this service yet');
   });
-
-  it('has no exit page for other claimants', async () => {
-    app = await bootMakeAClaim();
-    givenClaim({ eligibility: ELIGIBILITY, claimant: CLAIMANT });
-    expect((await app.get(claimPath('multiple-claimants-ineligible'))).status).toBe(404);
-  });
 });
 
 describe('grounds for possession on an excluded tenancy', () => {

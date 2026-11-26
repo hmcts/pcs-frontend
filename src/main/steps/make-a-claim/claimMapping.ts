@@ -5,7 +5,6 @@ import type { Request } from 'express';
 import { penceToPounds, strictPoundsToPence } from '../utils/currencyConversion';
 
 import { offeredProofTypes } from './conditions';
-import { todayInLondon } from './dates';
 import { FIELD_LIMITS } from './fieldLimits';
 import {
   type FormBody,
@@ -63,6 +62,7 @@ import {
   isRentArrearsGround,
   isWalesClaimData,
 } from '@services/citizenPossessionClaim.interface';
+import { todayInLondon } from '@utils/formatLocalisedDate';
 
 /** The details of the other grounds under the "Others" ticked in either group, once each, one group's after the other's. */
 function otherGroundsDetailsOf(body: FormBody): string | undefined {
@@ -97,7 +97,7 @@ function rememberOthersGroups(req: Request, body: FormBody): void {
  * How each make a claim page reads its answers from the saved claim and writes them back. Every translation
  * between the form and pcs-api's `citizenPossessionClaim` happens here.
  */
-export interface StepMapping {
+interface StepMapping {
   toForm?: (claim: CitizenPossessionClaim, req: Request) => FormBody;
   fromForm?: (claim: CitizenPossessionClaim, body: FormBody, req: Request) => void;
   isAnswered?: (claim: CitizenPossessionClaim, req: Request) => boolean;
@@ -133,46 +133,38 @@ export function usableAccountEmailOf(req: Request): string | undefined {
   return email && email.length <= FIELD_LIMITS.emailAddress ? email : undefined;
 }
 
-/** The defendant a defendant page is about: ?index=n, or the first. */
-export function defendantIndexOf(req: Request): number {
+/** The defendant or additional claimant a page is about: ?index=n, or the first. */
+export function itemIndexFromQuery(req: Request): number {
   return indexFromQuery(req.query?.index) ?? 0;
 }
 
-function defendantAt(claim: CitizenPossessionClaim, index: number): CitizenDefendant | undefined {
-  return claim.defendants?.[index]?.value;
+interface ItemTypes {
+  defendants: CitizenDefendant;
+  additionalClaimants: CitizenAdditionalClaimant;
 }
 
-function updateDefendant(claim: CitizenPossessionClaim, index: number, update: (d: CitizenDefendant) => void): void {
-  const defendants = [...(claim.defendants ?? [])];
-  const position = Math.min(index, defendants.length);
-  const existing = defendants[position] ?? { id: newItemId(), value: {} };
-  const value = { ...existing.value };
-  update(value);
-  defendants[position] = { ...existing, value };
-  claim.defendants = defendants;
-}
-
-/** The additional claimant an additional claimant page is about: ?index=n, or the first. */
-export function additionalClaimantIndexOf(req: Request): number {
-  return indexFromQuery(req.query?.index) ?? 0;
-}
-
-function additionalClaimantAt(claim: CitizenPossessionClaim, index: number): CitizenAdditionalClaimant | undefined {
-  return claim.additionalClaimants?.[index]?.value;
-}
-
-function updateAdditionalClaimant(
+function itemAt<K extends keyof ItemTypes>(
   claim: CitizenPossessionClaim,
+  key: K,
+  index: number
+): ItemTypes[K] | undefined {
+  return (claim[key] as CcdCollectionItem<ItemTypes[K]>[] | undefined)?.[index]?.value;
+}
+
+/** Updates the item at `index`, adding a new one when `index` is past the end. */
+function updateItem<K extends keyof ItemTypes>(
+  claim: CitizenPossessionClaim,
+  key: K,
   index: number,
-  update: (claimant: CitizenAdditionalClaimant) => void
+  update: (item: ItemTypes[K]) => void
 ): void {
-  const claimants = [...(claim.additionalClaimants ?? [])];
-  const position = Math.min(index, claimants.length);
-  const existing = claimants[position] ?? { id: newItemId(), value: {} };
+  const items = [...((claim[key] ?? []) as CcdCollectionItem<ItemTypes[K]>[])];
+  const position = Math.min(index, items.length);
+  const existing = items[position] ?? { id: newItemId(), value: {} as ItemTypes[K] };
   const value = { ...existing.value };
   update(value);
-  claimants[position] = { ...existing, value };
-  claim.additionalClaimants = claimants;
+  items[position] = { ...existing, value };
+  (claim as Record<K, unknown>)[key] = items;
 }
 
 /** Whether every question has been answered for an additional claimant. */
@@ -237,13 +229,8 @@ function yesNoStep<K extends keyof CitizenPossessionClaim>(
   };
 }
 
-/** A yes or no question whose other answer asks why, as for documents the claimant cannot upload. */
-function withReason<K extends 'tenancy' | 'notice'>(
-  key: K,
-  field: string,
-  reasonField: string,
-  reasonOn: 'yes' | 'no'
-): StepMapping {
+/** A yes or no question whose No answer asks why, as for documents the claimant cannot upload. */
+function withReason<K extends 'tenancy' | 'notice'>(key: K, field: string, reasonField: string): StepMapping {
   const read = (claim: CitizenPossessionClaim) => claim[key] as Record<string, string | undefined> | undefined;
   return {
     toForm: claim => ({
@@ -254,7 +241,7 @@ function withReason<K extends 'tenancy' | 'notice'>(
       setNested(claim, key, value => {
         const writable = value as Record<string, unknown>;
         writable[field] = toYesNo(body[field]);
-        writable[reasonField] = body[field] === reasonOn ? text(body[`${field}.${reasonField}`]) : undefined;
+        writable[reasonField] = body[field] === 'no' ? text(body[`${field}.${reasonField}`]) : undefined;
       }),
     isAnswered: claim => read(claim)?.[field] !== undefined,
   };
@@ -480,21 +467,21 @@ export const claimMappings: Record<string, StepMapping> = {
 
   'additional-claimant-type': {
     toForm: (claim, req) => ({
-      individualOrOrganisation: additionalClaimantAt(claim, additionalClaimantIndexOf(req))?.individualOrOrganisation,
+      individualOrOrganisation: itemAt(claim, 'additionalClaimants', itemIndexFromQuery(req))?.individualOrOrganisation,
     }),
     fromForm: (claim, body, req) =>
-      updateAdditionalClaimant(claim, additionalClaimantIndexOf(req), claimant => {
+      updateItem(claim, 'additionalClaimants', itemIndexFromQuery(req), claimant => {
         claimant.individualOrOrganisation = oneOf(body.individualOrOrganisation, ORGANISATION_TYPES);
       }),
   },
 
   'additional-claimant-name': {
     toForm: (claim, req) => {
-      const claimant = additionalClaimantAt(claim, additionalClaimantIndexOf(req));
+      const claimant = itemAt(claim, 'additionalClaimants', itemIndexFromQuery(req));
       return { firstName: claimant?.firstName, lastName: claimant?.lastName };
     },
     fromForm: (claim, body, req) =>
-      updateAdditionalClaimant(claim, additionalClaimantIndexOf(req), claimant => {
+      updateItem(claim, 'additionalClaimants', itemIndexFromQuery(req), claimant => {
         claimant.firstName = text(body.firstName);
         claimant.lastName = text(body.lastName);
       }),
@@ -502,43 +489,46 @@ export const claimMappings: Record<string, StepMapping> = {
 
   'additional-claimant-organisation-name': {
     toForm: (claim, req) => ({
-      organisationName: additionalClaimantAt(claim, additionalClaimantIndexOf(req))?.organisationName,
+      organisationName: itemAt(claim, 'additionalClaimants', itemIndexFromQuery(req))?.organisationName,
     }),
     fromForm: (claim, body, req) =>
-      updateAdditionalClaimant(claim, additionalClaimantIndexOf(req), claimant => {
+      updateItem(claim, 'additionalClaimants', itemIndexFromQuery(req), claimant => {
         claimant.organisationName = text(body.organisationName);
       }),
   },
 
   'additional-claimant-address': {
     toForm: (claim, req) =>
-      addressToForm(additionalClaimantAt(claim, additionalClaimantIndexOf(req))?.address, ADDITIONAL_CLAIMANT_ADDRESS),
+      addressToForm(
+        itemAt(claim, 'additionalClaimants', itemIndexFromQuery(req))?.address,
+        ADDITIONAL_CLAIMANT_ADDRESS
+      ),
     fromForm: (claim, body, req) =>
-      updateAdditionalClaimant(claim, additionalClaimantIndexOf(req), claimant => {
+      updateItem(claim, 'additionalClaimants', itemIndexFromQuery(req), claimant => {
         claimant.address = addressFromBody(body, ADDITIONAL_CLAIMANT_ADDRESS);
       }),
   },
 
   'additional-claimant-email': {
     toForm: (claim, req) => ({
-      emailAddress: additionalClaimantAt(claim, additionalClaimantIndexOf(req))?.emailAddress,
+      emailAddress: itemAt(claim, 'additionalClaimants', itemIndexFromQuery(req))?.emailAddress,
     }),
     fromForm: (claim, body, req) =>
-      updateAdditionalClaimant(claim, additionalClaimantIndexOf(req), claimant => {
+      updateItem(claim, 'additionalClaimants', itemIndexFromQuery(req), claimant => {
         claimant.emailAddress = optionalText(body.emailAddress, body);
       }),
   },
 
   'additional-claimant-phone': {
     toForm: (claim, req) => {
-      const claimant = additionalClaimantAt(claim, additionalClaimantIndexOf(req));
+      const claimant = itemAt(claim, 'additionalClaimants', itemIndexFromQuery(req));
       return {
         contactByPhone: fromYesNo(claimant?.contactByPhone),
         'contactByPhone.phoneNumber': claimant?.phoneNumber,
       };
     },
     fromForm: (claim, body, req) =>
-      updateAdditionalClaimant(claim, additionalClaimantIndexOf(req), claimant => {
+      updateItem(claim, 'additionalClaimants', itemIndexFromQuery(req), claimant => {
         claimant.contactByPhone = toYesNo(body.contactByPhone);
         claimant.phoneNumber = claimant.contactByPhone === 'YES' ? text(body['contactByPhone.phoneNumber']) : undefined;
       }),
@@ -546,14 +536,14 @@ export const claimMappings: Record<string, StepMapping> = {
 
   'additional-claimant-text-message': {
     toForm: (claim, req) => {
-      const claimant = additionalClaimantAt(claim, additionalClaimantIndexOf(req));
+      const claimant = itemAt(claim, 'additionalClaimants', itemIndexFromQuery(req));
       return {
         contactByText: fromYesNo(claimant?.contactByText),
         'contactByText.textMessageNumber': claimant?.textMessageNumber,
       };
     },
     fromForm: (claim, body, req) =>
-      updateAdditionalClaimant(claim, additionalClaimantIndexOf(req), claimant => {
+      updateItem(claim, 'additionalClaimants', itemIndexFromQuery(req), claimant => {
         claimant.contactByText = toYesNo(body.contactByText);
         claimant.textMessageNumber =
           claimant.contactByText === 'YES' ? text(body['contactByText.textMessageNumber']) : undefined;
@@ -562,7 +552,7 @@ export const claimMappings: Record<string, StepMapping> = {
 
   'defendant-name': {
     toForm: (claim, req) => {
-      const defendant = defendantAt(claim, defendantIndexOf(req));
+      const defendant = itemAt(claim, 'defendants', itemIndexFromQuery(req));
       return {
         nameKnown: fromYesNo(defendant?.nameKnown),
         'nameKnown.firstName': defendant?.firstName,
@@ -570,21 +560,21 @@ export const claimMappings: Record<string, StepMapping> = {
       };
     },
     fromForm: (claim, body, req) => {
-      if (defendantIndexOf(req) >= (claim.defendants?.length ?? 0)) {
+      if (itemIndexFromQuery(req) >= (claim.defendants?.length ?? 0)) {
         claim.defendantsConfirmed = 'NO';
       }
-      updateDefendant(claim, defendantIndexOf(req), defendant => {
+      updateItem(claim, 'defendants', itemIndexFromQuery(req), defendant => {
         defendant.nameKnown = toYesNo(body.nameKnown);
         defendant.firstName = defendant.nameKnown === 'YES' ? text(body['nameKnown.firstName']) : undefined;
         defendant.lastName = defendant.nameKnown === 'YES' ? text(body['nameKnown.lastName']) : undefined;
       });
     },
-    isAnswered: claim => defendantAt(claim, 0)?.nameKnown !== undefined,
+    isAnswered: claim => itemAt(claim, 'defendants', 0)?.nameKnown !== undefined,
   },
 
   'defendant-address': {
     toForm: (claim, req) => {
-      const defendant = defendantAt(claim, defendantIndexOf(req));
+      const defendant = itemAt(claim, 'defendants', itemIndexFromQuery(req));
       if (defendant?.addressSameAsProperty === 'YES') {
         return { sameAsProperty: 'yes' };
       }
@@ -593,12 +583,12 @@ export const claimMappings: Record<string, StepMapping> = {
         : {};
     },
     fromForm: (claim, body, req) =>
-      updateDefendant(claim, defendantIndexOf(req), defendant => {
+      updateItem(claim, 'defendants', itemIndexFromQuery(req), defendant => {
         defendant.addressSameAsProperty = toYesNo(body.sameAsProperty);
         defendant.address = defendant.addressSameAsProperty === 'NO' ? addressFromBody(body, 'defendant') : undefined;
         defendant.addressKnown = defendant.addressSameAsProperty === 'YES' || defendant.address ? 'YES' : undefined;
       }),
-    isAnswered: claim => defendantAt(claim, 0)?.addressSameAsProperty !== undefined,
+    isAnswered: claim => itemAt(claim, 'defendants', 0)?.addressSameAsProperty !== undefined,
   },
 
   'additional-defendants': {
@@ -635,7 +625,7 @@ export const claimMappings: Record<string, StepMapping> = {
     isAnswered: claim => claim.tenancy?.tenancyStartDate !== undefined,
   },
 
-  'tenancy-agreement': withReason('tenancy', 'tenancyAgreementAvailable', 'noTenancyAgreementReason', 'no'),
+  'tenancy-agreement': withReason('tenancy', 'tenancyAgreementAvailable', 'noTenancyAgreementReason'),
 
   'upload-tenancy-agreement': {
     isAnswered: claim => documentsAnswered(claim.tenancy?.tenancyAgreementDocuments),
@@ -666,24 +656,19 @@ export const claimMappings: Record<string, StepMapping> = {
     isAnswered: claim => claim.tenancy?.tenancyStartDate !== undefined,
   },
 
-  'occupation-contract-agreement': withReason('tenancy', 'tenancyAgreementAvailable', 'noTenancyAgreementReason', 'no'),
+  'occupation-contract-agreement': withReason('tenancy', 'tenancyAgreementAvailable', 'noTenancyAgreementReason'),
 
   'upload-occupation-contract': {
     isAnswered: claim => documentsAnswered(claim.tenancy?.tenancyAgreementDocuments),
   },
 
-  'epc-available': withReason(
-    'tenancy',
-    'hasEnergyPerformanceCertificate',
-    'noEnergyPerformanceCertificateReason',
-    'no'
-  ),
+  'epc-available': withReason('tenancy', 'hasEnergyPerformanceCertificate', 'noEnergyPerformanceCertificateReason'),
 
   'upload-epc': {
     isAnswered: claim => documentsAnswered(claim.tenancy?.energyPerformanceDocuments),
   },
 
-  'gas-safety-available': withReason('tenancy', 'hasGasSafetyReport', 'noGasSafetyReportReason', 'no'),
+  'gas-safety-available': withReason('tenancy', 'hasGasSafetyReport', 'noGasSafetyReportReason'),
 
   'upload-gas-safety': {
     isAnswered: claim => documentsAnswered(claim.tenancy?.gasSafetyReportDocuments),
@@ -692,8 +677,7 @@ export const claimMappings: Record<string, StepMapping> = {
   'eicr-available': withReason(
     'tenancy',
     'hasElectricalInstallationConditionReport',
-    'noElectricalInstallationConditionReason',
-    'no'
+    'noElectricalInstallationConditionReason'
   ),
 
   'upload-eicr': {
@@ -855,7 +839,7 @@ export const claimMappings: Record<string, StepMapping> = {
     isAnswered: claim => Boolean(claim.grounds?.excludedReason),
   },
 
-  'notice-served': withReason('notice', 'noticeServed', 'noNoticeReason', 'no'),
+  'notice-served': withReason('notice', 'noticeServed', 'noNoticeReason'),
 
   'notice-type': {
     toForm: claim => ({
@@ -898,7 +882,7 @@ export const claimMappings: Record<string, StepMapping> = {
     isAnswered: claim => Boolean(claim.notice?.noticeMethods?.length),
   },
 
-  'notice-available': withReason('notice', 'noticeAvailable', 'noticeUnavailableReason', 'no'),
+  'notice-available': withReason('notice', 'noticeAvailable', 'noticeUnavailableReason'),
 
   'upload-notice': {
     isAnswered: claim => documentsAnswered(claim.notice?.noticeDocuments),
@@ -1113,7 +1097,7 @@ export const claimMappings: Record<string, StepMapping> = {
 
   'remove-defendant': {
     fromForm: (claim, body, req) => {
-      const index = itemIndexOf(req, claim.defendants, 'index');
+      const index = itemIndexOf(req, claim.defendants);
       if (body.confirmRemove === 'yes' && index !== undefined) {
         removeDefendant(claim, index);
       }
@@ -1122,7 +1106,7 @@ export const claimMappings: Record<string, StepMapping> = {
 
   'remove-claimant': {
     fromForm: (claim, body, req) => {
-      const index = itemIndexOf(req, claim.additionalClaimants, 'index');
+      const index = itemIndexOf(req, claim.additionalClaimants);
       if (body.confirmRemove === 'yes' && index !== undefined) {
         removeAdditionalClaimant(claim, index);
       }
@@ -1210,14 +1194,14 @@ export function groundForReasonOf(req: Request, claim: CitizenPossessionClaim): 
 }
 
 /** The first chosen ground that needs a reason and has none yet. */
-export function groundWithoutReasonOf(claim: CitizenPossessionClaim): string | undefined {
+function groundWithoutReasonOf(claim: CitizenPossessionClaim): string | undefined {
   return groundsNeedingReasons(claim).find(
     ground => !groundReasonsOf(claim).some(item => item.value.ground === ground && item.value.reason)
   );
 }
 
 /** A new collection item's id, which pcs-api keeps, so a page can name the item rather than its position. */
-export function newItemId(): string {
+function newItemId(): string {
   return randomUUID();
 }
 
@@ -1225,17 +1209,13 @@ export function newItemId(): string {
  * The item a remove page is about: by ?id=, so repeating the request once it is gone changes nothing, or by
  * position for an item saved before it had an id.
  */
-export function itemIndexOf(
-  req: Request,
-  items: CcdCollectionItem<unknown>[] | undefined,
-  positionParam: 'index'
-): number | undefined {
+export function itemIndexOf(req: Request, items: CcdCollectionItem<unknown>[] | undefined): number | undefined {
   const id = Array.isArray(req.query?.id) ? req.query.id[0] : req.query?.id;
   if (typeof id === 'string') {
     const index = (items ?? []).findIndex(item => item.id === id);
     return index === -1 ? undefined : index;
   }
-  const index = indexFromQuery(req.query?.[positionParam]);
+  const index = indexFromQuery(req.query?.index);
   return index !== undefined && index < (items ?? []).length && !items?.[index]?.id ? index : undefined;
 }
 
@@ -1247,7 +1227,7 @@ export function removeDefendant(claim: CitizenPossessionClaim, index: number): v
 }
 
 /** Removes an additional claimant; once none is left the claimant has no other claimants, which they are asked. */
-export function removeAdditionalClaimant(claim: CitizenPossessionClaim, index: number): void {
+function removeAdditionalClaimant(claim: CitizenPossessionClaim, index: number): void {
   claim.additionalClaimants = (claim.additionalClaimants ?? []).filter((_, i) => i !== index);
   if (!claim.additionalClaimants.length) {
     delete claim.additionalClaimants;

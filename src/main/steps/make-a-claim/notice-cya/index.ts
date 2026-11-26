@@ -1,12 +1,10 @@
-import { createMakeAClaimStep, isRendering } from '../formStep';
+import { createSectionSummaryStep } from '../sectionSummaryStep';
 import { noticeCard } from '../summary';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-export const step: StepDefinition = createMakeAClaimStep({
+export const step: StepDefinition = createSectionSummaryStep({
   stepName: 'notice-cya',
   stepDir: __dirname,
-  customTemplate: 'make-a-claim/templates/summary.njk',
-  fields: [],
-  extendGetContent: (req, formContent) => (isRendering(formContent) ? { cards: [noticeCard(req)] } : {}),
+  cards: req => [noticeCard(req)],
 });

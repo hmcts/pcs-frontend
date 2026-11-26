@@ -367,13 +367,13 @@ export async function saveClaimDraft(
   }
 }
 
-export interface ClaimFee {
+interface ClaimFee {
   serviceRequestReference: string;
   feeAmount: string;
 }
 
 /** The claim fee pcs-api's submit created, from the confirmation it answers with or the claim it returns. */
-export function claimFeeFrom(submitted: CcdCase): ClaimFee | undefined {
+function claimFeeFrom(submitted: CcdCase): ClaimFee | undefined {
   const body = submitted.after_submit_callback_response?.confirmation_body;
   let confirmation: Partial<ClaimFee> = {};
   if (body) {

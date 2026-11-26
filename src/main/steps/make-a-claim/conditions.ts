@@ -35,7 +35,7 @@ export const hasRentArrearsGrounds = (req: Request): boolean =>
   asksAssuredGrounds(req) && readClaim(req).grounds?.hasRentArrearsGrounds === 'YES';
 
 /** The England grounds page is asked when no rent arrears grounds were claimed, or other grounds were. A Wales claim answers all its grounds on one page. */
-export const asksOtherGrounds = (req: Request): boolean => {
+const asksOtherGrounds = (req: Request): boolean => {
   const grounds = readClaim(req).grounds;
   return (
     isWalesClaim(req) ||
@@ -63,7 +63,7 @@ const proofTypeOf = (req: Request) => readClaim(req).rentArrears?.proofType;
 export const uploadsRentStatement = (req: Request): boolean => proofTypeOf(req) === 'UPLOAD_STATEMENT';
 
 /** Whether a rent statement can be created in rent periods: not for rent paid at some other frequency. */
-export const canUseTable = (req: Request): boolean => {
+const canUseTable = (req: Request): boolean => {
   const frequency = readClaim(req).rentArrears?.rentFrequency;
   return frequency !== undefined && TABLE_FREQUENCIES.includes(frequency);
 };

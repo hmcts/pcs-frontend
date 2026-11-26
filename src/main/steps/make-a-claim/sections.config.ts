@@ -148,24 +148,17 @@ export const makeAClaimSections: readonly SectionConfig[] = [
   },
 ];
 
-/** The check your answers pages the claimant must continue from before each section is done. */
+/** The check your answers page the claimant must continue from before each section is done. */
 export const SECTION_CYAS = {
-  aboutYou: ['claimant-cya'],
-  defendants: ['defendant-cya'],
-  tenancyAndGrounds: ['tenancy-cya'],
-  notice: ['notice-cya'],
-  rentArrears: ['arrears-cya'],
-  circumstances: ['situation-cya'],
-} as const satisfies Partial<Record<string, readonly string[]>>;
+  aboutYou: 'claimant-cya',
+  defendants: 'defendant-cya',
+  tenancyAndGrounds: 'tenancy-cya',
+  notice: 'notice-cya',
+  rentArrears: 'arrears-cya',
+  circumstances: 'situation-cya',
+} as const satisfies Partial<Record<string, string>>;
 
-export type SectionCya = (typeof SECTION_CYAS)[keyof typeof SECTION_CYAS][number];
+export type SectionCya = (typeof SECTION_CYAS)[keyof typeof SECTION_CYAS];
 
 /** The summary pages that end a section: Save and continue on them returns to the task list. */
-export const SECTION_SUMMARY_STEPS = [
-  'claimant-cya',
-  'defendant-cya',
-  'tenancy-cya',
-  'notice-cya',
-  'arrears-cya',
-  'situation-cya',
-] as const;
+export const SECTION_SUMMARY_STEPS: readonly SectionCya[] = Object.values(SECTION_CYAS);

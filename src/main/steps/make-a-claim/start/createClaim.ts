@@ -20,7 +20,7 @@ export { PROPERTY_INELIGIBLE_URL };
 export const PROPERTY_COUNTRY_URL = `${MAKE_A_CLAIM_START_ROUTE}/property-country`;
 export const WALES_CLAIMANT_TYPE_URL = `${MAKE_A_CLAIM_START_ROUTE}/wales-claimant-type`;
 export const WHO_IS_CLAIMING_URL = `${MAKE_A_CLAIM_START_ROUTE}/who-is-claiming`;
-export const PROPERTY_ADDRESS_TOO_LONG_URL = `${MAKE_A_CLAIM_START_ROUTE}/property-address?problem=tooLong`;
+const PROPERTY_ADDRESS_TOO_LONG_URL = `${MAKE_A_CLAIM_START_ROUTE}/property-address?problem=tooLong`;
 
 const logger = Logger.getLogger('makeAClaimCreateClaim');
 

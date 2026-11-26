@@ -81,11 +81,11 @@ const WALES_STEPS: Record<string, string> = {
 };
 
 /** Refusals that mean the claimant cannot use the service, by where they are told so. */
-const INELIGIBLE_REDIRECTS: Record<string, (caseId: string) => string> = {
-  PROPERTY_NOT_IN_ENGLAND_OR_WALES: () => PROPERTY_INELIGIBLE_URL,
-  CLAIMANT_TYPE_NOT_ELIGIBLE: () => `${MAKE_A_CLAIM_START_ROUTE}/not-private-landlord`,
-  CLAIM_AGAINST_TRESPASSERS_NOT_ELIGIBLE: () => `${MAKE_A_CLAIM_START_ROUTE}/trespass-ineligible`,
-  WHO_IS_CLAIMING_NOT_ELIGIBLE: () => `${MAKE_A_CLAIM_START_ROUTE}/not-litigant-in-person`,
+const INELIGIBLE_REDIRECTS: Record<string, string> = {
+  PROPERTY_NOT_IN_ENGLAND_OR_WALES: PROPERTY_INELIGIBLE_URL,
+  CLAIMANT_TYPE_NOT_ELIGIBLE: `${MAKE_A_CLAIM_START_ROUTE}/not-private-landlord`,
+  CLAIM_AGAINST_TRESPASSERS_NOT_ELIGIBLE: `${MAKE_A_CLAIM_START_ROUTE}/trespass-ineligible`,
+  WHO_IS_CLAIMING_NOT_ELIGIBLE: `${MAKE_A_CLAIM_START_ROUTE}/not-litigant-in-person`,
 };
 
 const ANSWER_REFUSAL = /^(REQUIRED|TOO_LONG):([A-Za-z]+(?:\[\d+\])?(?:\.[A-Za-z0-9_]+(?:\[\d+\])?)*)$/;
@@ -101,25 +101,25 @@ const MESSAGE_REFUSALS = [
   RENT_ARREARS_GROUND_NOT_ALLOWED,
 ];
 
-export const SUBMIT_FAILED = 'failed';
+const SUBMIT_FAILED = 'failed';
 
-export type SubmitRefusalOutcome = { redirect: string } | { codes: string[] };
+type SubmitRefusalOutcome = { redirect: string } | { codes: string[] };
 
 /**
  * What to do when the submit fails: send the claimant to an ineligible page, or show them the problems to put
  * right, carried as the codes pcs-api gave (or a general failure) for the check your answers page to explain.
  */
-export function submitRefusalOutcome(error: unknown, caseId: string): SubmitRefusalOutcome {
+export function submitRefusalOutcome(error: unknown): SubmitRefusalOutcome {
   const reasons = error instanceof CallbackRejectedError ? error.reasons : [];
   const ineligible = reasons.find(reason => INELIGIBLE_REDIRECTS[reason]);
   if (ineligible) {
-    return { redirect: INELIGIBLE_REDIRECTS[ineligible](caseId) };
+    return { redirect: INELIGIBLE_REDIRECTS[ineligible] };
   }
   const known = reasons.filter(reason => ANSWER_REFUSAL.test(reason) || MESSAGE_REFUSALS.includes(reason));
   return { codes: known.length > 0 ? known : [SUBMIT_FAILED] };
 }
 
-export interface ErrorSummaryItem {
+interface ErrorSummaryItem {
   text: string;
   href?: string;
 }

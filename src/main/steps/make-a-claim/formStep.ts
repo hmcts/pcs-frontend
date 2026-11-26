@@ -14,7 +14,7 @@ import {
   withReturnTo,
 } from './returnTo';
 import { confirmationsAfterSave, confirmedCyas, confirmingCya, isSectionCya } from './sectionConfirmation';
-import { SECTION_SUMMARY_STEPS, type SectionCya } from './sections.config';
+import type { SectionCya } from './sections.config';
 import { draftChangedUrl, isDraftChanged } from './submitErrors';
 import type { SummaryCard } from './summary';
 
@@ -194,13 +194,12 @@ async function saveAnswers(req: Request, stepName: string, apply: (claim: Citize
  */
 export function createMakeAClaimStep(config: MakeAClaimStepConfig): StepDefinition {
   const mapping = claimMappings[config.stepName];
-  const isSummary = (SECTION_SUMMARY_STEPS as readonly string[]).includes(config.stepName);
   const sectionCya = isSectionCya(config.stepName) ? config.stepName : undefined;
   const { redirectWhen, keepsOwnRedirectOnReturn: keepsOwnRedirect, ...stepConfig } = config;
   const keepsOwnRedirectOnReturn = keepsOwnRedirect ?? (sectionCya ? () => false : undefined);
   const ownRedirectAfterPost =
     config.resolveRedirectAfterPost ??
-    (isSummary ? async (req: Request) => taskListPath(caseReferenceOf(req)) : undefined);
+    (sectionCya ? async (req: Request) => taskListPath(caseReferenceOf(req)) : undefined);
 
   const step = createFormStep({
     customTemplate: QUESTION_TEMPLATE,

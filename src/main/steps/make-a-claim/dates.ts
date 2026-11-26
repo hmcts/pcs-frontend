@@ -9,5 +9,3 @@ export function formatClaimDate(isoDate: string | undefined, req: Request): stri
   }
   return formatLocalisedDate(isoDate, getRequestLanguage(req)) ?? isoDate;
 }
-
-export { todayInLondon } from '@utils/formatLocalisedDate';

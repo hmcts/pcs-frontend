@@ -9,7 +9,7 @@ import { createStartStep } from '../startStep';
 import { getFormData } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-export const WALES_CLAIMANT_TYPES = ['PRIVATE_LANDLORD', 'COMMUNITY_LANDLORD', 'MORTGAGE_LENDER'] as const;
+const WALES_CLAIMANT_TYPES = ['PRIVATE_LANDLORD', 'COMMUNITY_LANDLORD', 'MORTGAGE_LENDER'] as const;
 
 /** The Wales claimant types are only asked about a property in Wales. */
 function walesPropertyOnly(req: Request, res: Response, next: NextFunction): void {

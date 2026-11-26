@@ -27,12 +27,12 @@ async function freshClaim(req: Request): Promise<{ caseId: string; claim: Citize
 type UploadedDocuments = CcdCollectionItem<CcdUploadedDocument>[];
 
 /** The claim's documents as the upload path handles them. */
-export function toUploadedDocuments(documents: ClaimDocuments | undefined): UploadedDocuments {
+function toUploadedDocuments(documents: ClaimDocuments | undefined): UploadedDocuments {
   return (documents ?? []).map(item => ({ ...(item.id ? { id: item.id } : {}), value: { document: item.value } }));
 }
 
 /** Uploaded documents as the claim keeps them: CCD `Document` items. */
-export function toClaimDocuments(documents: UploadedDocuments): ClaimDocuments {
+function toClaimDocuments(documents: UploadedDocuments): ClaimDocuments {
   return documents.map(item => ({ id: item.id ?? null, value: item.value.document })) as ClaimDocuments;
 }
 

@@ -1,13 +1,11 @@
 import type { Request } from 'express';
 
 import { answersChanged, readClaim } from './claimDraft';
-import { SECTION_CYAS, type SectionCya, makeAClaimSections } from './sections.config';
+import { SECTION_CYAS, SECTION_SUMMARY_STEPS, type SectionCya, makeAClaimSections } from './sections.config';
 
 import type { SectionConfig } from '@modules/steps/stepFlow.interface';
 import type { CitizenPossessionClaim } from '@services/citizenPossessionClaim.interface';
 import type { SectionConfirmation } from '@services/sectionStatus';
-
-const ALL_SECTION_CYAS: readonly string[] = Object.values(SECTION_CYAS).flat();
 
 /** Pages outside the task list's sections whose saves change the answers a check your answers page shows. */
 const CHANGES_SHOWN_ON: Readonly<Record<string, SectionCya>> = {
@@ -16,11 +14,11 @@ const CHANGES_SHOWN_ON: Readonly<Record<string, SectionCya>> = {
 };
 
 export function isSectionCya(stepName: string): stepName is SectionCya {
-  return ALL_SECTION_CYAS.includes(stepName);
+  return (SECTION_SUMMARY_STEPS as readonly string[]).includes(stepName);
 }
 
-export function sectionCyas(section: SectionConfig): readonly SectionCya[] {
-  return (SECTION_CYAS as Partial<Record<string, readonly SectionCya[]>>)[section.id] ?? [];
+function sectionCya(section: SectionConfig): SectionCya | undefined {
+  return (SECTION_CYAS as Partial<Record<string, SectionCya>>)[section.id];
 }
 
 /** The check your answers page that shows a page's answers: the first one after the page in its section. */
@@ -63,15 +61,15 @@ export function confirmationsAfterSave(
   return confirmed.filter(name => name !== cya);
 }
 
-/** The first of a section's check your answers pages the claimant has not continued from. */
+/** A section's check your answers page, if the claimant has not continued from it. */
 export function unconfirmedCya(section: SectionConfig, req: Request): SectionCya | undefined {
-  const confirmed = confirmedCyas(readClaim(req));
-  return sectionCyas(section).find(cya => !confirmed.includes(cya));
+  const cya = sectionCya(section);
+  return cya && !confirmedCyas(readClaim(req)).includes(cya) ? cya : undefined;
 }
 
 /** A make a claim section is done once every question is answered and every one of its summaries confirmed. */
 export const makeAClaimSectionConfirmation: SectionConfirmation = {
-  hasCya: section => sectionCyas(section).length > 0,
+  hasCya: section => sectionCya(section) !== undefined,
   isConfirmed: (section, req) => unconfirmedCya(section, req) === undefined,
   confirmationCompletes: false,
 };

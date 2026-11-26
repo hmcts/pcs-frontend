@@ -1,22 +1,18 @@
 import { readClaim } from '../claimDraft';
 import { needsGroundReasons } from '../conditions';
-import { createMakeAClaimStep, isRendering } from '../formStep';
 import { reasonUrl } from '../ground-reason';
+import { createSectionSummaryStep } from '../sectionSummaryStep';
 import { tenancyCard } from '../summary';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { groundsNeedingReasons } from '@services/citizenPossessionClaim.interface';
 
-export const step: StepDefinition = createMakeAClaimStep({
+export const step: StepDefinition = createSectionSummaryStep({
   stepName: 'tenancy-cya',
   stepDir: __dirname,
-  customTemplate: 'make-a-claim/templates/summary.njk',
-  fields: [],
-  extendGetContent: (req, formContent) => {
+  cards: req => [tenancyCard(req, true)],
+  extendGetContent: req => {
     const grounds = needsGroundReasons(req) ? groundsNeedingReasons(readClaim(req)) : [];
-    return {
-      ...(isRendering(formContent) ? { cards: [tenancyCard(req, true)] } : {}),
-      ...(grounds.length > 0 ? { backUrl: reasonUrl(req, grounds[grounds.length - 1]) } : {}),
-    };
+    return grounds.length > 0 ? { backUrl: reasonUrl(req, grounds[grounds.length - 1]) } : {};
   },
 });

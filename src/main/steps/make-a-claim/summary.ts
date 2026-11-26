@@ -502,7 +502,7 @@ export function circumstancesCard(req: Request): SummaryCard {
   return { id: 'circumstances', title: t('makeAClaim:summary.cards.circumstances'), rows };
 }
 
-export function uploadDocumentsCard(req: Request): SummaryCard {
+function uploadDocumentsCard(req: Request): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const otherInformation = readClaim(req).otherInformation ?? {};
   const rows = new CardBuilder(req, t)
@@ -511,7 +511,7 @@ export function uploadDocumentsCard(req: Request): SummaryCard {
   return { id: 'uploadDocuments', title: t('makeAClaim:summary.cards.uploadDocuments'), rows };
 }
 
-export function otherInformationCard(req: Request): SummaryCard {
+function otherInformationCard(req: Request): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const otherInformation = readClaim(req).otherInformation ?? {};
   const rows = new CardBuilder(req, t)
@@ -528,7 +528,7 @@ export function otherInformationCard(req: Request): SummaryCard {
 }
 
 /** The support the claimant asked for through Your Support, one line for each request. */
-export function supportCard(req: Request): SummaryCard {
+function supportCard(req: Request): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const requests = (readClaim(req).otherInformation?.supportFlags?.details ?? [])
     .map(detail => detail.value)
@@ -541,7 +541,7 @@ export function supportCard(req: Request): SummaryCard {
 }
 
 /** Whether the claimant answered the equality and diversity questions, which pcs-api never shows them back. */
-export function equalityCard(req: Request): SummaryCard {
+function equalityCard(req: Request): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const answered = readClaim(req).otherInformation?.equalityQuestionsChoice === 'CONTINUE';
   const rows = new CardBuilder(req, t)
@@ -554,7 +554,7 @@ export function equalityCard(req: Request): SummaryCard {
   return { id: 'equality', title: t('makeAClaim:summary.cards.equality'), rows };
 }
 
-export function languageUsedCard(req: Request): SummaryCard {
+function languageUsedCard(req: Request): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const otherInformation = readClaim(req).otherInformation ?? {};
   const rows = new CardBuilder(req, t)
@@ -564,7 +564,7 @@ export function languageUsedCard(req: Request): SummaryCard {
 }
 
 /** The property, which cannot be changed once the claim exists. */
-export function propertyCard(req: Request): SummaryCard {
+function propertyCard(req: Request): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
 
   return {

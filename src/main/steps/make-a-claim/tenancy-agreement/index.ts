@@ -1,4 +1,4 @@
-import { longTextField, yesNoQuestion } from '../fieldBuilders';
+import { yesNoWithReason } from '../fieldBuilders';
 import { FIELD_LIMITS } from '../fieldLimits';
 import { createMakeAClaimStep } from '../formStep';
 
@@ -8,16 +8,6 @@ export const step: StepDefinition = createMakeAClaimStep({
   stepName: 'tenancy-agreement',
   stepDir: __dirname,
   fields: [
-    yesNoQuestion('tenancyAgreementAvailable', {
-      subFields: {
-        no: {
-          noTenancyAgreementReason: longTextField('noTenancyAgreementReason', {
-            required: true,
-            maxLength: FIELD_LIMITS.noTenancyAgreementReason,
-            errorMessage: 'errors.noTenancyAgreementReason',
-          }),
-        },
-      },
-    }),
+    yesNoWithReason('tenancyAgreementAvailable', 'noTenancyAgreementReason', FIELD_LIMITS.noTenancyAgreementReason),
   ],
 });

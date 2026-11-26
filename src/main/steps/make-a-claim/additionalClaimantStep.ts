@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
 import { readClaim } from './claimDraft';
-import { additionalClaimantAnswered, additionalClaimantIndexOf } from './claimMapping';
+import { additionalClaimantAnswered, itemIndexFromQuery } from './claimMapping';
 import { flowConfig } from './flow.config';
 import { createMakeAClaimStep } from './formStep';
 
@@ -22,14 +22,14 @@ type Config = Omit<FormBuilderConfig, 'journeyFolder' | 'flowConfig' | 'basePath
 };
 
 const claimantOf = (req: Request): CitizenAdditionalClaimant | undefined =>
-  readClaim(req).additionalClaimants?.[additionalClaimantIndexOf(req)]?.value;
+  readClaim(req).additionalClaimants?.[itemIndexFromQuery(req)]?.value;
 
 /** The index of the claimant the page just saved, which is the last one when the request named one that did not exist. */
 const savedIndexOf = (req: Request): number =>
-  Math.max(0, Math.min(additionalClaimantIndexOf(req), (readClaim(req).additionalClaimants?.length ?? 0) - 1));
+  Math.max(0, Math.min(itemIndexFromQuery(req), (readClaim(req).additionalClaimants?.length ?? 0) - 1));
 
 /** A page of the additional claimant questions, which are asked for one claimant at a time, named by ?index=. */
-export function additionalClaimantUrl(req: Request, stepName: string, index = additionalClaimantIndexOf(req)): string {
+export function additionalClaimantUrl(req: Request, stepName: string, index = itemIndexFromQuery(req)): string {
   const url = getStepUrl(stepName, flowConfig, req.res?.locals.validatedCase?.id);
   return stepName === ASK_AGAIN ? url : `${url}?index=${index}`;
 }

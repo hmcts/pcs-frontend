@@ -24,6 +24,7 @@ export const FIELD_LIMITS = {
   otherTenancyTypeDetails: REASON,
   otherOccupationContractDetails: REASON,
   noTenancyAgreementReason: REASON,
+  noCertificateOrReportReason: REASON,
   otherGroundsDetails: REASON,
   groundReason: REASON,
   noNoticeReason: REASON,

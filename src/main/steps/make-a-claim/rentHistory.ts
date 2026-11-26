@@ -33,7 +33,7 @@ function monthlyDueDate(year: number, monthIndex: number, dueDay: number): strin
   return fromDayNumber(Date.UTC(normalisedYear, normalisedMonth, day) / 86_400_000);
 }
 
-export function toPence(value: string | undefined): number {
+function toPence(value: string | undefined): number {
   if (!value) {
     return 0;
   }
@@ -198,7 +198,7 @@ export function statementRangeOf(
   return { statementStart: starts[0], statementEnd: fromDayNumber(Math.max(lastDay, nextDue - 1)) };
 }
 
-export interface RentTableLine {
+interface RentTableLine {
   rowIndex: number;
   periodStart?: string;
   isAdditionalPayment: boolean;

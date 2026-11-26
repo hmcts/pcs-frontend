@@ -1,5 +1,5 @@
 import { readClaim } from '../claimDraft';
-import { defendantAddressAnswered, defendantIndexOf } from '../claimMapping';
+import { defendantAddressAnswered, itemIndexFromQuery } from '../claimMapping';
 import { textField, yesNoQuestion } from '../fieldBuilders';
 import { FIELD_LIMITS } from '../fieldLimits';
 import { flowConfig } from '../flow.config';
@@ -29,7 +29,7 @@ export const step: StepDefinition = createMakeAClaimStep({
     }),
   ],
   extendGetContent: (req, formContent) => {
-    if (defendantIndexOf(req) === 0) {
+    if (itemIndexFromQuery(req) === 0) {
       return { next: '' };
     }
     const question = formContent.fields?.find(field => field.name === 'nameKnown')?.component as
@@ -44,9 +44,10 @@ export const step: StepDefinition = createMakeAClaimStep({
       backUrl: getStepUrl('additional-defendants', flowConfig, req.res?.locals.validatedCase?.id),
     };
   },
-  keepsOwnRedirectOnReturn: req => !defendantAddressAnswered(readClaim(req).defendants?.[defendantIndexOf(req)]?.value),
+  keepsOwnRedirectOnReturn: req =>
+    !defendantAddressAnswered(readClaim(req).defendants?.[itemIndexFromQuery(req)]?.value),
   resolveRedirectAfterPost: async req => {
-    const index = defendantIndexOf(req);
+    const index = itemIndexFromQuery(req);
     const url = getStepUrl('defendant-address', flowConfig, req.res?.locals.validatedCase?.id);
     return index > 0 ? `${url}?index=${index}` : undefined;
   },

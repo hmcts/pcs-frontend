@@ -1,4 +1,4 @@
-import { todayInLondon } from '../../../../main/steps/make-a-claim/dates';
+import { todayInLondon } from '../../../../main/utils/formatLocalisedDate';
 
 describe('todayInLondon', () => {
   it('is the date in England, not UTC, just after midnight in summer', () => {

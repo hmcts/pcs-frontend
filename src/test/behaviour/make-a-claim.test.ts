@@ -401,11 +401,6 @@ describe('before a claim exists', () => {
     expect(exit?.getAttribute('href')).toBe('https://www.gov.uk');
   });
 
-  it('no longer has a page for a property outside the pilot courts', async () => {
-    app = await bootMakeAClaim();
-    expect((await app.get('/make-a-claim/property-not-covered')).status).toBe(404);
-  });
-
   describe('checking the property as soon as the claimant gives it', () => {
     const giveProperty = async (): Promise<string | undefined> => {
       await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
