@@ -7,6 +7,7 @@ import {
   control,
   openPage,
   recordAttendance,
+  recordHearingNoteElsewhere,
   refuseNextEvent,
   selectTab,
   startClientContexts,
@@ -36,7 +37,7 @@ const HEARING = {
   earlierNotes: [
     {
       by: 'DJ Pat Example',
-      createdOn: '2026-09-01T15:30:00Z',
+      createdOn: '2026-09-02T15:30:00Z',
       hearingDate: '2026-09-01T10:00:00',
       note: 'Turned up with x and y.\nMade clear needs to do x and y.',
     },
@@ -46,7 +47,9 @@ const HEARING = {
 
 /** The tenancy types the judge can choose from, after the blank first option. */
 function tenancyTypes(): string[] {
-  return [...document.querySelectorAll('#tenancy-type option')].slice(1).map(option => option.textContent!.trim());
+  return [...document.querySelectorAll('#hearing-7-tenancy-type option')]
+    .slice(1)
+    .map(option => option.textContent!.trim());
 }
 
 function parse(html: string): Document {
@@ -64,18 +67,20 @@ describe('make an order: for a hearing', () => {
 
     // The link's hearing goes to pcs-api, which starts the order for it.
     expect(startClientContexts()).toEqual([{ hearingId: '7' }]);
-    expect(control('#case-facts-source').textContent).toBe('Last updated by DJ Pat Example on 1 September 2026.');
-    expect(control('[name="current-rent"]').value).toBe('900');
-    expect(control('[name="arrears-today"]').value).toBe('1200');
-    expect(control('[name="date-last-payment-month"]').value).toBe('8');
-    expect(control<HTMLTextAreaElement>('#hearing-notes').value).toBe('');
+    expect(control('#hearing-7-case-facts-source').textContent).toBe(
+      'Last updated by DJ Pat Example on 1 September 2026.'
+    );
+    expect(control('[name="hearing-7-current-rent"]').value).toBe('900');
+    expect(control('[name="hearing-7-arrears-today"]').value).toBe('1200');
+    expect(control('[name="hearing-7-date-last-payment-month"]').value).toBe('8');
+    expect(control<HTMLTextAreaElement>('#hearing-7-notes').value).toBe('');
 
     // The earlier notes, newest first, are for reading only.
     const earlier = [...document.querySelectorAll('.pcs-hearing-notes__note')].map(note => note.textContent);
     expect(earlier).toHaveLength(2);
-    expect(earlier[0]).toContain('1 September 2026 – DJ Pat Example');
+    expect(earlier[0]).toContain('DJ Pat Example on 2 September 2026');
     expect(earlier[0]).toContain('Made clear needs to do x and y.');
-    expect(earlier[1]).toContain('20 July 2026 – HHJ Sam Example');
+    expect(earlier[1]).toContain('HHJ Sam Example on 20 July 2026');
     expect(document.querySelector('.pcs-hearing-notes__list')?.querySelector('input, textarea')).toBeNull();
     expect(tenancyTypes()).toEqual([
       'Assured tenancy',
@@ -96,7 +101,7 @@ describe('make an order: for a hearing', () => {
     expect(body.has('caseContext')).toBe(false);
     expect([...body.values()].join(' ')).not.toContain('Read the papers.');
     body.set('hearing', 'not even JSON');
-    body.set('hearing-notes', 'The judge changed this note.');
+    body.set('hearing-7-notes', 'The judge changed this note.');
     expect((await app.post(FOR_HEARING, body)).status).toBe(302);
     expect(submittedOrders().at(-1)?.hearing).toMatchObject({
       id: 7,
@@ -108,39 +113,33 @@ describe('make an order: for a hearing', () => {
 
   it('reloads stale hearing edits and lets the judge save against the new version', async () => {
     app = await bootApp({ hearing: { ...HEARING, version: 3 } });
-    const firstTab = (await app.get(FOR_HEARING)).text;
-    const second = await openPage((await app.get(FOR_HEARING)).text);
-    type('hearing-notes', 'Changed in the other tab.');
-    await app.post(FOR_HEARING, second.body('SAVE_DRAFT'));
+    const first = await openPage((await app.get(FOR_HEARING)).text);
+    recordHearingNoteElsewhere(7, 'Changed by another judge.');
 
-    const first = await openPage(firstTab);
-    type('current-rent', '950.50');
+    type('hearing-7-current-rent', '950.50');
     const stale = await app.post(FOR_HEARING, first.body('SAVE_DRAFT'));
     expect(stale.status).toBe(409);
-    expect(submittedOrders()).toHaveLength(1);
+    expect(submittedOrders()).toHaveLength(0);
     const retry = await openPage(stale.text);
     expect(control('#make-order-error-summary').textContent).toContain('hearing facts or notes have changed');
-    expect(control<HTMLTextAreaElement>('#hearing-notes').value).toBe('Changed in the other tab.');
-    expect(retry.body().get('hearingVersion')).toBe('4');
-    type('current-rent', '950.50');
+    expect(control<HTMLTextAreaElement>('#hearing-7-notes').value).toBe('Changed by another judge.');
+    expect(retry.body().get('hearing-7-version')).toBe('4');
+    type('hearing-7-current-rent', '950.50');
     expect((await app.post(FOR_HEARING, retry.body('SAVE_DRAFT'))).status).toBe(302);
     expect(submittedOrders().at(-1)?.hearing).toMatchObject({
       id: 7,
       version: 4,
       caseFacts: { currentRent: 950.5 },
-      note: 'Changed in the other tab.',
+      note: 'Changed by another judge.',
     });
   });
 
   it('does not update hearing values that already match, even from an older version', async () => {
     app = await bootApp({ hearing: { ...HEARING, version: 3 } });
-    const firstTab = (await app.get(FOR_HEARING)).text;
-    const second = await openPage((await app.get(FOR_HEARING)).text);
-    type('hearing-notes', 'The same note.');
-    await app.post(FOR_HEARING, second.body('SAVE_DRAFT'));
+    const first = await openPage((await app.get(FOR_HEARING)).text);
+    recordHearingNoteElsewhere(7, 'The same note.');
 
-    const first = await openPage(firstTab);
-    type('hearing-notes', 'The same note.');
+    type('hearing-7-notes', 'The same note.');
     expect((await app.post(FOR_HEARING, first.body('SAVE_DRAFT'))).status).toBe(302);
     expect(submittedOrders().at(-1)?.hearing).toEqual({ id: 7, version: 4 });
   });
@@ -148,15 +147,15 @@ describe('make an order: for a hearing', () => {
   it('keeps the hearing version through validation errors and rejects a retry if it has since changed', async () => {
     app = await bootApp({ hearing: { ...HEARING, version: 3 } });
     const page = await openPage((await app.get(FOR_HEARING)).text);
-    type('current-rent', '950.505');
+    type('hearing-7-current-rent', '950.505');
     const invalid = await app.post(FOR_HEARING, page.body('SAVE_DRAFT'));
     expect(invalid.status).toBe(400);
     const retryBody = (await openPage(invalid.text)).body('SAVE_DRAFT');
-    expect(retryBody.get('hearingVersion')).toBe('3');
-    retryBody.set('current-rent', '950.50');
+    expect(retryBody.get('hearing-7-version')).toBe('3');
+    retryBody.set('hearing-7-current-rent', '950.50');
 
     const other = await openPage((await app.get(FOR_HEARING)).text);
-    type('hearing-notes', 'Changed elsewhere.');
+    type('hearing-7-notes', 'Changed elsewhere.');
     await app.post(FOR_HEARING, other.body('SAVE_DRAFT'));
     expect((await app.post(FOR_HEARING, retryBody)).status).toBe(409);
     expect(submittedOrders()).toHaveLength(1);
@@ -166,12 +165,12 @@ describe('make an order: for a hearing', () => {
     app = await bootApp({ hearing: HEARING });
     const firstTab = (await app.get(FOR_HEARING)).text;
     const second = await openPage((await app.get(FOR_HEARING)).text);
-    expect(second.body().get('hearingVersion')).toBe('');
-    type('hearing-notes', 'First recorded note.');
+    expect(second.body().get('hearing-7-version')).toBe('');
+    type('hearing-7-notes', 'First recorded note.');
     await app.post(FOR_HEARING, second.body('SAVE_DRAFT'));
 
     const first = await openPage(firstTab);
-    type('hearing-notes', 'A competing first note.');
+    type('hearing-7-notes', 'A competing first note.');
     expect((await app.post(FOR_HEARING, first.body('SAVE_DRAFT'))).status).toBe(409);
     expect(submittedOrders()).toHaveLength(1);
   });
@@ -179,15 +178,15 @@ describe('make an order: for a hearing', () => {
   it('reloads the hearing and version when the API refuses a save', async () => {
     app = await bootApp({ hearing: { ...HEARING, version: 3 } });
     const page = await openPage((await app.get(FOR_HEARING)).text);
-    type('hearing-notes', 'Attempted change.');
+    type('hearing-7-notes', 'Attempted change.');
     const body = page.body('SAVE_DRAFT');
     refuseNextEvent('The hearing record has changed.');
     const refused = await app.post(FOR_HEARING, body);
     expect(refused.status).toBe(422);
     const retry = await openPage(refused.text);
     expect(retry.body().get('eventToken')).not.toBe(body.get('eventToken'));
-    expect(retry.body().get('hearingVersion')).toBe('3');
-    type('hearing-notes', 'Checked the latest note.');
+    expect(retry.body().get('hearing-7-version')).toBe('3');
+    type('hearing-7-notes', 'Checked the latest note.');
     expect((await app.post(FOR_HEARING, retry.body('SAVE_DRAFT'))).status).toBe(302);
     expect(submittedOrders().at(-1)?.hearing).toMatchObject({ id: 7, version: 3, note: 'Checked the latest note.' });
   });
@@ -204,7 +203,7 @@ describe('make an order: for a hearing', () => {
     const page = await openPage((await app.get(PAGE)).text);
 
     expect(document.querySelector('[data-case-facts]')).toBeNull();
-    expect(document.querySelector('#hearing-notes')).toBeNull();
+    expect(document.querySelector('#hearing-7-notes')).toBeNull();
     await app.post(PAGE, page.body('SAVE_DRAFT'));
     expect(submittedOrders().at(-1)?.hearing).toBeNull();
   });
@@ -212,14 +211,14 @@ describe('make an order: for a hearing', () => {
   it("checks the hearing's facts on every save, then sends them and its recorded note, as changed", async () => {
     app = await bootApp({ hearing: { ...HEARING, version: 3, note: 'Adjourned for a rent statement.' } });
     let page = await openPage((await app.get(FOR_HEARING)).text);
-    expect(control<HTMLTextAreaElement>('#hearing-notes').value).toBe('Adjourned for a rent statement.');
+    expect(control<HTMLTextAreaElement>('#hearing-7-notes').value).toBe('Adjourned for a rent statement.');
 
     // A fact that is not valid stops even a draft, since saving records it, and keeps the hearing on the page.
-    type('current-rent', '950.505');
+    type('hearing-7-current-rent', '950.505');
     const today = DateTime.now().setZone('Europe/London');
-    typeDate('date-notice', String(today.day), String(today.month), String(today.year));
+    typeDate('hearing-7-date-notice', String(today.day), String(today.month), String(today.year));
     const tomorrow = today.plus({ days: 1 });
-    typeDate('date-last-payment', String(tomorrow.day), String(tomorrow.month), String(tomorrow.year));
+    typeDate('hearing-7-date-last-payment', String(tomorrow.day), String(tomorrow.month), String(tomorrow.year));
     const refused = await app.post(FOR_HEARING, page.body('SAVE_DRAFT'));
     expect(refused.status).toBe(400);
     expect(submittedOrders()).toHaveLength(0);
@@ -229,31 +228,31 @@ describe('make an order: for a hearing', () => {
       'Enter a valid current rent',
       'Date of last payment must be today or in the past',
     ]);
-    expect(shown.querySelector('#date-notice-error')?.textContent).toContain('must be in the past');
-    expect(shown.querySelector('label[for="hearing-notes"]')?.textContent).toContain('13 October 2026');
+    expect(shown.querySelector('#hearing-7-date-notice-error')?.textContent).toContain('must be in the past');
+    expect(shown.querySelector('label[for="hearing-7-notes"]')?.textContent).toContain('13 October 2026');
     expect(shown.querySelectorAll('.pcs-hearing-notes__note')).toHaveLength(2);
 
     // Facts and a note left as they started are not sent, so another judge's changes to them are not refused.
-    type('current-rent', '900.00');
-    typeDate('date-notice', '', '', '');
-    typeDate('date-last-payment', '1', '8', '2026');
+    type('hearing-7-current-rent', '900.00');
+    typeDate('hearing-7-date-notice', '', '', '');
+    typeDate('hearing-7-date-last-payment', '1', '8', '2026');
     expect((await app.post(FOR_HEARING, page.body('SAVE_DRAFT'))).status).toBe(302);
     expect(submittedOrders().at(-1)?.hearing).toEqual({ id: 7, version: 3 });
 
     page = await openPage((await app.get(FOR_HEARING)).text);
-    type('current-rent', '950.50');
-    type('arrears-today', '1,300');
-    typeDate('date-notice', '10', '8', '2026');
-    typeDate('date-last-payment', String(today.day), String(today.month), String(today.year));
-    type('hearing-notes', 'Paid £200 on the day.');
+    type('hearing-7-current-rent', '950.50');
+    type('hearing-7-arrears-today', '1,300');
+    typeDate('hearing-7-date-notice', '10', '8', '2026');
+    typeDate('hearing-7-date-last-payment', String(today.day), String(today.month), String(today.year));
+    type('hearing-7-notes', 'Paid £200 on the day.');
     selectTab('tab-free-form');
     recordAttendance();
     const sent = await app.post(FOR_HEARING, page.body('SUBMIT_FOR_REVIEW'));
 
     expect(sent.location).toBe(`${PAGE}/sent-for-review`);
     // The facts and note go with the hearing, never in the order's own answers.
-    expect(submittedOrders().at(-1)?.order).not.toHaveProperty(['formData', 'current-rent']);
-    expect(submittedOrders().at(-1)?.order).not.toHaveProperty(['formData', 'hearing-notes']);
+    expect(submittedOrders().at(-1)?.order).not.toHaveProperty(['formData', 'hearing-7-current-rent']);
+    expect(submittedOrders().at(-1)?.order).not.toHaveProperty(['formData', 'hearing-7-notes']);
     expect(submittedOrders().at(-1)?.hearing).toEqual({
       id: 7,
       version: 3,
