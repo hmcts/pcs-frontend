@@ -31,7 +31,8 @@ export const viewTheResponse = {
   },
   responseToClaimDetails: {
     'A yw’r math o denantiaeth, contract meddiannaeth neu gytundeb trwydded a roddwyd gan yr hawlydd yn gywir?': 'Ydy',
-    'A yw dyddiad dechrau’r denantiaeth, contract meddiannaeth neu gytundeb trwydded a roddwyd gan yr hawlydd yn gywir?': 'Ydy',
+    'A yw dyddiad dechrau’r denantiaeth, contract meddiannaeth neu gytundeb trwydded a roddwyd gan yr hawlydd yn gywir?':
+      'Ydy',
     'A yw eich landlord wedi anfon telerau ysgrifenedig atoch o’r contract meddiannaeth?': 'Ydy',
     'A wnaeth yr hawlydd eich hysbysu am eu bwriad i ddechrau achos meddiannu?': 'Do',
     'Pryd gawsoch yr hysbysiad gan yr hawlydd?': '10 Mawrth 2026',
