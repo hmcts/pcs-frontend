@@ -4,8 +4,8 @@ import { type DocumentStorage, toDisplayDocuments } from '@modules/documents/sto
 import { Logger } from '@modules/logger';
 import type { BuiltFormContent } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import { decodeBase64UrlJson } from '@utils/base64Json';
+import { RELEASE_1_4_ENABLED } from '@utils/featureFlags';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
-import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 
 const logger = Logger.getLogger('form-builder-fileUploadUtils');
 

@@ -7,8 +7,8 @@ import { getApplicationId, setApplicationId } from '../session';
 
 import { BuiltFormContent } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { ENABLE_DEFENDANT_GENERAL_APPLICATIONS_R2 } from '@utils/featureFlags';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
-import { ENABLE_DEFENDANT_GENERAL_APPLICATIONS_R2 } from '@utils/respondToClaimFlags';
 
 const isDefendantGeneralApplicationsR2Enabled = (req: Request): Promise<boolean> =>
   getLaunchDarklyFlag(req, ENABLE_DEFENDANT_GENERAL_APPLICATIONS_R2, false);
