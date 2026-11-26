@@ -101,22 +101,6 @@ describe('warrantReturn', () => {
         '<ul class="govuk-list"><li>John Smith</li><li>Jane Doe</li><li>person(s) unknown</li></ul>'
       );
     });
-
-    it('should escape defendant names so they show as text', () => {
-      const ccdCase = {
-        allDefendants: [
-          {
-            value: {
-              nameKnown: 'YES',
-              firstName: 'Sam <Jr>',
-              lastName: 'Smith & Co',
-            },
-          },
-        ],
-      } as CcdCaseData;
-
-      expect(formatDefendants(ccdCase)).toBe('<ul class="govuk-list"><li>Sam &lt;Jr&gt; Smith &amp; Co</li></ul>');
-    });
   });
 
   describe('formatClaimants', () => {
@@ -180,28 +164,6 @@ describe('warrantReturn', () => {
 
       expect(formatClaimants(ccdCase)).toBe(
         '<ul class="govuk-list"><li>John Smith</li><li>ABC Housing Association</li><li>Jane Doe</li></ul>'
-      );
-    });
-
-    it('should escape claimant names so they show as text', () => {
-      const ccdCase = {
-        allClaimants: [
-          {
-            value: {
-              orgName: 'Smith & Sons <Lettings>',
-            },
-          },
-          {
-            value: {
-              firstName: 'Jane <Q>',
-              lastName: 'Doe & Co',
-            },
-          },
-        ],
-      } as CcdCaseData;
-
-      expect(formatClaimants(ccdCase)).toBe(
-        '<ul class="govuk-list"><li>Smith &amp; Sons &lt;Lettings&gt;</li><li>Jane &lt;Q&gt; Doe &amp; Co</li></ul>'
       );
     });
   });

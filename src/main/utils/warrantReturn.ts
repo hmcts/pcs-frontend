@@ -1,5 +1,3 @@
-import escapeHtml from 'escape-html';
-
 import { normalizeYesNoValue } from '../steps/utils/normalizeYesNoValue';
 
 import { CcdCaseData, CcdCollectionItem, CcdParty } from '@services/ccdCase.interface';
@@ -228,7 +226,7 @@ export function formatDefendants(ccdCase: CcdCaseData): string {
   for (const defendant of allDefendants) {
     const party: CcdParty = defendant.value;
     if (normalizeYesNoValue(party.nameKnown) === 'YES') {
-      defendantHtml += `<li>${escapeHtml(`${party.firstName} ${party.lastName}`)}</li>`;
+      defendantHtml += `<li>${party.firstName} ${party.lastName}</li>`;
     } else {
       hasUnknownDefendants = true;
     }
@@ -253,9 +251,9 @@ export function formatClaimants(ccdCase: CcdCaseData): string {
   for (const defendant of allClaimants) {
     const party: CcdParty = defendant.value;
     if (party.orgName !== undefined) {
-      claimantHtml += `<li>${escapeHtml(party.orgName)}</li>`;
+      claimantHtml += `<li>${party.orgName}</li>`;
     } else {
-      claimantHtml += `<li>${escapeHtml(`${party.firstName} ${party.lastName}`)}</li>`;
+      claimantHtml += `<li>${party.firstName} ${party.lastName}}</li>`;
     }
   }
 
