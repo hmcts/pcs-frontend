@@ -253,7 +253,7 @@ export function formatClaimants(ccdCase: CcdCaseData): string {
     if (party.orgName !== undefined) {
       claimantHtml += `<li>${party.orgName}</li>`;
     } else {
-      claimantHtml += `<li>${party.firstName} ${party.lastName}}</li>`;
+      claimantHtml += `<li>${party.firstName} ${party.lastName}</li>`;
     }
   }
 
