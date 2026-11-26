@@ -73,7 +73,7 @@ export function dateError(answers: EvictionAnswers, now: DateTime = DateTime.now
   if (!dateTime) {
     return DATE_INVALID;
   }
-  if (dateTime <= now.startOf('minute')) {
+  if (dateTime < now.startOf('minute')) {
     return DATE_IN_PAST;
   }
   return undefined;
