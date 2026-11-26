@@ -1,6 +1,6 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 
-import { RELEASE_1B_ENABLED } from '@utils/featureFlags';
+import { BAILIFF_MANAGEMENT_ENABLED } from '@utils/featureFlags';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 
 export const featureFlagMiddleware: RequestHandler = async (
@@ -8,10 +8,10 @@ export const featureFlagMiddleware: RequestHandler = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const release1bEnabled = await getLaunchDarklyFlag(req, RELEASE_1B_ENABLED, false);
+  const bailiffManagementEnabled = await getLaunchDarklyFlag(req, BAILIFF_MANAGEMENT_ENABLED, false);
 
   res.locals.featureFlags = {
-    release1bEnabled,
+    bailiffManagementEnabled,
   };
 
   next();

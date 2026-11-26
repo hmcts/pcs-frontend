@@ -22,15 +22,18 @@ describe('featureFlagMiddleware', () => {
     next = jest.fn();
   });
 
-  it.each([true, false])('sets %s release1b feature flag on res.locals', async release1bEnabled => {
-    const req = {} as unknown as Request;
-    mockGetLaunchDarklyFlag.mockResolvedValue(release1bEnabled);
+  it.each([true, false])(
+    'sets %s bailiffManagementEnabled feature flag on res.locals',
+    async bailiffManagementEnabled => {
+      const req = {} as unknown as Request;
+      mockGetLaunchDarklyFlag.mockResolvedValue(bailiffManagementEnabled);
 
-    await invokeMiddleware(req);
+      await invokeMiddleware(req);
 
-    expect(next).toHaveBeenCalled();
-    expect(res.locals?.featureFlags).toEqual({
-      release1bEnabled,
-    });
-  });
+      expect(next).toHaveBeenCalled();
+      expect(res.locals?.featureFlags).toEqual({
+        bailiffManagementEnabled,
+      });
+    }
+  );
 });
