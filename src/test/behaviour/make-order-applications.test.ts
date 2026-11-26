@@ -4,6 +4,7 @@ import {
   bootApp,
   check,
   control,
+  offered,
   openPage,
   recordAttendance,
   selectTab,
@@ -12,6 +13,7 @@ import {
   type,
   typeDate,
   uncheck,
+  writeInPreview,
 } from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
@@ -30,12 +32,14 @@ const ADJOURN = {
   id: 'gen-app-1',
   reference: 'GA1',
   type: 'Adjourn the hearing',
+  adjournment: true,
   applicant: 'Alex Example (Defendant 1)',
   submittedOn: '2026-10-01',
   within14Days: 'YES',
   otherPartiesAgreed: 'NO',
   withoutNotice: 'NO',
-  whatOrderWanted: '1. The hearing on 14 October is adjourned.\n2. Costs in the case.',
+  whatOrderWanted: 'I am in hospital that week.',
+  listed: false,
   documents: [{ id: '3f2a6c1e-0000-4000-8000-000000000001', fileName: 'hospital-letter.pdf' }],
 };
 
@@ -48,16 +52,9 @@ const WARRANT = {
   applicant: 'Alex Example (Defendant 1)',
   submittedOn: '2026-10-09',
   whatOrderWanted: null,
+  listed: false,
   documents: [],
 };
-
-const GRANTED = "The defendant's application dated 1 October 2026 is granted.";
-const WORDING = '1. The hearing on 14 October is adjourned.\n2. Costs in the case.';
-
-/** Puts the applicant's wording in the order, as the judge does with the application's button. */
-function insertWording(reference = 'GA1'): void {
-  control<HTMLButtonElement>(`[data-application-reference="${reference}"] [data-insert-requested-wording]`).click();
-}
 
 /** The order's lines from "IT IS ORDERED THAT:" on. */
 function ordered(text: string): string[] {
@@ -118,6 +115,34 @@ describe('make an order: deciding applications', () => {
       expect(control('[name="app-gen-app-2-decision"][value="none"]').checked).toBe(true);
     });
 
+    it('says which applications an earlier order listed for a hearing, still to be decided', async () => {
+      await app.close();
+      app = await bootApp({ applications: [ADJOURN, { ...WARRANT, listed: true }] });
+      await openPage((await app.get(PAGE)).text);
+      const tags = [...document.querySelectorAll<HTMLElement>('[data-application]')].map(
+        row => row.querySelector('h3 .govuk-tag')?.textContent?.trim() ?? null
+      );
+      expect(tags).toEqual([null, 'Listed for hearing']);
+      expect(control('[name="app-gen-app-2-decision"][value="none"]').checked).toBe(true);
+    });
+
+    it('offers no striking out at a hearing, and refuses it', async () => {
+      const page = await openPage((await app.get(PAGE)).text);
+      const decisions = [...document.querySelectorAll<HTMLInputElement>(`[name="${P}-decision"]:enabled`)].map(
+        input => input.value
+      );
+      expect(decisions).toEqual(['none', 'adjourn', 'dismiss', 'list', 'freeform']);
+      expect(
+        control(`[name="${P}-decision"][value="strike-out"]`).closest<HTMLElement>('.govuk-radios__item')!.hidden
+      ).toBe(true);
+      recordAttendance();
+      const body = page.body('SUBMIT_FOR_REVIEW');
+      body.set(`${P}-decision`, 'strike-out');
+      const rejected = await app.post(PAGE, body);
+      expect(rejected.status).toBe(400);
+      expect(rejected.text).toContain('Select what you decide about application GA1');
+    });
+
     it('shows no applications section, and the claim without a tick box, when the case has none open', async () => {
       await app.close();
       app = await bootApp();
@@ -151,19 +176,17 @@ describe('make an order: deciding applications', () => {
       expect(submitted.order.formData['app-gen-app-2-decision']).toBe('dismiss');
     });
 
-    it("keeps the applicant's wording the judge inserted as they order on the claim and stop again", async () => {
+    it("keeps an application's clause as the judge orders on the claim and stops again", async () => {
       const page = await openPage((await app.get(PAGE)).text);
       recordAttendance();
-      check(`${P}-decision`, 'grant');
-      insertWording();
+      check(`${P}-decision`, 'dismiss');
       check('claim-order', 'yes');
       selectTab('tab-adjournment');
       check('adj-type', 'generally');
       expect(ordered(page.documentText())).toEqual([
         'IT IS ORDERED THAT:',
         'The claim is adjourned generally with liberty to restore by application by any party on notice to all other parties.',
-        GRANTED,
-        ...WORDING.split('\n'),
+        "The defendant's application dated 1 October 2026 is dismissed.",
       ]);
       expect(control('#order-type').value).toBe('ADJOURNMENT');
 
@@ -174,7 +197,7 @@ describe('make an order: deciding applications', () => {
       // Ticking again goes back to the tab the judge had open.
       check('claim-order', 'yes');
       expect(control('#order-type').value).toBe('ADJOURNMENT');
-      expect(page.documentText().match(/The hearing on 14 October is adjourned\./g)).toHaveLength(1);
+      expect(page.documentText().match(/application dated 1 October 2026 is dismissed\./g)).toHaveLength(1);
     });
   });
 
@@ -190,19 +213,19 @@ describe('make an order: deciding applications', () => {
       expect(launch.location).toBe(`${PAGE}?taskId=task-1&genAppId=gen-app-1`);
 
       const page = await openPage((await app.get(launch.location!)).text);
+      check('order-notice', 'none');
       expect(document.querySelector('h1')?.textContent).toBe('Make an order');
       expect(startClientContexts()).toEqual([{ genAppId: 'gen-app-1' }]);
       // Made without a hearing: no one attended.
-      expect(document.querySelector('[data-attendance-row]')).toBeNull();
+      expect(offered('[data-attendance-row]')).toBe(false);
       expect(control<HTMLDetailsElement>(`details#${P}-more`).open).toBe(true);
       expect(control<HTMLDetailsElement>('details#app-gen-app-2-more').open).toBe(false);
       expect(document.querySelector(`[name="${P}-decision"]:checked`)).toBeNull();
+      // On the papers it may be struck out.
+      expect(document.querySelector(`[name="${P}-decision"][value="strike-out"]`)).not.toBeNull();
       expect(control(`#${P}-details`).textContent).toContain('Alex Example (Defendant 1)');
       expect(control<HTMLAnchorElement>(`#${P}-details a`).href).toContain(
         `/case/${CASE_REFERENCE}/view-documents/3f2a6c1e-0000-4000-8000-000000000001`
-      );
-      expect(control(`#${P}-requested`).innerHTML.trim()).toBe(
-        '<p>1. The hearing on 14 October is adjourned.<br>2. Costs in the case.</p>'
       );
 
       check(`${P}-decision`, 'dismiss');
@@ -222,6 +245,7 @@ describe('make an order: deciding applications', () => {
 
     it('needs a decision on the application the task asked about, and a real one on any other', async () => {
       const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
       const body = page.body('SUBMIT_FOR_REVIEW');
       body.set('app-gen-app-2-decision', 'nonsense');
       const rejected = await app.post(TASK_PAGE, body);
@@ -233,104 +257,169 @@ describe('make an order: deciding applications', () => {
       ]);
     });
 
-    it("grants it in a clause naming it, puts the applicant's lines after it only on request, then the costs", async () => {
+    it('needs the decision written in the order when the judge decides an application freeform', async () => {
       const page = await openPage((await app.get(TASK_PAGE)).text);
-      const button = control<HTMLButtonElement>('[data-application-reference="GA1"] [data-insert-requested-wording]');
-      expect(button.closest<HTMLElement>('[hidden]')).not.toBeNull();
-      check(`${P}-decision`, 'grant');
-      expect(button.closest<HTMLElement>('[hidden]')).toBeNull();
-      expect(page.documentText()).not.toContain('The hearing on 14 October is adjourned.');
-      insertWording();
+      check('order-notice', 'none');
+      check(`${P}-decision`, 'freeform');
+      const rejected = await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'));
+      expect(rejected.status).toBe(400);
+      const again = await openPage(rejected.text);
+      expect([...document.querySelectorAll('.govuk-error-message')].map(error => error.textContent?.trim())).toEqual([
+        'Error: Write the decision on application GA1 in the order',
+      ]);
+
+      writeInPreview('The hearing on 14 October is adjourned to the first open date after 28 days.');
+      expect((await app.post(TASK_PAGE, again.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
+    });
+
+    it("puts the application's clauses before the costs", async () => {
+      const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
+      check(`${P}-decision`, 'dismiss');
       check('costs', 'yes');
       check('costs-choice', 'def-pay-cl-fixed');
       type('costs-def-pay-cl-fixed-amount', '150');
 
       expect(ordered(page.documentText())).toEqual([
         'IT IS ORDERED THAT:',
-        GRANTED,
-        ...WORDING.split('\n'),
+        "The defendant's application dated 1 October 2026 is dismissed.",
         "The defendant shall pay the claimant's costs of the application in the fixed sum of £150.00.",
       ]);
-      // The applicant's lines are one clause after the granted one, as they wrote them, then the costs.
-      expect(clauseLists()).toEqual([2, 1]);
+      expect(clauseLists()).toEqual([1, 1]);
     });
 
-    it('offers no wording to insert when the applicant asked for no order', async () => {
-      await app.close();
-      app = await bootApp({ application: { ...ADJOURN, whatOrderWanted: null } });
+    it("shows what the applicant asked for and why, and refuses taking an applicant's wording", async () => {
       const page = await openPage((await app.get(TASK_PAGE)).text);
-      expect(document.querySelector('[data-insert-requested-wording]')).toBeNull();
-      check(`${P}-decision`, 'grant');
-      expect(ordered(page.orderText())).toEqual(['IT IS ORDERED THAT:', GRANTED]);
-    });
-
-    it('keeps the wording the judge inserted when the decision changes', async () => {
-      const page = await openPage((await app.get(TASK_PAGE)).text);
-      check(`${P}-decision`, 'grant');
-      insertWording();
-      check(`${P}-decision`, 'dismiss');
-      expect(page.documentText()).toContain("The defendant's application dated 1 October 2026 is dismissed.");
-      expect(page.documentText()).not.toContain('is granted.');
-      check(`${P}-decision`, 'grant');
-      expect(page.documentText().match(/The hearing on 14 October is adjourned\./g)).toHaveLength(1);
-      expect(page.documentText()).not.toContain('is dismissed.');
-    });
-
-    it("keeps the judge's deletion of the wording when they reopen the order, until they insert it again", async () => {
-      await openPage((await app.get(TASK_PAGE)).text);
-      check(`${P}-decision`, 'grant');
-      insertWording();
-      // The judge deletes the applicant's clause: the inserted one, with no id.
-      const snapshot = JSON.parse(control<HTMLTextAreaElement>('#order-document').value);
-      const dropInserted = (node: { attrs?: { id?: string | null }; content?: unknown[] }): void => {
-        node.content = node.content?.filter(
-          child =>
-            !(
-              (child as { attrs?: { id?: string | null } }).attrs?.id === undefined &&
-              JSON.stringify(child).includes('Costs in the case')
-            )
-        );
-        node.content?.forEach(child => dropInserted(child as typeof node));
-      };
-      dropInserted(snapshot.current);
-      await app.close();
-      app = await bootApp({
-        application: ADJOURN,
-        order: {
-          id: 'order-saved',
-          version: 4,
-          orderType: 'NO_ORDER_ON_CLAIM',
-          formData: { [`${P}-decision`]: 'grant' },
-          docweaveSnapshot: snapshot,
-        },
-      });
-
-      const reopened = await openPage((await app.get(`${TASK_PAGE}&orderId=order-saved`)).text);
-      expect(reopened.documentText()).toContain(GRANTED);
-      expect(reopened.documentText()).not.toContain('Costs in the case.');
-      insertWording();
-      expect(reopened.documentText().match(/Costs in the case\./g)).toHaveLength(1);
+      check('order-notice', 'none');
+      expect(document.querySelector(`[name="${P}-decision"][value="applicant-wording"]`)).toBeNull();
+      expect(control(`#${P}-explanation`).textContent?.trim()).toBe('I am in hospital that week.');
+      check(`${P}-decision`, 'freeform');
+      expect(ordered(page.orderText())).toEqual(['IT IS ORDERED THAT:']);
+      const body = page.body('SUBMIT_FOR_REVIEW');
+      body.set(`${P}-decision`, 'applicant-wording');
+      const rejected = await app.post(TASK_PAGE, body);
+      expect(rejected.status).toBe(400);
+      expect(rejected.text).toContain('Select what you decide about application GA1');
     });
 
     it('lists the application for a hearing on notice, asking when as an adjournment does', async () => {
       const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
       const listing = control<HTMLElement>('[data-application-reference="GA1"] [data-decision-shows="list"]');
       expect(listing.hidden).toBe(true);
       check(`${P}-decision`, 'list');
       expect(listing.hidden).toBe(false);
       const rejected = await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'));
       expect(rejected.text).toContain('Enter a valid hearing date');
-      expect(rejected.text).toContain('Enter the time estimate as a whole number');
+      expect(rejected.text).toContain(
+        'Enter the time estimate in whole days, hours and minutes, with minutes under 60'
+      );
 
       check(`${P}-list-when`, 'specific');
       typeDate(`${P}-list-hearing-date-specific`, '2', '11', '2026');
       type(`${P}-list-specific-time`, '10:30');
-      type(`${P}-list-time-estimate`, '30');
+      type(`${P}-list-time-estimate-minutes`, '30');
       check(`${P}-list-directions`, 'defence');
       typeDate(`${P}-list-defence-date`, '20', '10', '2026');
       expect(ordered(page.orderText()).slice(1)).toEqual([
         "The defendant's application dated 1 October 2026 shall be listed for a hearing on notice to all parties on 2 November 2026 at 10:30am with a time estimate of 30 minutes.",
         'The defendant must by 4pm on 20 October 2026 submit to the court and all other parties a defence.',
+      ]);
+    });
+  });
+
+  describe('on an application to adjourn a hearing', () => {
+    beforeEach(async () => {
+      app = await bootApp({ application: ADJOURN, applications: [WARRANT] });
+    });
+
+    it('adjourns the hearing generally or to a further hearing, asking when as the adjournment tab does', async () => {
+      const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
+      const adjournment = control<HTMLElement>('[data-application-reference="GA1"] [data-decision-shows="adjourn"]');
+      expect(adjournment.hidden).toBe(true);
+      check(`${P}-decision`, 'adjourn');
+      expect(adjournment.hidden).toBe(false);
+      expect((await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'))).text).toContain('Select an adjournment type');
+
+      check(`${P}-adjourn-type`, 'generally');
+      expect(ordered(page.orderText()).slice(1)).toEqual([
+        'The hearing is adjourned generally with liberty to restore by application by any party on notice to all other parties.',
+      ]);
+
+      check(`${P}-adjourn-type`, 'further-hearing');
+      expect((await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'))).text).toContain('Enter a valid hearing date');
+      check(`${P}-adjourn-when`, 'specific');
+      typeDate(`${P}-adjourn-hearing-date-specific`, '2', '11', '2026');
+      type(`${P}-adjourn-specific-time`, '10:30');
+      type(`${P}-adjourn-time-estimate-minutes`, '30');
+      expect(ordered(page.orderText()).slice(1)).toEqual([
+        'The hearing shall be adjourned to be heard on 2 November 2026 at 10:30am with a time estimate of 30 minutes.',
+      ]);
+      expect((await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
+      const [submitted] = submittedOrders() as { order: Record<string, unknown> }[];
+      expect(submitted.order.applicationDecisions).toEqual([{ genAppId: 'gen-app-1', decision: 'DISPOSED' }]);
+    });
+
+    it('offers adjourning only on an application to adjourn, and refuses it on another', async () => {
+      const page = await openPage((await app.get(TASK_PAGE)).text);
+      const decisions = (name: string): string[] =>
+        [...document.querySelectorAll<HTMLInputElement>(`[name="${name}"]`)].map(input => input.value);
+      expect(decisions(`${P}-decision`)).toEqual(['none', 'adjourn', 'dismiss', 'strike-out', 'list', 'freeform']);
+      expect(decisions('app-gen-app-2-decision')).not.toContain('adjourn');
+      const body = page.body('SUBMIT_FOR_REVIEW');
+      body.set(`${P}-decision`, 'dismiss');
+      body.set('app-gen-app-2-decision', 'adjourn');
+      const rejected = await app.post(TASK_PAGE, body);
+      expect(rejected.status).toBe(400);
+      expect(rejected.text).toContain('Select what you decide about application GA2');
+    });
+  });
+
+  describe('listing an application when the case has hearings to come', () => {
+    beforeEach(async () => {
+      app = await bootApp({
+        application: ADJOURN,
+        hearings: [
+          { id: 7, date: '2020-03-02T10:00:00' },
+          { id: 8, date: '2099-01-12T10:00:00' },
+        ],
+      });
+    });
+
+    it('lists it to be heard at a hearing the case already has, which asks nothing more', async () => {
+      const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
+      check(`${P}-decision`, 'list');
+      const choices = [...document.querySelectorAll<HTMLInputElement>(`input[name="${P}-list-at"]`)];
+      // A hearing already held is not one to list it at.
+      expect(choices.map(choice => choice.labels?.[0]?.textContent?.trim())).toEqual([
+        'A new hearing',
+        'The hearing on 12 January 2099 at 10:00am',
+      ]);
+      const listNew = control<HTMLElement>(`#conditional-${P}-list-at`);
+      expect(listNew.classList).not.toContain('govuk-radios__conditional--hidden');
+
+      check(`${P}-list-at`, '8');
+      expect(listNew.classList).toContain('govuk-radios__conditional--hidden');
+      expect(ordered(page.orderText()).slice(1)).toEqual([
+        "The defendant's application dated 1 October 2026 shall be heard at the hearing on 12 January 2099 at 10:00am.",
+      ]);
+      const accepted = await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'));
+      expect(accepted.text).not.toContain('Enter a valid hearing date');
+      const [submitted] = submittedOrders() as { order: { formData: Record<string, unknown> } }[];
+      expect(submitted.order.formData[`${P}-list-at`]).toBe('8');
+    });
+
+    it('lists it at a new hearing without notice to the other parties', async () => {
+      const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
+      check(`${P}-decision`, 'list');
+      check(`${P}-list-without-notice`, 'yes');
+      typeDate(`${P}-list-hearing-date-next-list`, '2', '11', '2026');
+      type(`${P}-list-time-estimate-minutes`, '30');
+      expect(ordered(page.orderText()).slice(1)).toEqual([
+        "The defendant's application dated 1 October 2026 shall be listed for a hearing without notice to the other parties on the next available possession list after 2 November 2026 with a time estimate of 30 minutes. Further details of the hearing will be provided by the court.",
       ]);
     });
   });
@@ -350,11 +439,11 @@ describe('make an order: deciding applications', () => {
       });
     });
 
-    it('grants it on the conditions a suspended possession order has, which it needs', async () => {
+    it('suspends it on the conditions a suspended possession order has, which it needs', async () => {
       const page = await openPage((await app.get(WARRANT_PAGE)).text);
-      const conditions = control<HTMLElement>('[data-decision-shows="grant"]');
+      const conditions = control<HTMLElement>('[data-decision-shows="suspend"]');
       expect(conditions.hidden).toBe(true);
-      check(`${W}-decision`, 'grant');
+      check(`${W}-decision`, 'suspend');
       expect(conditions.hidden).toBe(false);
       const rejected = await app.post(WARRANT_PAGE, page.body('SUBMIT_FOR_REVIEW'));
       expect(rejected.text).toContain('Enter valid arrears');
@@ -375,6 +464,19 @@ describe('make an order: deciding applications', () => {
       expect((await app.post(WARRANT_PAGE, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
     });
 
+    it('offers no striking out, and refuses it', async () => {
+      const page = await openPage((await app.get(WARRANT_PAGE)).text);
+      const decisions = [...document.querySelectorAll<HTMLInputElement>(`[name="${W}-decision"]`)].map(
+        input => input.value
+      );
+      expect(decisions).toEqual(['none', 'suspend', 'dismiss', 'list', 'freeform']);
+      const body = page.body('SUBMIT_FOR_REVIEW');
+      body.set(`${W}-decision`, 'strike-out');
+      const rejected = await app.post(WARRANT_PAGE, body);
+      expect(rejected.status).toBe(400);
+      expect(rejected.text).toContain('Select what you decide about application GA2');
+    });
+
     it('dismisses it with nothing more to answer', async () => {
       const page = await openPage((await app.get(WARRANT_PAGE)).text);
       check(`${W}-decision`, 'dismiss');
@@ -382,6 +484,47 @@ describe('make an order: deciding applications', () => {
         "The second defendant's application dated 9 October 2026 to suspend enforcement is dismissed.",
       ]);
       expect((await app.post(WARRANT_PAGE, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
+    });
+  });
+
+  describe('whether each applicant asked for their application to be made without notice', () => {
+    const WITHOUT_NOTICE = {
+      id: 'gen-app-3',
+      reference: 'GA3',
+      type: 'Something else',
+      somethingElseDetails: 'Stop the eviction',
+      applicant: 'Alex Example (Defendant 1)',
+      submittedOn: '2026-10-11',
+      withoutNotice: 'YES',
+      withoutNoticeReason: 'Risk of harm',
+      whatOrderWanted: null,
+      documents: [],
+    };
+
+    /** What an application's details say of its request, by the row's key. */
+    function detailsRow(prefix: string): string | undefined {
+      return [...document.querySelectorAll(`#${prefix}-details .govuk-summary-list__row`)]
+        .find(row => row.querySelector('dt')?.textContent?.trim() === 'Without notice requested')
+        ?.querySelector('dd')
+        ?.textContent?.trim();
+    }
+
+    it('retains the recorded notice status and request warning in the details without a header label', async () => {
+      // GA1 asked not to be without notice, GA2 was made before the question was asked, GA3 asked to be.
+      app = await bootApp({ applications: [ADJOURN, WARRANT, WITHOUT_NOTICE] });
+      await openPage((await app.get(PAGE)).text);
+
+      expect(document.querySelector('[id$="-notice-request"]')).toBeNull();
+      expect([detailsRow('app-gen-app-1'), detailsRow('app-gen-app-2'), detailsRow('app-gen-app-3')]).toEqual([
+        'No',
+        'Not recorded',
+        'Yes: Risk of harm',
+      ]);
+      // A request is not a promise of who is told.
+      expect(control('#app-gen-app-3-more').textContent).toContain(
+        'The applicant asked for this application to be made without notice.'
+      );
+      expect(document.body.textContent).not.toContain('will be told');
     });
   });
 });

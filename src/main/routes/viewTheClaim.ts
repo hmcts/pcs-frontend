@@ -7,9 +7,9 @@ import { getRequestLanguage, getTranslationFunction } from '../modules/i18n';
 
 import { getDashboardUrl } from '@routes/dashboard';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { RELEASE_1_4_ENABLED } from '@utils/featureFlags';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
-import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 import { buildViewTheClaimPageData } from '@utils/viewTheClaim/viewTheClaimUtils';
 
 export default function viewTheClaimRoutes(app: Application): void {

@@ -7,7 +7,7 @@ import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { FrequencyValue, HouseholdCircumstances, IncomeExpenseDetails } from '@services/ccdCase.interface';
-import { release14RadioWording } from '@utils/respondToClaimFlags';
+import { release14RadioWording } from '@utils/featureFlags';
 
 const regularExpenseKeys = [
   'householdBills',

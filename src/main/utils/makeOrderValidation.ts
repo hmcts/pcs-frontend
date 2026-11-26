@@ -1,6 +1,15 @@
+import { type DocWeaveSnapshot, describeChanges } from '@hmcts-cft/docweave';
 import { DateTime } from 'luxon';
 
-import { MAX_MONEY, exceedsMaxMoney, parseDate, parseMoney, parseTime, registryName } from './makeOrderFormat';
+import {
+  MAX_MONEY,
+  NOTICE_DATE_PREFIXES,
+  exceedsMaxMoney,
+  parseDate,
+  parseMoney,
+  parseTime,
+  timeEstimateOf,
+} from './makeOrderFormat';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -13,9 +22,6 @@ export const MAKE_ORDER_TYPES = [
   'NO_ORDER_ON_CLAIM',
 ] as const;
 export type MakeOrderType = (typeof MAKE_ORDER_TYPES)[number];
-
-/** Order types the screen offers only at a hearing: no possession orders are made without one. */
-export const AT_HEARING_ORDER_TYPES: readonly MakeOrderType[] = ['OUTRIGHT_POSSESSION', 'SUSPENDED_POSSESSION'];
 
 export interface MakeOrderValidationIssue {
   id: string;
@@ -130,9 +136,9 @@ function validation(formData: Record<string, unknown>) {
 function validateCosts(formData: Record<string, unknown>, suspended: boolean): MakeOrderValidationIssue[] {
   const amountTypes: Partial<Record<string, string>> = {
     'def-pay-cl-fixed': 'fixed',
-    'def-pay-cl-summary': 'summary assessed',
-    'cl-pay-def-summary': 'summary assessed',
-    ...(suspended ? { 'fixed-same-terms': 'fixed', 'summary-same-terms': 'summary assessed' } : {}),
+    'def-pay-cl-summary': 'summarily assessed',
+    'cl-pay-def-summary': 'summarily assessed',
+    ...(suspended ? { 'fixed-same-terms': 'fixed', 'summary-same-terms': 'summarily assessed' } : {}),
   };
   const choice = value(formData, 'costs-choice');
   const amountType = amountTypes[choice];
@@ -175,9 +181,16 @@ function validatePaymentConditions(formData: Record<string, unknown>, prefix: st
   return issues;
 }
 
+/** The time possession is ordered by, which the judge may leave blank. */
+function possessionTime(formData: Record<string, unknown>, id: string): MakeOrderValidationIssue[] {
+  const time = value(formData, id);
+  return time && !parseTime(time) ? [{ id, message: 'Enter a valid time possession is ordered by, like 16:00' }] : [];
+}
+
 function validateSuspended(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, date } = validation(formData);
   date('suspended-by-date', 'Enter a valid possession date');
+  issues.push(...possessionTime(formData, 'suspended-by-time'));
   return [...issues, ...validatePaymentConditions(formData, 'suspended'), ...validateCosts(formData, true)];
 }
 
@@ -193,6 +206,7 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
   );
   if (possession === 'by') {
     date('outright-by-date', 'Enter a valid possession date');
+    issues.push(...possessionTime(formData, 'outright-by-time'));
   }
   add(
     ['mandatory', 'discretionary'].includes(value(formData, 'outright-grounds-type')),
@@ -221,7 +235,7 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
       add(
         plans.includes('lump') || plans.includes('instalments'),
         'outright-mj-plan',
-        'Select payment to claimant or instalment payments'
+        'Select initial payment or instalment payments'
       );
       if (plans.includes('lump')) {
         money('outright-mj-lump-amount', 'Enter a valid payment amount');
@@ -258,14 +272,9 @@ function validateListing(
   const directions = values(formData, `${prefix}-directions`);
   date(hearingDate, dateMessage);
   add(
-    /^\d+$/.test(value(formData, `${prefix}-time-estimate`)) && Number(value(formData, `${prefix}-time-estimate`)) > 0,
-    `${prefix}-time-estimate`,
-    'Enter the time estimate as a whole number'
-  );
-  add(
-    ['minutes', 'hours'].includes(value(formData, `${prefix}-time-estimate-unit`)),
-    `${prefix}-time-estimate-unit`,
-    'Select minutes or hours for the time estimate'
+    Boolean(timeEstimateOf(name => value(formData, name), prefix)),
+    `${prefix}-time-estimate-days`,
+    'Enter the time estimate in whole days, hours and minutes, with minutes under 60'
   );
   if (when === 'specific') {
     const time = value(formData, `${prefix}-specific-time`);
@@ -363,13 +372,22 @@ function validateAttendance(formData: Record<string, unknown>, parties: readonly
   return issues;
 }
 
-export const APPLICATION_DECISIONS = ['none', 'grant', 'dismiss', 'strike-out', 'list', 'other'] as const;
+export const APPLICATION_DECISIONS = [
+  'none',
+  'adjourn',
+  'suspend',
+  'dismiss',
+  'strike-out',
+  'list',
+  'freeform',
+] as const;
 
 /** An open application the order can decide, whose answers start with `app-<id>`. */
 export interface ApplicationToDecide {
   id: string;
   reference: string;
   enforcementSuspension?: boolean;
+  adjournment?: boolean;
   /** The application the judge's task asked them to decide, which the order may not leave as it is. */
   required?: boolean;
 }
@@ -381,33 +399,80 @@ export function applicationPrefix(application: { id: string }): string {
 
 /**
  * What the judge decides about each application, and what follows the decision: when the hearing is if they list
- * it, and for an application to suspend enforcement, the conditions if they grant it. The order may leave any
+ * it, and for an application to suspend enforcement, the conditions if they suspend it. The order may leave any
  * application as it is but the one the judge's task asked them to decide.
  */
 function validateApplications(
   formData: Record<string, unknown>,
-  applications: readonly ApplicationToDecide[]
+  applications: readonly ApplicationToDecide[],
+  withoutHearing: boolean,
+  upcomingHearingIds: readonly string[]
 ): MakeOrderValidationIssue[] {
   const { issues, add } = validation(formData);
   for (const application of applications) {
     const prefix = applicationPrefix(application);
     const decision = value(formData, `${prefix}-decision`) || 'none';
     const allowed =
-      (APPLICATION_DECISIONS as readonly string[]).includes(decision) && !(application.required && decision === 'none');
+      (APPLICATION_DECISIONS as readonly string[]).includes(decision) &&
+      !(application.required && decision === 'none') &&
+      // Only enforcement is suspended on conditions, and only a hearing adjourned on an application to adjourn it.
+      !(decision === 'suspend' && !application.enforcementSuspension) &&
+      !(decision === 'adjourn' && !application.adjournment) &&
+      // Striking out is a decision on the papers, and never one on an application to suspend enforcement.
+      !(decision === 'strike-out' && (!withoutHearing || application.enforcementSuspension));
     add(allowed, `${prefix}-decision`, `Select what you decide about application ${application.reference}`);
-    if (decision === 'list') {
+    // Listed at one of the case's hearings, the order only says which, so only a new hearing asks when.
+    const listAt = value(formData, `${prefix}-list-at`) || 'new';
+    if (decision === 'list' && listAt === 'new') {
       issues.push(...validateListing(formData, `${prefix}-list`, 'Enter a valid hearing date'));
     }
-    if (application.enforcementSuspension && decision === 'grant') {
+    // A hearing the order was drafted to list it at that has passed since is not one it can be heard at.
+    add(
+      decision !== 'list' || listAt === 'new' || upcomingHearingIds.includes(listAt),
+      `${prefix}-list-at`,
+      `The hearing application ${application.reference} is listed at has passed. Select another hearing`
+    );
+    if (decision === 'suspend') {
       issues.push(...validatePaymentConditions(formData, `${prefix}-suspension`));
+    }
+    if (decision === 'adjourn') {
+      const adjournment = value(formData, `${prefix}-adjourn-type`);
+      add(
+        ['further-hearing', 'generally'].includes(adjournment),
+        `${prefix}-adjourn-type`,
+        'Select an adjournment type'
+      );
+      if (adjournment === 'further-hearing') {
+        issues.push(...validateListing(formData, `${prefix}-adjourn`, 'Enter a valid hearing date'));
+      }
     }
   }
   return issues;
 }
 
 /**
- * The hearing's record: the judge's own figures for the case and their note, which they need not give, but
- * which pcs-api records whenever they save, so are checked on every save.
+ * A freeform decision generates no wording, leaving the judge to write it: an order deciding an application that way
+ * needs a clause someone wrote, or it would dispose of the application without saying how.
+ */
+export function validateFreeformWording(
+  formData: Record<string, unknown>,
+  applications: readonly ApplicationToDecide[],
+  snapshot: DocWeaveSnapshot | null
+): MakeOrderValidationIssue[] {
+  if (!snapshot || describeChanges(snapshot).inserted > 0) {
+    return [];
+  }
+  return applications
+    .filter(application => value(formData, `${applicationPrefix(application)}-decision`) === 'freeform')
+    .map(application => ({
+      id: `${applicationPrefix(application)}-decision`,
+      message: `Write the decision on application ${application.reference} in the order`,
+    }));
+}
+
+/**
+ * The hearing's record, by its fields' own names: the judge's own figures for the case and their note, which they
+ * need not give, but which pcs-api records whenever they save, so are checked on every save.
  */
 export function validateHearingRecord(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, add, optionalMoney, optionalDate } = validation(formData);
@@ -436,7 +501,7 @@ export function validateHearingRecord(formData: Record<string, unknown>): MakeOr
   );
   optionalMoney('last-payment', 'Enter a valid last payment');
   optionalMoney('arrears-today', 'Enter valid arrears today');
-  return [...issues, ...validateText(formData, 'hearing-notes', 'Hearing notes')];
+  return [...issues, ...validateText(formData, 'notes', 'Hearing notes')];
 }
 
 /** A long text box the page has whatever the order type: hearing notes, recitals or the staff message. */
@@ -456,32 +521,6 @@ function validateStaffMessage(formData: Record<string, unknown>): MakeOrderValid
     return [{ id: 'staff-message-text', message: 'Enter a message for court staff' }];
   }
   return validateText(formData, 'staff-message-text', 'Staff message');
-}
-
-const MAX_REGISTRY_LENGTH = 60;
-
-/** Where enforcement of the possession order goes, when an order made without a hearing transfers it. */
-function validateEnforcementTransfer(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
-  const { issues, add, maxLength } = validation(formData);
-  const court = value(formData, 'transfer-enforcement-court');
-  add(
-    ['kings-bench', 'district-registry'].includes(court),
-    'transfer-enforcement-court',
-    "Select King's Bench Division or a District Registry"
-  );
-  if (court === 'district-registry') {
-    // The order adds "District Registry" after the name, so that alone names no registry.
-    if (!registryName(value(formData, 'transfer-enforcement-registry'))) {
-      add(false, 'transfer-enforcement-registry', 'Enter the District Registry');
-    } else {
-      maxLength(
-        'transfer-enforcement-registry',
-        MAX_REGISTRY_LENGTH,
-        `District Registry must be ${MAX_REGISTRY_LENGTH} characters or less`
-      );
-    }
-  }
-  return issues;
 }
 
 /** The checks particular to one kind of order. A switch, so an order type from the request only reaches these. */
@@ -510,26 +549,40 @@ function validateOrderType(orderType: MakeOrderType, formData: Record<string, un
   }
 }
 
+export const APPLY_BY_PASSED =
+  'The date by which a party may apply to set aside, vary or stay the order must be today or in the future';
+
+function validateNotice(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+  const prefix = NOTICE_DATE_PREFIXES[value(formData, 'order-notice')];
+  if (!prefix) {
+    return [];
+  }
+  const { issues, add, date } = validation(formData);
+  date(prefix, 'Enter a real date by which a party may apply to set aside, vary or stay the order');
+  const applyBy = dateOf(formData, prefix);
+  // Parsed dates are UTC midnights, so today is the court's date as one too.
+  const today = new Date(`${DateTime.now().setZone('Europe/London').toISODate()}T00:00:00Z`);
+  add(!applyBy || applyBy >= today, `${prefix}-day`, APPLY_BY_PASSED);
+  return issues;
+}
+
 export function validateMakeOrder(
   orderType: MakeOrderType,
   formData: Record<string, unknown>,
   parties: readonly AttendanceParty[],
   withoutHearing = false,
-  applications: readonly ApplicationToDecide[] = []
+  applications: readonly ApplicationToDecide[] = [],
+  upcomingHearingIds: readonly string[] = []
 ): MakeOrderValidationIssue[] {
   const chosen = (name: string): boolean => values(formData, name).includes('yes');
-  if (withoutHearing && AT_HEARING_ORDER_TYPES.includes(orderType)) {
-    return [{ id: 'order-type', message: 'Select an order type made without a hearing' }];
-  }
   // In the order the page asks, so the error summary follows the page.
   return [
-    ...validateHearingRecord(formData),
     // No one attended an order made without a hearing, whose parties the caller leaves out.
     ...validateAttendance(formData, parties),
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
-    ...(withoutHearing && chosen('transfer-enforcement') ? validateEnforcementTransfer(formData) : []),
     ...validateOrderType(orderType, formData),
-    ...validateApplications(formData, applications),
+    ...validateApplications(formData, applications, withoutHearing, upcomingHearingIds),
+    ...validateNotice(formData),
     ...(chosen('staff-message') ? validateStaffMessage(formData) : []),
   ];
 }
