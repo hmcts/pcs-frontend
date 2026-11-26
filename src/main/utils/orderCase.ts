@@ -8,6 +8,7 @@ import { linkSignOutToLogout } from '../middleware/legalRepresentativeHeaders';
 import { getUserRoles } from '../steps/utils';
 import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
 
+import { formatAddress } from '@utils/makeOrderFormat';
 import type { MakeOrderType } from '@utils/makeOrderValidation';
 import { buildManageCaseDetailsRedirect } from '@utils/manageCaseRedirect';
 
@@ -25,11 +26,15 @@ export interface OrderCaseContext {
   caseName: string;
   claimants: OrderParty[];
   defendants: OrderParty[];
-  openCounterclaim?: boolean;
+  openCounterclaim: boolean;
   /** The case's open applications, any of which the order can decide, oldest first. */
-  applications?: OrderApplication[];
+  applications: OrderApplication[];
   /** The case bundle, every document on the case in one PDF, for a judge once one has been made. */
   caseBundle?: OrderCaseBundle | null;
+  /** The case's hearings that have not been cancelled, earliest first, which a judge can make the order at. */
+  hearings: { id: number; date: string }[];
+  /** The court managing the case, as an order names where the judge sits, or a placeholder for them to fill in. */
+  court: string;
 }
 
 export interface OrderCaseBundle {
@@ -41,13 +46,17 @@ export interface OrderCaseBundle {
 /** A general application as the judge deciding it reads it, with what court staff said when they referred it. */
 export interface OrderApplication {
   id: string;
-  /** An application to suspend enforcement, which granting suspends on conditions. */
-  enforcementSuspension?: boolean;
+  /** An application to suspend enforcement, which an order can suspend on conditions. */
+  enforcementSuspension: boolean;
+  /** An application to adjourn a hearing, which an order can adjourn. */
+  adjournment: boolean;
+  /** Whether an issued order has listed it for a hearing, where it is still to be decided. */
+  listed: boolean;
   reference: string;
   type: string;
   somethingElseDetails?: string | null;
-  applicant?: string | null;
-  submittedOn?: string | null;
+  applicant: string;
+  submittedOn: string;
   within14Days?: 'YES' | 'NO' | null;
   otherPartiesAgreed?: 'YES' | 'NO' | null;
   withoutNotice?: 'YES' | 'NO' | null;
@@ -58,7 +67,7 @@ export interface OrderApplication {
 
 /** A judicial note on the case, with the hearing it was made at, if any. */
 export interface JudicialNote {
-  by?: string | null;
+  by: string;
   createdOn: string;
   hearingDate?: string | null;
   note: string;
@@ -75,24 +84,28 @@ export interface OrderHearing {
   inWales?: boolean;
   version?: number | null;
   caseFacts?: Record<string, unknown>;
-  recorded?: { by?: string | null; on: string } | null;
+  recorded?: { by: string; on: string } | null;
   note?: string | null;
   earlierNotes: JudicialNote[];
 }
 
 /**
  * What an order event sends when it starts: the order, and the case it is made on. The make order event
- * sends the judge their working order, if any, or the order a caseworker returned to them with its query; the
- * confirm order review event sends the caseworker the order awaiting review.
+ * sends the judge their one draft on the case, if they have one, or the order a caseworker returned to them with its
+ * query; the confirm order review event sends the caseworker the order awaiting review.
  */
 export interface OrderStart {
   order: {
     id?: string;
     version: number;
+    /** Where the order is; none until it is first saved. Only a draft can be discarded. */
+    state?: 'DRAFT' | 'SUBMITTED_FOR_REVIEW' | 'RETURNED_TO_JUDGE' | 'ISSUED' | 'DISCARDED' | null;
     orderType?: MakeOrderType;
-    formData?: FormData;
+    formData: FormData;
     docweaveSnapshot?: DocWeaveSnapshot | null;
     queryFromCaseworker?: string | null;
+    /** The day an order sent for review is made (ISO), which its wording names; none while the judge makes it. */
+    madeOn?: string | null;
   };
   caseContext: OrderCaseContext;
   /**
@@ -100,15 +113,19 @@ export interface OrderStart {
    * is, without its facts and notes, which are the judge's to record.
    */
   hearing?: OrderHearing | null;
+  /**
+   * The case's other hearings a judge can choose to make the order at instead, each with its facts and notes as they
+   * would start an order for it. Court staff reviewing an order choose no hearing, so are sent none.
+   */
+  otherHearings: OrderHearing[];
   /** The application the judge's task asked them to decide, which the order must decide. */
   taskGenAppId?: string | null;
-}
-
-export function formatAddress(address: Record<string, string | undefined> = {}): string {
-  return ['AddressLine1', 'AddressLine2', 'AddressLine3', 'PostTown', 'County', 'PostCode', 'Country']
-    .map(key => address[key])
-    .filter(Boolean)
-    .join(', ');
+  /**
+   * The judge the order is made by, as it names them: the judge making it, or the one who made the order under review.
+   */
+  judge: string;
+  /** The coming year's England and Wales bank holidays, as ISO days, which a date to apply by moves off. */
+  bankHolidays: string[];
 }
 
 export interface OrderConfirmationHeader {

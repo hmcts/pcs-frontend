@@ -75,14 +75,14 @@ describe('make an order: outright possession', () => {
     check('outright-options', 'money-judgment');
     check('outright-mj-sections', 'arrears');
     // A keystroke alone fires input, so the preview must follow without a change event.
-    const arrearsToday = control('[name="arrears-today"]');
+    const arrearsToday = control('[name="hearing-1-arrears-today"]');
     arrearsToday.value = '5000';
     arrearsToday.dispatchEvent(new Event('input', { bubbles: true }));
     expect(page.documentText()).toContain('Judgment for the claimant(s) in the sum of £5,000.00.');
     expect(control('[name="suspended-arrears"]').value).toBe('5000');
 
     type('outright-mj-arrears', '4000');
-    type('arrears-today', '6000');
+    type('hearing-1-arrears-today', '6000');
     expect(control('[name="outright-mj-arrears"]').value).toBe('4000');
     expect(control('[name="suspended-arrears"]').value).toBe('6000');
 
@@ -91,7 +91,7 @@ describe('make an order: outright possession', () => {
     body.set('action', 'SAVE_DRAFT');
     expect((await app.post(PAGE, body)).status).toBe(302);
     await openPage((await app.get(PAGE)).text);
-    type('arrears-today', '7000');
+    type('hearing-1-arrears-today', '7000');
     expect(control('[name="outright-mj-arrears"]').value).toBe('4000');
     expect(control('[name="suspended-arrears"]').value).toBe('7000');
   });
@@ -99,14 +99,14 @@ describe('make an order: outright possession', () => {
   it('works out the daily rate for damages from the rent until the judge enters their own', async () => {
     app = await bootApp();
     await openPage((await app.get(PAGE)).text);
-    type('rent-frequency', 'WEEKLY');
-    type('current-rent', '102.50');
+    type('hearing-1-rent-frequency', 'WEEKLY');
+    type('hearing-1-current-rent', '102.50');
     expect(control('[name="outright-use-occupation-rate"]').value).toBe('14.64');
-    type('rent-frequency', 'MONTHLY');
+    type('hearing-1-rent-frequency', 'MONTHLY');
     expect(control('[name="outright-use-occupation-rate"]').value).toBe('3.37');
 
     type('outright-use-occupation-rate', '15');
-    type('current-rent', '900');
+    type('hearing-1-current-rent', '900');
     expect(control('[name="outright-use-occupation-rate"]').value).toBe('15');
   });
 
@@ -121,6 +121,39 @@ describe('make an order: outright possession', () => {
     expect(page.orderText()).toContain('This order for possession was made on mandatory grounds.');
   });
 
+  it('gives possession by 4pm unless the judge changes or clears the time', async () => {
+    app = await bootApp();
+    const page = await openPage((await app.get(PAGE)).text);
+    check('outright-possession', 'by');
+    typeDate('outright-by-date', '1', '10', '2026');
+    expect(control('[name="outright-by-time"]').value).toBe('16:00');
+    expect(page.orderText()).toContain('on or before 4pm on 1 October 2026.');
+
+    type('outright-by-time', '10:30');
+    expect(page.orderText()).toContain('on or before 10:30am on 1 October 2026.');
+    type('outright-by-time', '');
+    expect(page.orderText()).toContain('on or before 1 October 2026.');
+
+    type('outright-by-time', '25:00');
+    check('outright-grounds-type', 'mandatory');
+    const rejected = await app.post(PAGE, page.body('SUBMIT_FOR_REVIEW'));
+    expect(rejected.status).toBe(400);
+    expect(rejected.text).toContain('Enter a valid time possession is ordered by, like 16:00');
+  });
+
+  it('keeps a time the judge cleared when the draft is opened again', async () => {
+    app = await bootApp({
+      order: {
+        id: 'order-saved',
+        version: 1,
+        orderType: 'OUTRIGHT_POSSESSION',
+        formData: { 'outright-possession': 'by', 'outright-by-time': '' },
+      },
+    });
+    await openPage((await app.get(`${PAGE}?orderId=order-saved`)).text);
+    expect(control('[name="outright-by-time"]').value).toBe('');
+  });
+
   it('starts a blank draft, builds the order from the form and sends it for review', async () => {
     app = await bootApp();
     const response = await app.get(PAGE);
@@ -132,10 +165,10 @@ describe('make an order: outright possession', () => {
     expect(document.body.textContent).toContain('Test case name');
     expect(control('[name="current-rent"]').value).toBe('750');
     // The judge works out the arrears on issue for themselves, even if pcs-api sends the claim's.
-    expect(control('[name="arrears-issue"]').value).toBe('');
-    expect(control('[name="date-tenancy-day"]').value).toBe('9');
-    expect(control('[name="date-tenancy-month"]').value).toBe('1');
-    expect(control('[name="date-tenancy-year"]').value).toBe('2024');
+    expect(control('[name="hearing-1-arrears-issue"]').value).toBe('');
+    expect(control('[name="hearing-1-date-tenancy-day"]').value).toBe('9');
+    expect(control('[name="hearing-1-date-tenancy-month"]').value).toBe('1');
+    expect(control('[name="hearing-1-date-tenancy-year"]').value).toBe('2024');
 
     check('claimant-claimant-id-attendance', 'solicitor');
     type('claimant-claimant-id-name', 'Sam Solicitor');
@@ -169,7 +202,7 @@ describe('make an order: outright possession', () => {
         'The Court heard from Sam Solicitor, solicitor for the claimant.',
         'Alex Example did not attend the hearing, but the Court was satisfied they had received notice of the hearing, and it was reasonable to proceed in their absence.',
         'IT IS ORDERED THAT:',
-        'The defendant(s) must give up possession of 10 Test Street, Bristol, BS1 1AA to the claimant(s) on or before 1 October 2026.',
+        'The defendant(s) must give up possession of 10 Test Street, Bristol, BS1 1AA to the claimant(s) on or before 4pm on 1 October 2026.',
         'This order for possession was made on mandatory grounds, namely Ground 8.',
         'Judgment for the claimant(s) in the total sum of £2,500.00.',
         "The defendant(s) must pay the claimant(s)' fixed costs of £300.00.",

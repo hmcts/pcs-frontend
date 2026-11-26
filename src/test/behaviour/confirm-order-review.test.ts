@@ -3,10 +3,12 @@ import {
   MANAGE_CASE_URL,
   type Page,
   type TestApp,
+  before,
   bootApp,
   check,
   control,
   eventStarts,
+  futureDate,
   openPage,
   recordAttendance,
   refuseNextEvent,
@@ -16,19 +18,20 @@ import {
   submittedEventTokens,
   submittedReviews,
   type,
+  typeDate,
   writeInPreview,
 } from './harness';
 
 // The routes read config as they load, so the test does not import them for the message.
 const NO_WORDING = "The order's wording did not load. Reload the page and review the order again";
+const DECIDED_SINCE =
+  'An application the Judge decided in this order has closed or been decided by another order since. Return the ' +
+  'order to the Judge with a query';
 const MAKE_ORDER = `/case/${CASE_REFERENCE}/make-order`;
 const BASE = `/case/${CASE_REFERENCE}/confirm-order-review`;
 const INTRO = `${BASE}?orderId=order-awaiting-review&taskId=task-1`;
 const REVIEW = `${BASE}/review`;
-const ORDER_DETAILS = `${BASE}/order-details`;
-const MONEY_JUDGMENTS = `${BASE}/money-judgments`;
-const REVIEW_DATES = `${BASE}/review-dates`;
-const PROCEED_TO_ISSUE = `${BASE}/proceed-to-issue`;
+const RECORD = `${BASE}/record`;
 const CHECK_YOUR_ANSWERS = `${BASE}/check-your-answers`;
 
 type Order = { orderType: string; formData: Record<string, unknown>; docweaveSnapshot: unknown };
@@ -51,12 +54,16 @@ async function judgesOrder(
     staffMessage?: string;
     edit?: () => void;
     applications?: (Record<string, unknown> & { id: string })[];
+    hearings?: (Record<string, unknown> & { id: number; date: string })[];
     decide?: () => void;
+    /** The application of the task the judge opened the order from. */
+    task?: string;
   } = {}
 ): Promise<Order> {
-  const judgeApp = await bootApp({ applications: options.applications });
+  const judgeApp = await bootApp({ applications: options.applications, hearings: options.hearings });
   try {
-    const page = await openPage((await judgeApp.get(MAKE_ORDER)).text);
+    const link = options.task ? `${MAKE_ORDER}?genAppId=${options.task}` : MAKE_ORDER;
+    const page = await openPage((await judgeApp.get(link)).text);
     if (options.decide) {
       options.decide();
     } else if (options.tab) {
@@ -95,8 +102,10 @@ async function judgesOrder(
 function changeGeneratedWording(): void {
   const field = document.querySelector<HTMLTextAreaElement>('#order-document')!;
   const snapshot = JSON.parse(field.value);
+  // A generated paragraph of plain text: one with facts, as the order's opening line, must keep them.
   const paragraph = snapshot.current.content.find(
-    (node: { type: string; attrs?: { id?: string | null } }) => node.type === 'paragraph' && node.attrs?.id
+    (node: { type: string; attrs?: { id?: string | null }; content?: { type: string }[] }) =>
+      node.type === 'paragraph' && node.attrs?.id && node.content?.every(child => child.type === 'text')
   );
   paragraph.content = [{ type: 'text', text: 'Wording the judge rewrote' }];
   field.value = JSON.stringify(snapshot);
@@ -129,7 +138,7 @@ const APPLICATIONS = [
     somethingElseDetails: 'Relief from sanctions',
     applicant: 'Alex Example (Defendant 1)',
     submittedOn: '2026-10-19',
-    whatOrderWanted: 'The defendant has relief from sanctions.\nNo order as to costs.',
+    whatOrderWanted: 'I missed the deadline through illness.',
     documents: [],
   },
   {
@@ -143,27 +152,25 @@ const APPLICATIONS = [
   },
 ];
 
-/** Opens the review of the order, as the caseworker reaches it from the introduction. */
+/** Opens the review of the order from the caseworker's task, which starts it and shows the review page. */
 async function openReview(app: TestApp): Promise<Page> {
-  await app.get(INTRO);
+  expect((await app.get(INTRO)).location).toBe(REVIEW);
   return openPage((await app.get(REVIEW)).text);
 }
 
-/** Goes on to issue the order as the review page shows it, which asks for the review dates next. */
+/** Goes on to issue the order as the review page shows it, which asks what to record from it next. */
 async function issueFromReview(app: TestApp): Promise<void> {
   const page = await openReview(app);
-  expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(REVIEW_DATES);
+  expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(RECORD);
 }
 
-/** Takes the caseworker from the introduction to the given page with every answer before it given. */
-async function reachProceedToIssue(app: TestApp): Promise<void> {
-  await issueFromReview(app);
-  const dates = await app.post(REVIEW_DATES, form({ 'has-review-dates': 'no', action: 'continue' }));
-  expect(dates.location).toBe(PROCEED_TO_ISSUE);
-}
-
-const proceedToIssueAnswers = (answers: Record<string, string> = {}) =>
-  form({
+/** The record page's answers for an order with no money judgments or review dates, unless changed. */
+const recordAnswers = (answers: Record<string, string | string[]> = {}) => {
+  const body = form({});
+  const all: Record<string, string | string[]> = {
+    costs: 'NONE',
+    'has-money-judgments': 'no',
+    'has-review-dates': 'no',
     'next-steps': 'complete',
     'final-order': 'no',
     'restitution-permission': 'no',
@@ -171,20 +178,71 @@ const proceedToIssueAnswers = (answers: Record<string, string> = {}) =>
     seal: 'COUNTY_COURT',
     action: 'continue',
     ...answers,
-  });
+  };
+  Object.entries(all).forEach(([name, value]) => [value].flat().forEach(each => body.append(name, each)));
+  return body;
+};
+
+/** A date's day, month and year boxes, typed as 27/3/2027. */
+const dateFields = (prefix: string, typed: string) => {
+  const [day, month, year] = typed.split('/');
+  return { [`${prefix}-day`]: day, [`${prefix}-month`]: month, [`${prefix}-year`]: year };
+};
+
+/** Posts the record page's answers without the named ones, as a page with them unanswered would. */
+const without = (...names: string[]) => {
+  const body = recordAnswers();
+  names.forEach(name => body.delete(name));
+  return body;
+};
 
 describe('confirm order review', () => {
   let app: TestApp;
   afterEach(() => app?.close());
 
   describe('an order on the applications alone', () => {
-    it("shows the applications first with the claim untouched, the judge's inserted wording, and issues", async () => {
+    it('words the applications in the order they were made, whichever task the Judge opened the order from', async () => {
+      const decideBoth = () => {
+        check('app-gen-app-1-decision', 'dismiss');
+        check('app-gen-app-2-decision', 'dismiss');
+      };
+      app = await caseworkerReviewing(
+        await judgesOrder({ applications: APPLICATIONS, task: 'gen-app-2', decide: decideBoth }),
+        APPLICATIONS
+      );
+      const page = await openReview(app);
+
+      const wording = page.orderText();
+      expect(wording.indexOf('application dated 19 October 2026 is dismissed')).toBeLessThan(
+        wording.indexOf('application dated 21 October 2026 is dismissed')
+      );
+      expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(RECORD);
+    });
+
+    it('refuses to issue an order deciding an application that has closed since the Judge sent it', async () => {
       app = await caseworkerReviewing(
         await judgesOrder({
           applications: APPLICATIONS,
           decide: () => {
-            check('app-gen-app-1-decision', 'grant');
-            control<HTMLButtonElement>('[data-application-reference="GA1"] [data-insert-requested-wording]').click();
+            check('app-gen-app-1-decision', 'dismiss');
+            check('app-gen-app-2-decision', 'dismiss');
+          },
+        }),
+        // Another order has decided the first since.
+        [APPLICATIONS[1]]
+      );
+      const page = await openReview(app);
+
+      const refused = await app.post(REVIEW, page.body('ISSUE'));
+      expect(errors(refused.text)).toEqual([DECIDED_SINCE]);
+    });
+
+    it('shows the applications first with the claim untouched, the decisions, and issues', async () => {
+      app = await caseworkerReviewing(
+        await judgesOrder({
+          applications: APPLICATIONS,
+          decide: () => {
+            check('app-gen-app-1-decision', 'dismiss');
             check('app-gen-app-2-decision', 'dismiss');
           },
         }),
@@ -192,12 +250,9 @@ describe('confirm order review', () => {
       );
       const page = await openReview(app);
 
-      // The judge's order as submitted, with the wording they inserted marked as theirs.
+      // The judge's order as submitted.
       const preview = document.querySelector('[data-order-preview]')!;
-      expect(preview.textContent).toContain("The defendant's application dated 19 October 2026 is granted.");
-      expect(preview.querySelector('.docweave-clause--inserted')?.textContent).toContain(
-        'The defendant has relief from sanctions.'
-      );
+      expect(preview.textContent).toContain("The defendant's application dated 19 October 2026 is dismissed.");
       expect(preview.textContent).toContain("The claimant's application dated 21 October 2026 is dismissed.");
       expect(preview.textContent).not.toContain('possession');
 
@@ -205,37 +260,76 @@ describe('confirm order review', () => {
       expect(control('input[name="claim-order"]').checked).toBe(false);
       expect(control<HTMLElement>('[data-claim-order]').hidden).toBe(true);
       expect(control('#order-type').value).toBe('NO_ORDER_ON_CLAIM');
-      expect(control('[name="app-gen-app-1-decision"][value="grant"]').checked).toBe(true);
+      expect(control('[name="app-gen-app-1-decision"][value="dismiss"]').checked).toBe(true);
       expect(control('[name="app-gen-app-2-decision"][value="dismiss"]').checked).toBe(true);
       const lines = page.documentText().split('\n');
       expect(lines.slice(lines.indexOf('IT IS ORDERED THAT:'))).toEqual([
         'IT IS ORDERED THAT:',
-        "The defendant's application dated 19 October 2026 is granted.",
-        'The defendant has relief from sanctions.',
-        'No order as to costs.',
+        "The defendant's application dated 19 October 2026 is dismissed.",
         "The claimant's application dated 21 October 2026 is dismissed.",
       ]);
 
       // The caseworker can go on to issue it as it is.
-      expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(REVIEW_DATES);
+      expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(RECORD);
     });
   });
 
-  describe('introduction', () => {
-    it('shows the case and what the caseworker needs to do, starting the review event', async () => {
+  describe('an application listed at a hearing that has passed since the judge sent the order', () => {
+    it('keeps the hearing in the wording, and asks for another before issuing', async () => {
+      const order = await judgesOrder({
+        applications: APPLICATIONS,
+        hearings: [{ id: 7, date: '2099-01-12T10:00:00' }],
+        decide: () => {
+          check('app-gen-app-2-decision', 'list');
+          check('app-gen-app-2-list-at', '7');
+        },
+      });
+      app = await bootApp({
+        caseworker: true,
+        order: await awaitingReview(order),
+        applications: APPLICATIONS,
+        hearings: [{ id: 7, date: '2026-09-22T10:00:00' }],
+      });
+      const page = await openReview(app);
+
+      expect(control('[name="app-gen-app-2-list-at"][value="7"]').checked).toBe(true);
+      expect(page.documentText()).toContain(
+        "The claimant's application dated 21 October 2026 shall be heard at the hearing on 22 September 2026 at 10:00am."
+      );
+      expect(errors((await app.post(REVIEW, page.body('ISSUE'))).text)).toEqual([
+        'The hearing application GA2 is listed at has passed. Select another hearing',
+      ]);
+    });
+  });
+
+  describe('opening the review', () => {
+    it('starts the review event and shows the case and the review page, which a refresh does not start again', async () => {
       app = await caseworkerReviewing();
 
-      const intro = await app.get(INTRO);
+      const opened = await app.get(INTRO);
 
-      expect(intro.status).toBe(200);
-      const page = parse(intro.text);
-      expect(page.querySelector('h1')?.textContent?.trim()).toBe('Confirm order review');
+      expect(opened.location).toBe(REVIEW);
+      expect(eventStarts()).toBe(1);
+      const review = await app.get(REVIEW);
+      expect(review.status).toBe(200);
+      const page = parse(review.text);
+      expect(page.querySelector('h1')?.textContent?.trim()).toBe('Review the order');
       expect(page.body.textContent).toContain('1777-0276-0001-7760');
       expect(page.body.textContent).toContain('10 Test Street, Bristol, BS1 1AA');
       expect(page.body.textContent).toContain('Test case name');
       expect(page.querySelector('.govuk-warning-text')).toBeNull();
-      expect(page.querySelector<HTMLAnchorElement>('a.govuk-button')?.getAttribute('href')).toBe(REVIEW);
+      await app.get(REVIEW);
       expect(eventStarts()).toBe(1);
+    });
+
+    it('dates an order made without a hearing the day the judge sent it, not the day it is reviewed', async () => {
+      app = await bootApp({
+        caseworker: true,
+        hearing: null,
+        order: { ...(await awaitingReview()), madeOn: '2026-09-21' },
+      });
+
+      expect((await openReview(app)).openingText()).toBe(before('21 September 2026'));
     });
 
     it('warns that a free form order needs reviewing in full', async () => {
@@ -243,12 +337,12 @@ describe('confirm order review', () => {
         await judgesOrder({ tab: 'tab-free-form', edit: () => writeInPreview('The claim is adjourned.') })
       );
 
-      const page = parse((await app.get(INTRO)).text);
+      await app.get(INTRO);
+      const page = parse((await app.get(REVIEW)).text);
 
       expect(page.querySelector('#free-form-warning')?.textContent).toContain(
         'The Judge has created a custom order. Review the full order before issuing'
       );
-      expect(page.querySelector('#edited-warning')).toBeNull();
     });
 
     it('does not ask staff to match fields to wording the judge only added', async () => {
@@ -256,9 +350,11 @@ describe('confirm order review', () => {
         await judgesOrder({ edit: () => writeInPreview('Adjourn the hearing for 28 days.') })
       );
 
-      const page = parse((await app.get(INTRO)).text);
+      await app.get(INTRO);
+      const edits = parse((await app.get(REVIEW)).text).querySelector('#judge-edits')?.textContent;
 
-      expect(page.querySelector('#edited-warning')).toBeNull();
+      expect(edits).toContain('The Judge added wording to the order');
+      expect(edits).not.toContain('The Judge changed generated wording');
     });
 
     it('tells the caseworker why pcs-api will not start the review, and the way back to the case', async () => {
@@ -321,10 +417,7 @@ describe('confirm order review', () => {
         })
       );
 
-      const intro = parse((await app.get(INTRO)).text);
-      expect(intro.querySelector('#edited-warning')?.textContent).toContain('identified differences');
-
-      const page = await openPage((await app.get(REVIEW)).text);
+      const page = await openReview(app);
 
       const edits = document.querySelector('#judge-edits')?.textContent;
       expect(edits).toContain('The Judge added wording to the order');
@@ -350,7 +443,7 @@ describe('confirm order review', () => {
       type('recitals-text', 'Upon hearing the claimant');
       writeInPreview('The claimant may apply to restore the claim.');
 
-      expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(REVIEW_DATES);
+      expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(RECORD);
 
       const again = await openPage((await app.get(REVIEW)).text);
       expect(control<HTMLTextAreaElement>('[name="recitals-text"]').value).toBe('Upon hearing the claimant');
@@ -387,20 +480,21 @@ describe('confirm order review', () => {
       const page = await openReview(app);
       writeInPreview('The claimant may apply to restore the claim. '.repeat(3000));
 
-      expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(REVIEW_DATES);
+      expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(RECORD);
     });
 
     it('does not go on to issue an order the judge could not have sent', async () => {
       app = await caseworkerReviewing();
       const page = await openReview(app);
-      type('current-rent', 'a lot');
+      check('recitals', 'yes');
+      type('recitals-text', 'x'.repeat(30001));
 
       const refused = await app.post(REVIEW, page.body('ISSUE'));
 
       expect(refused.status).toBe(400);
-      expect(errors(refused.text)).toEqual(['Enter a valid current rent']);
+      expect(errors(refused.text)).toEqual(['Recitals must be 30,000 characters or less']);
       await openPage(refused.text);
-      expect(control('[name="current-rent"]').value).toBe('a lot');
+      expect(control<HTMLTextAreaElement>('[name="recitals-text"]').value).toHaveLength(30001);
     });
 
     it('does not go on to issue an order whose wording the page did not send, as when its script did not load', async () => {
@@ -491,7 +585,7 @@ describe('confirm order review', () => {
       const cancelled = await app.get(`${BASE}/cancel`);
 
       expect(cancelled.location).toBe(MANAGE_CASE_URL);
-      expect((await app.get(REVIEW_DATES)).location).toBe(BASE);
+      expect((await app.get(RECORD)).location).toBe(BASE);
       expect(submittedReviews()).toEqual([]);
     });
   });
@@ -505,19 +599,13 @@ describe('confirm order review', () => {
 
     beforeEach(async () => {
       app = await caseworkerReviewing(await freeFormOrder());
-      const page = await openReview(app);
-      const issuing = await app.post(REVIEW, page.body('ISSUE'));
-      if (issuing.location !== ORDER_DETAILS) {
-        throw new Error(`Issuing a free-form order went to ${issuing.location}, not ${ORDER_DETAILS}`);
-      }
+      await issueFromReview(app);
     });
 
     it('asks what the order does, and the details of what it does', async () => {
-      expect(errors((await app.post(ORDER_DETAILS, form({ action: 'continue' }))).text)).toEqual([
-        'Select what the order does',
-      ]);
+      expect(errors((await app.post(RECORD, recordAnswers())).text)).toEqual(['Select what the order does']);
 
-      const outright = await app.post(ORDER_DETAILS, form({ 'order-does': 'outright', action: 'continue' }));
+      const outright = await app.post(RECORD, recordAnswers({ 'order-does': 'outright' }));
       expect(errors(outright.text)).toEqual([
         'Select when possession is ordered',
         'Select the grounds possession is ordered on',
@@ -527,65 +615,82 @@ describe('confirm order review', () => {
       expect(parse(outright.text).querySelector<HTMLInputElement>('#order-does')?.checked).toBe(true);
 
       const noDate = await app.post(
-        ORDER_DETAILS,
-        form({ 'order-does': 'suspended', 'suspended-date-day': '31', 'suspended-date-month': '2', action: 'continue' })
+        RECORD,
+        recordAnswers({ 'order-does': 'suspended', ...dateFields('suspended-date', '31/2/') })
       );
       expect(errors(noDate.text)).toContain('Enter a real date possession is ordered by');
+      expect(parse(noDate.text).querySelector<HTMLInputElement>('#suspended-date-month')?.value).toBe('2');
+      // Suspended possession asks only for the date, with no condition or warrant question.
+      expect(
+        parse(noDate.text).querySelector('[name="suspended-condition"], [name="suspended-warrant-on-notice"]')
+      ).toBeNull();
+      const suspended = await app.post(
+        RECORD,
+        recordAnswers({ 'order-does': 'suspended', ...dateFields('suspended-date', '1/2/2099') })
+      );
+      expect(errors(suspended.text)).not.toContain('Select if the condition is money or non-money');
 
       const generally = await app.post(
-        ORDER_DETAILS,
-        form({ 'order-does': 'adjournment', adjournment: 'generally', action: 'continue' })
+        RECORD,
+        recordAnswers({ 'order-does': 'adjournment', adjournment: 'generally' })
       );
-      expect(generally.location).toBe(MONEY_JUDGMENTS);
-      const back = await app.post(MONEY_JUDGMENTS, form({ action: 'previous' }));
-      expect(back.location).toBe(ORDER_DETAILS);
+      expect(generally.location).toBe(CHECK_YOUR_ANSWERS);
+      expect((await app.post(RECORD, recordAnswers({ action: 'previous' }))).location).toBe(REVIEW);
     });
 
     it('lists what the order does to check, and issues it with what pcs-api records, leaving the wording as the judge wrote it', async () => {
-      await app.post(
-        ORDER_DETAILS,
-        form({
+      // A free-form order's money judgments are recorded from nothing, against all the defendants by default.
+      expect((await app.post(RECORD, without('has-money-judgments'))).text).toContain(
+        'Add the money judgments the order makes, or select that it makes none'
+      );
+      const add = await app.post(RECORD, recordAnswers({ action: 'add-judgment' }));
+      expect(add.location).toBe(`${RECORD}#judgment-1`);
+      const judgments = parse((await app.get(RECORD)).text);
+      // The claimant is listed first, then the defendant; a judgment still to fill in starts open.
+      expect(judgments.querySelector<HTMLDetailsElement>('#judgment-1')?.open).toBe(true);
+      expect(judgments.querySelector<HTMLInputElement>('#judgment-1-debtors')?.checked).toBe(false);
+      expect(judgments.querySelector<HTMLInputElement>('#judgment-1-debtors-2')?.checked).toBe(true);
+      expect(judgments.querySelector('#has-money-judgments')).toBeNull();
+
+      // A judgment with no amount is the amounts' error together, not any one of them.
+      const missingAmounts = parse(
+        (
+          await app.post(
+            RECORD,
+            recordAnswers({
+              'judgment-1-debtors': 'defendant-id',
+              'judgment-1-creditors': 'claimant-id',
+              action: 'continue',
+            })
+          )
+        ).text
+      );
+      expect(missingAmounts.querySelector('.govuk-error-summary a[href="#judgment-1-amounts"]')).not.toBeNull();
+      expect(missingAmounts.querySelector('#judgment-1-amounts-error')?.textContent).toContain(
+        'Enter at least one amount for money judgment 1'
+      );
+      expect(missingAmounts.querySelector('#judgment-1-arrears-error')).toBeNull();
+
+      const recorded = await app.post(
+        RECORD,
+        recordAnswers({
           'order-does': 'outright',
           'outright-possession': 'by',
-          'outright-date-day': '4',
-          'outright-date-month': '12',
-          'outright-date-year': '2026',
+          ...dateFields('outright-date', '4/12/2026'),
           'outright-grounds': 'mandatory',
           'outright-grounds-details': ' Ground 8 ',
           'outright-transfer': 'no',
-          action: 'continue',
-        })
-      );
-      // A free-form order's money judgments are recorded from nothing, against all the defendants by default.
-      const judgments = parse((await app.get(MONEY_JUDGMENTS)).text);
-      // The claimant is listed first, then the defendant.
-      expect(judgments.querySelector<HTMLInputElement>('#judgment-1-debtors')?.checked).toBe(false);
-      expect(judgments.querySelector<HTMLInputElement>('#judgment-1-debtors-2')?.checked).toBe(true);
-      const unanswered = await app.post(MONEY_JUDGMENTS, form({ action: 'continue' }));
-      expect(errors(unanswered.text)).toEqual([
-        'Select what the order says about costs',
-        'Select if the order makes a money judgment',
-      ]);
-      const recorded = await app.post(
-        MONEY_JUDGMENTS,
-        form({
           costs: 'DEFENDANT_PAYS_FIXED',
-          'has-money-judgments': 'yes',
           'judgment-1-debtors': 'defendant-id',
           'judgment-1-creditors': 'claimant-id',
           'judgment-1-arrears': '2,450',
           'judgment-1-costs': '355',
           'judgment-1-instalment-amount': '50',
           'judgment-1-instalment-frequency': 'MONTHLY',
-          'judgment-1-first-instalment-date-day': '1',
-          'judgment-1-first-instalment-date-month': '1',
-          'judgment-1-first-instalment-date-year': '2027',
-          action: 'continue',
+          ...dateFields('judgment-1-first-instalment-date', '1/1/2027'),
         })
       );
-      expect(recorded.location).toBe(REVIEW_DATES);
-      await app.post(REVIEW_DATES, form({ 'has-review-dates': 'no', action: 'continue' }));
-      await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers());
+      expect(recorded.location).toBe(CHECK_YOUR_ANSWERS);
 
       const page = parse((await app.get(CHECK_YOUR_ANSWERS)).text);
       const rows = [...page.querySelectorAll('#order-details-answers .govuk-summary-list__row')].map(row => [
@@ -599,6 +704,13 @@ describe('confirm order review', () => {
         ['Details of the grounds', 'Ground 8'],
         ['Transfer to the High Court for enforcement', 'No'],
       ]);
+      // Recorded, the judgment is summed up and shut.
+      const again = parse((await app.get(RECORD)).text);
+      expect(again.querySelector<HTMLDetailsElement>('#judgment-1')?.open).toBe(false);
+      expect(again.querySelector('#judgment-1 [data-judgment-summary]')?.textContent).toBe(
+        'Defendant 1: Alex Example to pay Claimant 1: Example Housing £2,805.00'
+      );
+      expect(again.querySelector<HTMLInputElement>('#judgment-1-first-instalment-date-year')?.value).toBe('2027');
 
       await app.post(CHECK_YOUR_ANSWERS, form({ action: 'continue' }));
       const [review] = submittedReviews() as {
@@ -638,8 +750,11 @@ describe('confirm order review', () => {
     app = await caseworkerReviewing();
     await issueFromReview(app);
 
-    expect((await app.get(ORDER_DETAILS)).location).toBe(MONEY_JUDGMENTS);
-    expect((await app.post(REVIEW_DATES, form({ action: 'previous' }))).location).toBe(MONEY_JUDGMENTS);
+    const page = parse((await app.get(RECORD)).text);
+    expect(page.querySelector('#order-details')).toBeNull();
+    expect(page.querySelector('h1')?.textContent?.trim()).toBe('Record and issue');
+    // Beside the questions, the order to issue and the judge's message.
+    expect(page.querySelector('#issuing-order')?.textContent).toContain('IT IS ORDERED THAT');
   });
 
   it("takes the money judgment from the judge's answers for court staff to check, and issues it as they leave it", async () => {
@@ -653,48 +768,42 @@ describe('confirm order review', () => {
         },
       })
     );
-    const page = await openReview(app);
-    expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(MONEY_JUDGMENTS);
+    await issueFromReview(app);
 
-    const judgments = parse((await app.get(MONEY_JUDGMENTS)).text);
+    const judgments = parse((await app.get(RECORD)).text);
+    // Summed up a row each, shut until court staff open one to change it.
+    expect(judgments.querySelector<HTMLDetailsElement>('#judgment-1')?.open).toBe(false);
+    expect(judgments.querySelector('#judgment-1 [data-judgment-summary]')?.textContent).toBe(
+      'Defendant 1: Alex Example to pay Claimant 1: Example Housing £445.00'
+    );
     expect(judgments.querySelector<HTMLInputElement>('#judgment-1-arrears')?.value).toBe('400');
     expect(judgments.querySelector<HTMLInputElement>('#judgment-1-other-amount')?.value).toBe('45');
     // Against the defendant, listed after the claimant, in favour of the claimant.
     expect(judgments.querySelector<HTMLInputElement>('#judgment-1-debtors-2')?.checked).toBe(true);
     expect(judgments.querySelector<HTMLInputElement>('#judgment-1-creditors')?.checked).toBe(true);
+    // Leaving the page for the review does not make them court staff's, so a change to the judge's answers changes them.
+    expect((await app.post(RECORD, form({ action: 'previous' }))).location).toBe(REVIEW);
 
     // Court staff split it: the arrears stay with the defendant, and the claimant pays the defendant's costs.
-    const add = await app.post(
-      MONEY_JUDGMENTS,
-      form({
-        costs: 'CLAIMANT_PAYS_SUMMARY',
-        'has-money-judgments': 'yes',
-        'judgment-1-debtors': 'defendant-id',
-        'judgment-1-creditors': 'claimant-id',
-        'judgment-1-arrears': '400',
-        'judgment-1-other-amount': '45',
-        action: 'add',
-      })
-    );
-    expect(add.location).toBe(`${MONEY_JUDGMENTS}#judgment-2`);
+    const first = {
+      costs: 'CLAIMANT_PAYS_SUMMARY',
+      'judgment-1-debtors': 'defendant-id',
+      'judgment-1-creditors': 'claimant-id',
+      'judgment-1-arrears': '400',
+      'judgment-1-other-amount': '45',
+    };
+    const add = await app.post(RECORD, recordAnswers({ ...first, action: 'add-judgment' }));
+    expect(add.location).toBe(`${RECORD}#judgment-2`);
     const saved = await app.post(
-      MONEY_JUDGMENTS,
-      form({
-        costs: 'CLAIMANT_PAYS_SUMMARY',
-        'has-money-judgments': 'yes',
-        'judgment-1-debtors': 'defendant-id',
-        'judgment-1-creditors': 'claimant-id',
-        'judgment-1-arrears': '400',
-        'judgment-1-other-amount': '45',
+      RECORD,
+      recordAnswers({
+        ...first,
         'judgment-2-debtors': 'claimant-id',
         'judgment-2-creditors': 'defendant-id',
         'judgment-2-costs': '120',
-        action: 'continue',
       })
     );
-    expect(saved.location).toBe(REVIEW_DATES);
-    await app.post(REVIEW_DATES, form({ 'has-review-dates': 'no', action: 'continue' }));
-    await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers());
+    expect(saved.location).toBe(CHECK_YOUR_ANSWERS);
 
     const answers = parse((await app.get(CHECK_YOUR_ANSWERS)).text);
     expect(
@@ -716,25 +825,37 @@ describe('confirm order review', () => {
     ]);
   });
 
+  it('removes a money judgment, asking again whether the order makes any once none are left', async () => {
+    app = await caseworkerReviewing();
+    await issueFromReview(app);
+    await app.post(RECORD, recordAnswers({ action: 'add-judgment' }));
+
+    const removed = await app.post(RECORD, recordAnswers({ 'judgment-1-arrears': '10', action: 'remove-judgment-1' }));
+
+    expect(removed.location).toBe(`${RECORD}#money-judgments`);
+    const page = parse((await app.get(RECORD)).text);
+    expect(page.querySelector('#judgment-1')).toBeNull();
+    expect(page.querySelector<HTMLInputElement>('#has-money-judgments')?.checked).toBe(false);
+  });
+
   describe('review dates', () => {
     beforeEach(async () => {
       app = await caseworkerReviewing();
       await issueFromReview(app);
     });
 
-    it('asks whether there are review dates, then for a real date, a reason and a description of each', async () => {
-      const unanswered = await app.post(REVIEW_DATES, form({ action: 'continue' }));
-      expect(errors(unanswered.text)).toEqual(['Select if there are any review dates to add']);
+    it('asks for review dates or that there are none, then for a real date, a reason and a description of each', async () => {
+      const unanswered = await app.post(RECORD, without('has-review-dates'));
+      expect(errors(unanswered.text)).toEqual(['Add the review dates the order needs, or select that it needs none']);
 
+      expect((await app.post(RECORD, recordAnswers({ action: 'add-review-date' }))).location).toBe(
+        `${RECORD}#review-date-1`
+      );
       const incomplete = await app.post(
-        REVIEW_DATES,
-        form({
-          'has-review-dates': 'yes',
-          'review-date-1-date-day': '31',
-          'review-date-1-date-month': '2',
-          'review-date-1-date-year': '2027',
+        RECORD,
+        recordAnswers({
+          ...dateFields('review-date-1-date', '31/2/2027'),
           'review-date-1-description': 'x'.repeat(501),
-          action: 'continue',
         })
       );
 
@@ -743,55 +864,61 @@ describe('confirm order review', () => {
         'Select the reason for review 1',
         'The description of review 1 must be 500 characters or less',
       ]);
+      // In a table, a row each, each field with its own label.
+      const page = parse(incomplete.text);
+      expect(page.querySelector<HTMLInputElement>('#review-date-1-date-day')?.value).toBe('31');
+      expect(page.querySelector('#review-date-1')?.getAttribute('aria-label')).toBe('Review date 1');
+      expect(page.querySelector('#has-review-dates')).toBeNull();
     });
 
     it('adds review dates one after another, up to 10', async () => {
       const reviewDate = (n: number) => ({
-        [`review-date-${n}-date-day`]: '15',
-        [`review-date-${n}-date-month`]: '1',
-        [`review-date-${n}-date-year`]: '2027',
+        ...dateFields(`review-date-${n}-date`, '15/1/2027'),
         [`review-date-${n}-reason`]: 'GENERAL_ORDER',
         [`review-date-${n}-description`]: `Review ${n}`,
       });
-      let answers: Record<string, string> = { 'has-review-dates': 'yes' };
-      for (let n = 1; n <= 10; n++) {
+      let answers: Record<string, string> = {};
+      for (let n = 1; n <= 11; n++) {
+        await app.post(RECORD, recordAnswers({ ...answers, action: 'add-review-date' }));
         answers = { ...answers, ...reviewDate(n) };
-        await app.post(REVIEW_DATES, form({ ...answers, action: 'add' }));
       }
 
-      const page = parse((await app.get(REVIEW_DATES)).text);
+      const page = parse((await app.get(RECORD)).text);
 
-      expect(page.querySelectorAll('fieldset.pcs-review-date')).toHaveLength(10);
+      expect(page.querySelectorAll('.pcs-review-date')).toHaveLength(10);
       expect(page.querySelector<HTMLInputElement>('#review-date-10-description')?.value).toBe('Review 10');
-      expect(page.querySelector('button[value="add"]')).toBeNull();
+      expect(page.querySelector('button[value="add-review-date"]')).toBeNull();
       expect(page.body.textContent).toContain('You can add up to 10 review dates.');
     });
 
     it('removes a review date, keeping the others as they were last typed', async () => {
-      const answers = {
-        'has-review-dates': 'yes',
-        'review-date-1-description': 'Check the stay',
-        'review-date-2-description': 'Check compliance',
-      };
-      await app.post(REVIEW_DATES, form({ 'has-review-dates': 'yes', action: 'add' }));
+      await app.post(RECORD, recordAnswers({ action: 'add-review-date' }));
+      await app.post(RECORD, recordAnswers({ action: 'add-review-date' }));
 
-      const removing = await app.post(REVIEW_DATES, form({ ...answers, action: 'remove-1' }));
+      const removing = await app.post(
+        RECORD,
+        recordAnswers({
+          'review-date-1-description': 'Check the stay',
+          'review-date-2-description': 'Check compliance',
+          action: 'remove-review-date-1',
+        })
+      );
 
-      expect(removing.location).toBe(REVIEW_DATES);
-      const page = parse((await app.get(REVIEW_DATES)).text);
-      expect(page.querySelectorAll('fieldset.pcs-review-date')).toHaveLength(1);
+      expect(removing.location).toBe(`${RECORD}#review-dates`);
+      const page = parse((await app.get(RECORD)).text);
+      expect(page.querySelectorAll('.pcs-review-date')).toHaveLength(1);
       expect(page.querySelector<HTMLInputElement>('#review-date-1-description')?.value).toBe('Check compliance');
     });
   });
 
-  describe('proceed to issue', () => {
+  describe('service and seal', () => {
     beforeEach(async () => {
       app = await caseworkerReviewing();
-      await reachProceedToIssue(app);
+      await issueFromReview(app);
     });
 
-    it('serves the order on all parties, in claim order, under the County Court seal, without permission for restitution, unless changed', async () => {
-      const page = parse((await app.get(PROCEED_TO_ISSUE)).text);
+    it('asks who to serve the order on with no answer chosen, under the County Court seal, without permission for restitution, unless changed', async () => {
+      const page = parse((await app.get(RECORD)).text);
 
       expect(page.querySelector<HTMLInputElement>('input[name="restitution-permission"][value="no"]')?.checked).toBe(
         true
@@ -799,11 +926,14 @@ describe('confirm order review', () => {
       expect(page.querySelector('#final-order-hint')?.textContent?.trim()).toBe(
         'Select Yes if this order brings the main claim, a general application, counterclaim or enforcement action to an end. The whole case does not need to be concluded.'
       );
-      expect(page.querySelector<HTMLInputElement>('input[name="serve-all-parties"][value="yes"]')?.checked).toBe(true);
+      expect(page.querySelector<HTMLInputElement>('input[name="serve-all-parties"]:checked')).toBeNull();
+      expect(page.querySelector('#serve-all-parties-hint')?.textContent?.trim()).toBe(
+        'If you select No, only the parties you select, court staff and judges will see this order on the case. If you are not sure, go back to the review and send a query to the Judge.'
+      );
       expect(page.querySelector<HTMLInputElement>('input[name="seal"][value="COUNTY_COURT"]')?.checked).toBe(true);
-      expect(page.querySelector<HTMLInputElement>('input[name="next-steps"]:checked')).toBeNull();
+      expect(page.querySelector<HTMLInputElement>('input[name="next-steps"]')?.checked).toBe(false);
       expect(page.querySelector<HTMLInputElement>('input[name="final-order"]:checked')).toBeNull();
-      expect(page.querySelector('#outstanding-tasks-guidance')?.textContent).toBe(
+      expect(page.querySelector('#next-steps-item-hint')?.textContent?.trim()).toBe(
         'You must complete all outstanding tasks before issuing this order and serving it on the parties'
       );
       // The parties to serve, in claim order.
@@ -815,10 +945,13 @@ describe('confirm order review', () => {
     });
 
     it('asks every question, and who to serve when not all parties are served', async () => {
-      const unanswered = await app.post(PROCEED_TO_ISSUE, form({ 'serve-all-parties': 'no', action: 'continue' }));
+      const unanswered = await app.post(
+        RECORD,
+        form({ costs: 'NONE', 'has-money-judgments': 'no', 'has-review-dates': 'no', 'serve-all-parties': 'no' })
+      );
 
       expect(errors(unanswered.text)).toEqual([
-        'Select if all the next steps for court staff have been completed',
+        'Confirm all the next steps for court staff have been completed',
         'Select if this order finally resolves any part of the case',
         'Select if permission has been given to issue a warrant or writ of restitution',
         'Select who to serve the order on',
@@ -826,37 +959,49 @@ describe('confirm order review', () => {
       ]);
     });
 
-    it('does not go on while court staff still have tasks to do', async () => {
-      const outstanding = await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers({ 'next-steps': 'outstanding' }));
+    it('does not go on until court staff say whether the order is served on all parties', async () => {
+      const unanswered = await app.post(RECORD, without('serve-all-parties'));
 
-      expect(errors(outstanding.text)).toEqual([
-        'You must complete all outstanding tasks before issuing this order and serving it on the parties',
-      ]);
+      expect(errors(unanswered.text)).toEqual(['Select if this order should be served on all parties']);
+      // An order with neither statement may still be served on only some parties.
+      const some = await app.post(
+        RECORD,
+        recordAnswers({ 'serve-all-parties': 'no', 'parties-to-serve': 'defendant-id' })
+      );
+      expect(some.location).toBe(CHECK_YOUR_ANSWERS);
+    });
+
+    it('does not go on until court staff confirm they have completed the next steps', async () => {
+      const outstanding = await app.post(RECORD, without('next-steps'));
+
+      expect(errors(outstanding.text)).toEqual(['Confirm all the next steps for court staff have been completed']);
     });
   });
 
   describe('check your answers', () => {
     beforeEach(async () => {
       app = await caseworkerReviewing();
-      await reachProceedToIssue(app);
+      await issueFromReview(app);
     });
 
-    it('shows the answers, each with a change link that comes back to it', async () => {
+    it('shows the answers beside the order, each with a change link to its section of the record page', async () => {
       await app.post(
-        PROCEED_TO_ISSUE,
-        proceedToIssueAnswers({ 'serve-all-parties': 'no', 'parties-to-serve': 'defendant-id', seal: 'HIGH_COURT' })
+        RECORD,
+        recordAnswers({ 'serve-all-parties': 'no', 'parties-to-serve': 'defendant-id', seal: 'HIGH_COURT' })
       );
 
       const page = parse((await app.get(CHECK_YOUR_ANSWERS)).text);
-      const rows = [...page.querySelectorAll('.govuk-summary-list__row')].map(row => [
+      expect(page.querySelector('button[value="continue"]')?.textContent?.trim()).toBe('Issue order');
+      expect(page.querySelector('#issuing-order')?.textContent).toContain('IT IS ORDERED THAT');
+      const rows = [...page.querySelectorAll('[id$="-answers"] .govuk-summary-list__row')].map(row => [
         row.querySelector('.govuk-summary-list__key')?.textContent?.trim(),
         row.querySelector('.govuk-summary-list__value')?.textContent?.trim(),
       ]);
       expect(rows).toEqual([
         ['What does the order say about costs?', 'The order says nothing about costs'],
         ['Does the order make a money judgment?', 'No'],
-        ['Are there any review dates to add?', 'No'],
-        ['Have all the next steps for court staff been completed?', 'There are no other tasks to complete'],
+        ['Review dates', 'None'],
+        ['Next steps for court staff completed', 'Yes'],
         ['Does this order finally resolve any part of the case?', 'No'],
         ['Has permission been given to issue a warrant/writ of restitution?', 'No'],
         ['Should this order be served on all parties?', 'No'],
@@ -865,33 +1010,29 @@ describe('confirm order review', () => {
       ]);
 
       const changeSeal = [...page.querySelectorAll<HTMLAnchorElement>('.govuk-summary-list__actions a')].at(-1)!;
-      expect(changeSeal.getAttribute('href')).toBe(PROCEED_TO_ISSUE);
-      const changed = await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers({ seal: 'COUNTY_COURT' }));
+      expect(changeSeal.getAttribute('href')).toBe(`${RECORD}#service`);
+      const changed = await app.post(RECORD, recordAnswers({ seal: 'COUNTY_COURT' }));
       expect(changed.location).toBe(CHECK_YOUR_ANSWERS);
+      expect((await app.post(CHECK_YOUR_ANSWERS, form({ action: 'previous' }))).location).toBe(RECORD);
     });
 
-    it("issues the order with the caseworker's changes and answers, submitting the event the introduction started", async () => {
+    it("issues the order with the caseworker's changes and answers, submitting the event that opening the review started", async () => {
       const page = await openPage((await app.get(REVIEW)).text);
       check('recitals', 'yes');
       type('recitals-text', 'Upon hearing the claimant');
       writeInPreview('The claimant may apply to restore the claim.');
       await app.post(REVIEW, page.body('ISSUE'));
       const { orderType, orderDocument } = Object.fromEntries(page.body());
+      await app.post(RECORD, recordAnswers({ action: 'add-review-date' }));
       await app.post(
-        REVIEW_DATES,
-        form({
-          'has-review-dates': 'yes',
-          'review-date-1-date-day': '5',
-          'review-date-1-date-month': '3',
-          'review-date-1-date-year': '2027',
+        RECORD,
+        recordAnswers({
+          ...dateFields('review-date-1-date', '5/3/2027'),
           'review-date-1-reason': 'UNLESS_ORDER',
           'review-date-1-description': ' Check compliance ',
-          action: 'continue',
+          'final-order': 'yes',
+          'restitution-permission': 'yes',
         })
-      );
-      await app.post(
-        PROCEED_TO_ISSUE,
-        proceedToIssueAnswers({ 'final-order': 'yes', 'restitution-permission': 'yes' })
       );
 
       const submitted = await app.post(CHECK_YOUR_ANSWERS, form({ action: 'continue' }));
@@ -929,18 +1070,104 @@ describe('confirm order review', () => {
       const confirmation = parse((await app.get(`${BASE}/confirmed`)).text);
       expect(confirmation.querySelector('.govuk-panel__title')?.textContent?.trim()).toBe('Order issued');
       expect(submittedReviews()).toHaveLength(1);
-      // The review is over: its pages start again from the introduction.
+      // The review is over: its pages start again from opening it.
       expect((await app.get(REVIEW)).location).toBe(BASE);
     });
 
     it('shows why pcs-api refused the review', async () => {
-      await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers());
+      await app.post(RECORD, recordAnswers());
       refuseNextEvent('The order has been updated by another user. Reload it and try again');
 
       const refused = await app.post(CHECK_YOUR_ANSWERS, form({ action: 'continue' }));
 
       expect(refused.status).toBe(422);
       expect(errors(refused.text)).toEqual(['The order has been updated by another user. Reload it and try again']);
+    });
+  });
+
+  describe('what court staff check before choosing who to serve', () => {
+    const MIXED = [
+      { ...APPLICATIONS[0], withoutNotice: 'YES' },
+      { ...APPLICATIONS[1], withoutNotice: 'NO' },
+      { ...APPLICATIONS[1], id: 'gen-app-3', reference: 'GA3', withoutNotice: null },
+    ];
+
+    function summary(html: string): string[][] {
+      return [...parse(html).querySelectorAll('#issue-summary .govuk-summary-list__row')].map(row => [
+        row.querySelector('.govuk-summary-list__key')!.textContent!.trim(),
+        ...row
+          .querySelector('.govuk-summary-list__value span')!
+          .innerHTML.split('<br>')
+          .map(line => line.trim()),
+      ]);
+    }
+
+    it("shows the order's answers as staff left them, the Judge's where staff changed them, and the order to issue", async () => {
+      const judgeDate = futureDate(20);
+      app = await caseworkerReviewing(
+        await judgesOrder({
+          applications: MIXED,
+          staffMessage: 'Serve the defendant by hand',
+          decide: () => {
+            check('app-gen-app-1-decision', 'freeform');
+            check('app-gen-app-2-decision', 'dismiss');
+            check('order-notice', 'without-notice');
+            typeDate('without-notice-by', judgeDate.day, judgeDate.month, judgeDate.year);
+          },
+          edit: () => writeInPreview("The claimant's application is granted."),
+        }),
+        MIXED
+      );
+      const review = await openReview(app);
+      expect(document.querySelector('[id$="-notice-request"]')).toBeNull();
+      expect(control<HTMLButtonElement>('button[value="ISSUE"]').textContent?.trim()).toBe('Continue');
+
+      const staffDate = futureDate(21);
+      typeDate('without-notice-by', staffDate.day, staffDate.month, staffDate.year);
+      expect((await app.post(REVIEW, review.body('ISSUE'))).location).toBe(RECORD);
+
+      const asDate = ({ day, month, year }: { day: string; month: string; year: string }) =>
+        new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))).toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+          timeZone: 'UTC',
+        });
+      const expected = [
+        ['Order made', 'At the hearing on 13 October 2026 at 10:00am'],
+        ['Statement selected', 'Order without notice'],
+        ['Apply-by date entered', asDate(staffDate), `The Judge entered: ${asDate(judgeDate)}`],
+        [
+          'Applications this order decides',
+          'GA1: Something else – Freeform – Without notice requested',
+          'GA2: Adjourn the hearing – Dismissed – Without notice not requested',
+        ],
+        ['Message from the Judge', 'Serve the defendant by hand'],
+      ];
+      const proceed = (await app.get(RECORD)).text;
+      expect(summary(proceed)).toEqual(expected);
+      const issuing = parse(proceed).querySelector('#issuing-order');
+      expect(issuing?.textContent).toContain(asDate(staffDate));
+      // The original judge snapshot is not what the issuing preview shows.
+      expect(issuing?.textContent).not.toContain(asDate(judgeDate));
+
+      // Without notice, the order may still be served on every party.
+      expect((await app.post(RECORD, recordAnswers())).location).toBe(CHECK_YOUR_ANSWERS);
+      const answers = (await app.get(CHECK_YOUR_ANSWERS)).text;
+      expect(summary(answers)).toEqual(expected);
+      expect(parse(answers).querySelector('#issuing-order')?.textContent).toContain(asDate(staffDate));
+    });
+
+    it('does not take a statement the Judge never recorded to be neither', async () => {
+      const order = await (plainOrder ??= judgesOrder());
+      const { 'order-notice': _notice, ...legacy } = order.formData;
+      app = await caseworkerReviewing({ ...order, formData: legacy });
+      await issueFromReview(app);
+
+      expect(summary((await app.get(RECORD)).text)).toEqual([
+        ['Order made', 'At the hearing on 13 October 2026 at 10:00am'],
+        ['Statement selected', 'Neither', 'The Judge selected: Not recorded'],
+      ]);
     });
   });
 });
