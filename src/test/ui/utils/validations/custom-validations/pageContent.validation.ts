@@ -5,6 +5,7 @@ import { Page, test } from '@playwright/test';
 
 import { contactUs } from '../../../data/section-data/contactUs.section.data';
 import { contactUsCy } from '../../../data/section-data/contactUs.section.data.cy';
+import { isLdFlagged, resolveLdFlagged } from '../../actions/custom-actions/launchDarkly.action';
 import { takeValidationFailureScreenshot } from '../../common/pft-validation-screenshot';
 import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { performAction } from '../../controller';
@@ -169,10 +170,11 @@ export class PageContentValidation implements IValidation {
         ) {
           continue;
         }
-        if (typeof value === 'string' && value.trim() !== '') {
+        const expected = isLdFlagged(value) ? await resolveLdFlagged(value) : value;
+        if (typeof expected === 'string' && expected.trim() !== '') {
           const elementType = this.getElementType(key);
-          const isVisible = await this.isElementVisible(page, value as string, elementType);
-          pageResults.push({ element: key, expected: value as string, status: isVisible ? 'pass' : 'fail' });
+          const isVisible = await this.isElementVisible(page, expected, elementType);
+          pageResults.push({ element: key, expected, status: isVisible ? 'pass' : 'fail' });
         }
       }
 

@@ -11,6 +11,7 @@ import {
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../data/page-data/genApps-page-data';
 import { applyToStopOrDelayEviction } from '../../data/page-data/genApps-page-data/applyToStopOrDelayEviction.page.data';
+import { DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG } from '../../utils/actions/custom-actions/launchDarkly.action';
 import { FieldsStore } from '../../utils/actions/custom-actions/recordAnsweredFields.action';
 import { getFormattedDate } from '../../utils/common/date.utils';
 import { test } from '../../utils/common/test-with-case-role-cleanup';
@@ -22,6 +23,7 @@ let doYouNeedHelpPayingTheFeeSuspend: ReturnType<typeof doYouNeedHelpPayingTheFe
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
+  await performAction('skipTestIfLdFlagDisabled', DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG);
   FieldsStore.clear();
 
   await test.step('Create and submit case, update payment and create new citizen user', async () => {

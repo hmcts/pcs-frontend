@@ -63,6 +63,12 @@ export function formatDate(date: Date): string {
   );
 }
 
+/** A time as typed, as pcs-api is sent it (HH:mm), or undefined if it is blank or not a time. */
+export function isoTime(raw: string): string | undefined {
+  const time = parseTime(raw);
+  return time && `${String(time.hours).padStart(2, '0')}:${String(time.minutes).padStart(2, '0')}`;
+}
+
 /** A time as GOV.UK writes it: 10:30am, 2pm, midday or midnight. */
 export function formatTime({ hours, minutes }: TimeOfDay): string {
   if (minutes === 0 && (hours === 0 || hours === 12)) {
@@ -73,10 +79,75 @@ export function formatTime({ hours, minutes }: TimeOfDay): string {
   return minutes ? `${hour}:${String(minutes).padStart(2, '0')}${suffix}` : `${hour}${suffix}`;
 }
 
-const DISTRICT_REGISTRY = 'district registry';
+/** A hearing's time estimate as HMC and List Assist give it: days, hours and minutes. */
+export const TIME_ESTIMATE_PARTS = ['days', 'hours', 'minutes'] as const;
+export type TimeEstimatePart = (typeof TIME_ESTIMATE_PARTS)[number];
+export type TimeEstimate = Record<TimeEstimatePart, number>;
 
-/** A District Registry as the judge named it, without "District Registry" if they typed it after the name. */
-export function registryName(typed: string): string {
-  const name = typed.trim();
-  return name.toLowerCase().endsWith(DISTRICT_REGISTRY) ? name.slice(0, -DISTRICT_REGISTRY.length).trim() : name;
+/**
+ * The time estimate the three fields give, each blank or a whole number, and minutes under an hour; none when a
+ * field is not one or every one is blank or nought.
+ */
+export function parseTimeEstimate(typed: Record<TimeEstimatePart, string>): TimeEstimate | undefined {
+  const parts = {} as TimeEstimate;
+  for (const part of TIME_ESTIMATE_PARTS) {
+    const raw = typed[part].trim();
+    if (raw && !/^\d{1,3}$/.test(raw)) {
+      return undefined;
+    }
+    parts[part] = Number(raw || 0);
+  }
+  return parts.minutes < 60 && TIME_ESTIMATE_PARTS.some(part => parts[part] > 0) ? parts : undefined;
 }
+
+/** The time estimate the listing with the prefix gives, from its days, hours and minutes fields. */
+export function timeEstimateOf(answer: (name: string) => string, prefix: string): TimeEstimate | undefined {
+  return parseTimeEstimate({
+    days: answer(`${prefix}-time-estimate-days`),
+    hours: answer(`${prefix}-time-estimate-hours`),
+    minutes: answer(`${prefix}-time-estimate-minutes`),
+  });
+}
+
+/** "3 days, 4 hours and 30 minutes", leaving out the parts that are nought. */
+export function formatTimeEstimate(estimate: TimeEstimate): string {
+  const named = TIME_ESTIMATE_PARTS.filter(part => estimate[part] > 0).map(part =>
+    estimate[part] === 1 ? `1 ${part.slice(0, -1)}` : `${estimate[part]} ${part}`
+  );
+  return named.length > 1 ? `${named.slice(0, -1).join(', ')} and ${named[named.length - 1]}` : named[0];
+}
+
+/** A date as an ISO day, "2026-12-25", from its local parts. */
+function isoDay(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+/**
+ * The date, or the first after it that is a working day: not a Saturday, Sunday or one of the bank holidays (ISO
+ * days). A date to do something by that falls when the court office is closed runs to the next day it is open.
+ */
+export function workingDayOnOrAfter(date: Date, bankHolidays: readonly string[]): Date {
+  const holidays = new Set(bankHolidays);
+  const working = new Date(date);
+  while (working.getDay() === 0 || working.getDay() === 6 || holidays.has(isoDay(working))) {
+    working.setDate(working.getDate() + 1);
+  }
+  return working;
+}
+
+/** A postal address on one line, as the order gives the property. */
+export function formatAddress(address: Record<string, string | undefined> = {}): string {
+  return ['AddressLine1', 'AddressLine2', 'AddressLine3', 'PostTown', 'County', 'PostCode', 'Country']
+    .map(key => address[key])
+    .filter(Boolean)
+    .join(', ');
+}
+
+/** What the page's choice of when the order is made posts for an order made without a hearing. */
+export const WITHOUT_HEARING = 'without-hearing';
+
+/** The date a party may apply by, which an order made on the court's own initiative or without notice gives. */
+export const NOTICE_DATE_PREFIXES: Record<string, string> = {
+  'own-initiative': 'own-initiative-by',
+  'without-notice': 'without-notice-by',
+};

@@ -27,10 +27,10 @@ import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { formatAddress } from '@utils/ccdDashboardUtils';
 import { findCaseDocumentById } from '@utils/documentUtils';
+import { RELEASE_1_4_ENABLED } from '@utils/featureFlags';
 import { formatLocalisedDate } from '@utils/formatLocalisedDate';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
-import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 import { enumToSentence } from '@utils/viewTheClaim/viewTheClaimUtils';
 
 const logger = Logger.getLogger('viewTheResponse');
