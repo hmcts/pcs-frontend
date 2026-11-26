@@ -7,19 +7,8 @@ import { CONFIRM_ORDER_REVIEW_ROUTE } from '../constants/caseRoutes';
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
-import {
-  applicationsToDecide,
-  attendanceParties,
-  orderFormModel,
-  upcomingHearings,
-  withoutUnchosenNoticeDates,
-} from '@utils/makeOrderForm';
-import {
-  APPLY_BY_PASSED,
-  MAKE_ORDER_TYPES,
-  validateFreeformWording,
-  validateMakeOrder,
-} from '@utils/makeOrderValidation';
+import { applicationsToDecide, attendanceParties, caseBundleModel, upcomingHearings } from '@utils/makeOrderForm';
+import { validateFreeformWording, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
   COSTS,
   FREQUENCIES,
@@ -87,9 +76,8 @@ import {
  * A caseworker's review of a judge's order, reached from their Work Allocation task through XUI. Like the
  * make order page, it is plain Express rather than a citizen steps journey: its pages are a CCD event
  * started as the review opens and submitted with that start's token, and its forms post several buttons.
- * Three pages, each with the order beside it: the review of the judge's order, which embeds the make order
- * form and its editor and can return the order to the judge; what court staff record from the order to
- * issue it; and their answers to check before they issue it.
+ * Three pages, each with the order beside it: the review of the judge's order, which lets staff edit wording
+ * or return the order to the judge; what court staff record from the order; and a final check before issue.
  */
 
 const CONFIRM_ORDER_REVIEW_EVENT_ID = 'ext:confirmOrderReview';
@@ -276,7 +264,7 @@ function checkYourAnswersContent(req: Request, review: OrderReviewSession): Reco
   return {
     issueSummary: issueSummary(review),
     sections: [
-      ...(issuesFreeForm(answers)
+      ...(issuesFreeForm(review)
         ? [
             {
               heading: 'What the order does',
@@ -341,9 +329,7 @@ function checkYourAnswersContent(req: Request, review: OrderReviewSession): Reco
 
 /** The order as it will be issued, with any changes court staff made. */
 function issuingHtml(review: OrderReviewSession): string | undefined {
-  return review.answers.order?.orderDocumentJson
-    ? renderHtml(parseSnapshot(review.answers.order.orderDocumentJson))
-    : undefined;
+  return review.answers.orderDocumentJson ? renderHtml(parseSnapshot(review.answers.orderDocumentJson)) : undefined;
 }
 
 /** A money judgment as its row of the record page shows it: summed up, with its answers as typed. */
@@ -367,8 +353,12 @@ function judgmentModel(
 const VIEWS = {
   review: (_req: Request, review: OrderReviewSession) => ({
     ...orderModel(review),
-    // The judge's form, which the caseworker may change: as they last sent it, or else as the judge did.
-    ...orderFormModel(review, review.answers.order),
+    orderDocumentJson:
+      review.answers.orderDocumentJson ??
+      (review.order.docweaveSnapshot ? JSON.stringify(review.order.docweaveSnapshot) : ''),
+    caseBundle: review.caseContext.caseBundle
+      ? caseBundleModel(review.caseContext.caseBundle, review.caseContext.caseReference)
+      : undefined,
     answers: review.answers,
     maxQueryLength: MAX_QUERY_LENGTH,
   }),
@@ -380,7 +370,7 @@ const VIEWS = {
       // The order as it will be issued, with any changes court staff made, to record from.
       issuingHtml: issuingHtml(review),
       sections: SECTIONS,
-      freeForm: issuesFreeForm(answers),
+      freeForm: issuesFreeForm(review),
       orderDetails: answers.orderDetails,
       orderDoes: ORDER_DOES,
       outrightPossession: OUTRIGHT_POSSESSION,
@@ -440,8 +430,7 @@ const showRefusal = (req: Request, res: Response, view: View) => (error: Callbac
     error.status
   );
 
-const APPLY_BY_PASSED_REVIEW =
-  'If the date needs to change, you can send a query to the Judge to return the order to them';
+const RETURN_FOR_CORRECTION = 'Return the order to the Judge with a query.';
 
 /** What stops the order being issued as the review page last sent it, by the rules the judge's order met. */
 export const NO_WORDING = "The order's wording did not load. Reload the page and review the order again";
@@ -449,41 +438,33 @@ export const DECIDED_SINCE =
   'An application the Judge decided in this order has closed or been decided by another order since. Return the ' +
   'order to the Judge with a query';
 
-/**
- * The Judge's order decides an application the review no longer has, as it is no longer open: the page would issue
- * it without that decision, so court staff return it to the Judge.
- */
-function decidedSince(review: OrderReviewSession): ValidationIssue[] {
-  const open = new Set(review.caseContext.applications.map(({ id }) => id));
-  return applicationDecisions(review.order.formData).some(({ genAppId }) => !open.has(genAppId))
-    ? [{ id: 'make-order-form', message: DECIDED_SINCE }]
-    : [];
+function atOrderEditor(message: string): ValidationIssue {
+  return { id: 'order-editor', message };
 }
 
 function orderIssues(review: OrderReviewSession): ValidationIssue[] {
-  const { order } = review.answers;
-  if (!order) {
-    return [{ id: 'order-type', message: 'Select the type of order' }];
+  const { orderType, formData } = review.order;
+  const { orderDocumentJson } = review.answers;
+  if (!orderType || !orderDocumentJson) {
+    return [atOrderEditor(NO_WORDING)];
   }
-  // The page's script builds the wording to issue; without it, as when the script did not load, there is none.
-  if (!order.orderDocumentJson) {
-    return [{ id: 'make-order-form', message: NO_WORDING }];
+  const open = new Set(review.caseContext.applications.map(({ id }) => id));
+  if (applicationDecisions(formData).some(({ genAppId }) => !open.has(genAppId))) {
+    return [atOrderEditor(DECIDED_SINCE)];
   }
   const applications = applicationsToDecide(review);
   return [
-    ...decidedSince(review),
     ...validateMakeOrder(
-      order.orderType,
-      order.formData,
+      orderType,
+      formData,
       review.hearing ? attendanceParties(review) : [],
       !review.hearing,
       applications,
       upcomingHearings(review).map(({ id }) => id)
     ),
-    ...validateFreeformWording(order.formData, applications, postedSnapshot(order.orderDocumentJson)),
-  ].map(issue =>
-    // Court staff may not know what date the Judge would give instead, which they can ask with a query.
-    issue.message === APPLY_BY_PASSED ? { ...issue, message: `${APPLY_BY_PASSED}. ${APPLY_BY_PASSED_REVIEW}` } : issue
+    ...validateFreeformWording(formData, applications, postedSnapshot(orderDocumentJson)),
+  ].map(({ message }) =>
+    atOrderEditor(`${message.replace(/\. Select another hearing$/, '')}. ${RETURN_FOR_CORRECTION}`)
   );
 }
 
@@ -491,7 +472,7 @@ function orderIssues(review: OrderReviewSession): ValidationIssue[] {
 function recordIssues(review: OrderReviewSession): ValidationIssue[] {
   const { answers } = review;
   return [
-    ...(issuesFreeForm(answers) ? validateOrderDetails(answers.orderDetails) : []),
+    ...(issuesFreeForm(review) ? validateOrderDetails(answers.orderDetails) : []),
     ...moneyJudgmentIssues(answers),
     ...validateReviewDates(answers),
     ...validateProceedToIssue(answers),
@@ -515,7 +496,7 @@ function firstIncompletePage(review: OrderReviewSession, after?: Page): Page | u
 /** Takes the record page's answers, every section's, as it posted them. */
 function takeRecordAnswers(review: OrderReviewSession, body: Record<string, unknown>): void {
   const { answers } = review;
-  if (issuesFreeForm(answers)) {
+  if (issuesFreeForm(review)) {
     answers.orderDetails = Object.fromEntries(ORDER_DETAILS_FIELDS.map(field => [field, text(body[field])]));
   }
 
@@ -529,7 +510,7 @@ function takeRecordAnswers(review: OrderReviewSession, body: Record<string, unkn
     : list(body['has-money-judgments']).includes('no')
       ? 'no'
       : undefined;
-  // Once court staff change or confirm them, they are theirs: a change to the judge's answers no longer changes them.
+  // Keep recorded judgments if staff go back to review the wording.
   if (body.action !== 'previous' || JSON.stringify(judgments) !== before) {
     answers.moneyJudgmentsSaved = true;
   }
@@ -626,30 +607,14 @@ export default function confirmOrderReviewRoutes(app: Application): void {
 
   app.post(route('review'), ...inJourney, async (req: Request, res: Response, next) => {
     const review = reviewOf(req)!;
-    const {
-      _csrf,
-      action,
-      orderType,
-      orderDocument: encodedDocument,
-      'send-query': sendQuery,
-      'query-to-judge': queryToJudge,
-      reviewOrderId: _reviewOrderId,
-      ...formData
-    } = req.body;
-    const orderDocument = decodeOrderDocument(encodedDocument);
+    const { action, orderDocument, 'send-query': sendQuery, 'query-to-judge': queryToJudge } = req.body;
     review.answers.sendQuery = ticked(sendQuery);
     review.answers.queryToJudge = text(queryToJudge);
-    const type = choice(orderType, MAKE_ORDER_TYPES);
-    if (type) {
-      // Kept whichever button was pressed, so the page shows the caseworker's changes again.
-      postedSnapshot(text(orderDocument));
-      review.answers.order = {
-        orderType: type,
-        formData: withoutUnchosenNoticeDates(formData),
-        orderDocumentJson: text(orderDocument),
-      };
-    }
     try {
+      const snapshot = postedSnapshot(decodeOrderDocument(orderDocument));
+      if (snapshot) {
+        review.answers.orderDocumentJson = JSON.stringify(snapshot);
+      }
       if (action === 'RETURN_TO_JUDGE') {
         const issues = validateQuery(review.answers);
         if (issues.length) {
@@ -658,7 +623,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
         await submitReview(req, review, 'RETURN_TO_JUDGE');
         return res.redirect(pageUrl(caseReferenceOf(req), 'confirmed'));
       }
-      const issues = orderIssues(review);
+      const issues = snapshot ? orderIssues(review) : [atOrderEditor(NO_WORDING)];
       if (issues.length) {
         return render(req, res, 'review', issues);
       }

@@ -510,22 +510,26 @@ export async function openPage(html: string): Promise<Page> {
   document.write(html);
   document.close();
   const { initAll } = await import('govuk-frontend');
-  const { initMakeOrder, buildOrderDocument, startWithSavedOrderTab } = await import('../../main/assets/js/make-order');
+  const { initMakeOrder, initOrderReview, buildOrderDocument, startWithSavedOrderTab } =
+    await import('../../main/assets/js/make-order');
   // The template's inline script adds these; jsdom does not run it.
   document.body.classList.add('js-enabled', 'govuk-frontend-supported');
   startWithSavedOrderTab(initAll);
   initMakeOrder();
-  const form = document.querySelector<HTMLFormElement>('#make-order-form');
+  initOrderReview();
+  const form = document.querySelector<HTMLFormElement>('#make-order-form, #review-order-form');
   if (!form) {
-    throw new Error(`The make order form is not on the page: ${document.body?.textContent?.trim().slice(0, 200)}`);
+    throw new Error(`The order form is not on the page: ${document.body?.textContent?.trim().slice(0, 200)}`);
   }
   // Tests post the submitted form through the app harness, since jsdom cannot navigate.
   form.addEventListener('submit', event => event.preventDefault());
+  const documentText = () => renderText(JSON.parse(control<HTMLTextAreaElement>('#order-document').value));
+  const generatedText = () => (form.id === 'make-order-form' ? buildOrderDocument(form).textContent : documentText());
   return {
     form,
-    orderText: () => withoutOpening(buildOrderDocument(form).textContent),
-    documentText: () => withoutOpening(renderText(JSON.parse(control<HTMLTextAreaElement>('#order-document').value))),
-    openingText: () => buildOrderDocument(form).textContent.split('\n')[0],
+    orderText: () => withoutOpening(generatedText()),
+    documentText: () => withoutOpening(documentText()),
+    openingText: () => generatedText().split('\n')[0],
     body: action => {
       const body = new URLSearchParams();
       form.dispatchEvent(new Event('submit', { cancelable: true }));

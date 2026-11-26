@@ -1,4 +1,4 @@
-import { type DocWeaveDocument, createDocEditor } from '@hmcts-cft/docweave';
+import { type CreateDocEditorOptions, type DocWeaveDocument, createDocEditor } from '@hmcts-cft/docweave';
 
 import { WITHOUT_HEARING, parseMoney, workingDayOnOrAfter } from '../../utils/makeOrderFormat';
 import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation';
@@ -271,6 +271,39 @@ export function initApplicationDecisions(form: HTMLFormElement): void {
   });
 }
 
+/** The snapshot field restores the saved document and holds edits as they are made. */
+function bindOrderEditor(form: HTMLFormElement, options?: Pick<CreateDocEditorOptions, 'templates'>) {
+  const mount = form.querySelector<HTMLElement>('#order-editor');
+  const documentField = form.querySelector<HTMLTextAreaElement>('#order-document');
+  if (!mount || !documentField) {
+    return;
+  }
+
+  const editor = createDocEditor({
+    ...options,
+    mount,
+    label: 'Order',
+    field: documentField,
+    onError: () => (documentField.value = ''),
+  });
+  // Keep JSON in the editor field; encode only the outgoing value.
+  form.addEventListener('formdata', ({ formData }) => {
+    formData.set(
+      'orderDocument',
+      new TextEncoder().encode(documentField.value).toBase64({ alphabet: 'base64url', omitPadding: true })
+    );
+  });
+  return editor;
+}
+
+/** Review the judge's saved document without regenerating it from form answers. */
+export function initOrderReview(): void {
+  const form = document.querySelector<HTMLFormElement>('#review-order-form');
+  if (form) {
+    bindOrderEditor(form);
+  }
+}
+
 export function initMakeOrder(): void {
   const form = document.querySelector<HTMLFormElement>('#make-order-form');
   if (!form) {
@@ -289,26 +322,19 @@ export function initMakeOrder(): void {
     setDate(suspendedBy, daysFromToday(14));
   }
 
-  const mount = document.querySelector<HTMLElement>('#order-editor');
-  const documentField = document.querySelector<HTMLTextAreaElement>('#order-document');
-  const orderTypeField = document.querySelector<HTMLInputElement>('#order-type');
-  if (!mount || !documentField || !orderTypeField) {
+  const orderTypeField = form.querySelector<HTMLInputElement>('#order-type');
+  const editor = bindOrderEditor(form, {
+    templates: {
+      url: '/docweave/templates',
+      csrfToken: () => form.querySelector<HTMLInputElement>('input[name="_csrf"]')?.value,
+    },
+  });
+  if (!editor || !orderTypeField) {
     return;
   }
 
   // One document whatever the order type: switching type changes the generated clauses in place, so wording the
   // judge inserted stays, but their edits to a type's own clauses go with them.
-  const editor = createDocEditor({
-    mount,
-    label: 'Order',
-    templates: {
-      url: '/docweave/templates',
-      csrfToken: () => form.querySelector<HTMLInputElement>('input[name="_csrf"]')?.value,
-    },
-    field: documentField,
-    // A document the field cannot hold is regenerated from the form.
-    onError: () => (documentField.value = ''),
-  });
   const render = (): void => editor.render(buildOrderDocument(form));
   const selectOrderType = (type: OrderType): void => {
     orderTypeField.value = type;
@@ -362,14 +388,6 @@ export function initMakeOrder(): void {
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   form.addEventListener('submit', followTab);
-  // Keep JSON in the editor field; encode only the outgoing value.
-  form.addEventListener('formdata', ({ formData }) => {
-    formData.set(
-      'orderDocument',
-      new TextEncoder().encode(documentField.value).toBase64({ alphabet: 'base64url', omitPadding: true })
-    );
-  });
-
   selectOrderType(orderingOnClaim() ? (tabType() ?? (orderTypeField.value as OrderType)) : 'NO_ORDER_ON_CLAIM');
   initApplicationDecisions(form);
 }

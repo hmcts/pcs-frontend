@@ -66,7 +66,10 @@ function displayDate(iso: string): string {
 }
 
 /** The case bundle as the order pages link it, with when it was last brought up to date. */
-function caseBundleModel(bundle: OrderCaseBundle, caseReference: number) {
+export function caseBundleModel(
+  bundle: OrderCaseBundle,
+  caseReference: number
+): { href: string; updatedDisplay?: string } {
   const updated = DateTime.fromISO(String(bundle.updatedAt ?? ''));
   return {
     href: `/case/${caseReference}/view-documents/${encodeURIComponent(bundle.id)}`,
@@ -417,14 +420,12 @@ export interface OrderFormSubmission {
 }
 
 /**
- * What the make order form shows, for the judge making an order and the caseworker reviewing it: the
- * order's answers and document, or those last sent, over the facts of the case.
+ * What the make order form shows: the order's answers and document, or those last sent, over the facts of the case.
  */
 export function orderFormModel(start: OrderStart, submission?: OrderFormSubmission): Record<string, unknown> {
   const { caseContext, order, hearing } = start;
   const applications = applicationsToDecide(start);
-  // A hearing's facts and note are pcs-api's record of the hearing, kept apart from the order: the page has those of
-  // every hearing the judge can choose. The caseworker's review is sent the hearing without them.
+  // The hearing facts and note are kept apart from the order: the page has those of every hearing the judge can choose.
   const recording = hearingChoices(start).filter(choice => choice.caseFacts);
   const recorded: FormData = Object.assign({}, ...recording.map(startedRecord));
   // A date the order does not give is left blank, for the page to start afresh if the judge chooses it.

@@ -1,6 +1,6 @@
 import { parseSnapshot, renderHtml } from '@hmcts-cft/docweave';
 
-import { type OrderFormSubmission, hearingTime, noticeRequestLabel } from '@utils/makeOrderForm';
+import { hearingTime, noticeRequestLabel } from '@utils/makeOrderForm';
 import { NOTICE_DATE_PREFIXES, formatDate, parseDate } from '@utils/makeOrderFormat';
 import { type MoneyJudgmentsAnswers, judgmentsFromOrder, moneyJudgmentsRequest } from '@utils/moneyJudgments';
 import type { FormData, OrderStart } from '@utils/orderCase';
@@ -31,8 +31,8 @@ export interface ReviewDateAnswer {
 
 /** The caseworker's answers so far, as they gave them. */
 export interface OrderReviewAnswers {
-  /** The order to issue, as the review page last sent it: the judge's form and document with the caseworker's changes. */
-  order?: Required<OrderFormSubmission>;
+  /** The submitted DocWeave document with the caseworker's wording edits. */
+  orderDocumentJson?: string;
   sendQuery?: boolean;
   /** What a free-form order does, as court staff record it. */
   orderDetails: OrderDetailsAnswers;
@@ -97,8 +97,8 @@ export function blankReviewDate(): ReviewDateAnswer {
 }
 
 /** Whether the order to issue is free-form, whose wording is the judge's, so court staff record what it does. */
-export function issuesFreeForm(answers: OrderReviewAnswers): boolean {
-  return answers.order?.orderType === 'FREE_FORM';
+export function issuesFreeForm({ order }: OrderReviewSession): boolean {
+  return order.orderType === 'FREE_FORM';
 }
 
 // Posted form values, which a browser sends as a string, several strings, or nothing.
@@ -220,20 +220,26 @@ export function reviewRequest(
         }))
       : [];
   const serveAllParties = answers.serveAllParties === 'yes';
+  const { orderType, formData } = order;
+  const docweaveSnapshot = answers.orderDocumentJson ? parseSnapshot(answers.orderDocumentJson) : null;
   return {
     action,
     orderId: order.id,
     version: order.version,
     taskId,
     issue: {
-      order: answers.order && issuedOrder(answers.order),
+      order: docweaveSnapshot && {
+        orderType,
+        formData,
+        applicationDecisions: applicationDecisions(formData),
+        docweaveSnapshot,
+        html: renderHtml(docweaveSnapshot),
+      },
       reviewDates,
       nextStepsComplete: answers.nextSteps === 'complete',
       claimOutcome:
-        answers.order &&
-        (issuesFreeForm(answers)
-          ? orderDetailsRequest(answers.orderDetails)
-          : claimOutcome(answers.order.orderType, answers.order.formData)),
+        orderType &&
+        (issuesFreeForm(review) ? orderDetailsRequest(answers.orderDetails) : claimOutcome(orderType, formData)),
       serveAllParties,
       partiesToServe: serveAllParties ? [] : answers.partiesToServe,
       seal: answers.seal,
@@ -245,32 +251,20 @@ export function reviewRequest(
 
 /**
  * The costs and money judgments as the order to issue makes them, until court staff save their own: a generated
- * order's from the judge's answers, so a change to them changes these; a free-form order's to record from nothing.
+ * order's from the judge's answers; a free-form order's to record from nothing.
  */
 export function startMoneyJudgments(review: OrderReviewSession): void {
-  const { answers, caseContext } = review;
-  if (answers.moneyJudgmentsSaved || !answers.order) {
+  const { answers, caseContext, order } = review;
+  if (answers.moneyJudgmentsSaved || !order.orderType) {
     return;
   }
   const sides = {
     claimants: caseContext.claimants.map(party => party.id),
     defendants: caseContext.defendants.map(party => party.id),
   };
-  answers.moneyJudgments = issuesFreeForm(answers)
+  answers.moneyJudgments = issuesFreeForm(review)
     ? { judgments: [] }
-    : judgmentsFromOrder(answers.order.orderType, answers.order.formData, sides);
-}
-
-function issuedOrder(order: Required<OrderFormSubmission>): Record<string, unknown> {
-  const docweaveSnapshot = order.orderDocumentJson ? parseSnapshot(order.orderDocumentJson) : null;
-  return {
-    orderType: order.orderType,
-    formData: order.formData,
-    applicationDecisions: applicationDecisions(order.formData),
-    docweaveSnapshot,
-    // Its wording exported to HTML, which pcs-api issues as the order's document.
-    html: docweaveSnapshot ? renderHtml(docweaveSnapshot) : undefined,
-  };
+    : judgmentsFromOrder(order.orderType, order.formData, sides);
 }
 
 // The make order form's choice of statement, as the judge's form words it.
@@ -309,14 +303,11 @@ function applyByEntered(formData: FormData): string | undefined {
 }
 
 /**
- * What court staff check before choosing who the order is served on, from the order's answers as they now are: where
- * it was made, the statement and apply-by date chosen, with the judge's own where staff changed them, the applications
- * it decides with whether each applicant asked for it to be made without notice, and the judge's message. These are
- * answers, not the wording, which may have been edited.
+ * What court staff check before choosing who the order is served on: the judge's answers about where it
+ * was made, the statement and apply-by date, the applications it decides and the message for staff.
  */
 export function issueSummary(review: OrderReviewSession): { key: string; lines: string[] }[] {
-  const current = review.answers.order?.formData ?? review.order.formData;
-  const original = review.order.formData;
+  const { formData } = review.order;
   const rows: { key: string; lines: string[] }[] = [
     {
       key: 'Order made',
@@ -325,29 +316,19 @@ export function issueSummary(review: OrderReviewSession): { key: string; lines: 
       ],
     },
   ];
-  const withOriginal = (now: string, judge: string, prefix: string) =>
-    now === judge ? [now] : [now, `${prefix}: ${judge}`];
-
-  rows.push({
-    key: 'Statement selected',
-    lines: withOriginal(statementSelected(current), statementSelected(original), 'The Judge selected'),
-  });
-  const applyBy = applyByEntered(current);
-  const judgeApplyBy = applyByEntered(original);
-  if (applyBy || judgeApplyBy) {
-    rows.push({
-      key: 'Apply-by date entered',
-      lines: withOriginal(applyBy ?? 'Not applicable', judgeApplyBy ?? 'Not applicable', 'The Judge entered'),
-    });
+  rows.push({ key: 'Statement selected', lines: [statementSelected(formData)] });
+  const applyBy = applyByEntered(formData);
+  if (applyBy) {
+    rows.push({ key: 'Apply-by date entered', lines: [applyBy] });
   }
 
   const applications = new Map(review.caseContext.applications.map(application => [application.id, application]));
-  const decided = applicationDecisions(current).flatMap(({ genAppId }) => {
+  const decided = applicationDecisions(formData).flatMap(({ genAppId }) => {
     const application = applications.get(genAppId);
     return application
       ? [
           `${application.reference}: ${application.type} – ` +
-            `${DECISION_LABELS[first(current[`app-${genAppId}-decision`])]} – ` +
+            `${DECISION_LABELS[first(formData[`app-${genAppId}-decision`])]} – ` +
             noticeRequestLabel(application.withoutNotice),
         ]
       : [];
@@ -356,7 +337,7 @@ export function issueSummary(review: OrderReviewSession): { key: string; lines: 
     rows.push({ key: 'Applications this order decides', lines: decided });
   }
 
-  const message = staffMessage(original);
+  const message = staffMessage(formData);
   if (message) {
     rows.push({ key: 'Message from the Judge', lines: [message] });
   }

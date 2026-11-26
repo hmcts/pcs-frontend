@@ -8,15 +8,12 @@
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% import "confirm-order-review/_order-panel.njk" as orderPanel %}
 
-{# The make order form's layout, for the Judge's form the caseworker may change. #}
-{% set htmlClasses = "pcs-make-order" %}
-
 {% set pageHeading = "Review the order" %}
 {% set orderPreviewHeading = "Order to issue" %}
 
 {% block page %}
   <div class="pcs-review-page">
-    {# What the Judge submitted stays above the page, read only, whatever the caseworker changes in the form. #}
+    {# What the Judge submitted stays above the page, read only, whatever the caseworker changes in the editor. #}
     {% call orderPanel.panel("Order the Judge submitted", staffMessage) %}
       {% if edits.added or edits.changed %}
         <p class="govuk-body-s" id="judge-changes-key">
@@ -26,9 +23,7 @@
       {% include "confirm-order-review/_order-preview.njk" %}
     {% endcall %}
 
-    {# The make order page's script runs the Judge's form and its order editor, which it finds by this id. #}
-    <form method="post" action="{{ formAction }}" novalidate id="make-order-form">
-      <script type="application/json" id="order-context">{{ orderContext | jsonScript | safe }}</script>
+    <form method="post" action="{{ formAction }}" novalidate id="review-order-form">
       {{ csrfProtection(csrfToken) }}
       <input type="hidden" name="reviewOrderId" value="{{ reviewOrderId }}">
 
@@ -48,7 +43,7 @@
               <li>The Judge added wording to the order. Check the wording and any follow-up before issue</li>
             {% endif %}
             {% if edits.changed %}
-              <li>The Judge changed generated wording. Check the fields below still reflect the order</li>
+              <li>The Judge changed generated wording. Check the edited wording before issuing</li>
             {% endif %}
           </ul>
         {% endset %}
@@ -60,12 +55,10 @@
       {% endif %}
 
       <p class="govuk-body" id="order-changes-guidance">
-        Check the Judge's order. These are their answers and the order they generate: you can change the answers
-        and the wording before you issue it, or return the order to the Judge with a query. The order the Judge
-        submitted stays as it is.
+        Correct minor errors in the wording before issuing the order. Return it to the Judge if a decision needs changing.
       </p>
 
-      {% include "make-order/_form.njk" %}
+      {% include "make-order/_editor.njk" %}
 
       {% set queryHtml %}
         {{ govukCharacterCount({

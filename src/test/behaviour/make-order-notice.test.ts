@@ -131,7 +131,7 @@ describe("make an order: made on the court's own initiative or without notice", 
     expect(sent.order.formData).toMatchObject({ 'order-notice': 'own-initiative', 'own-initiative-by-day': due.day });
   });
 
-  it('keeps the adjournment on an order deciding an application without notice, which court staff review', async () => {
+  it('keeps the adjournment on an order deciding an application without notice', async () => {
     app = await bootApp({ application: APPLICATION });
     const page = await openPage((await app.get(`${PAGE}?genAppId=gen-app-1`)).text);
     check('app-gen-app-1-decision', 'adjourn');
@@ -146,24 +146,6 @@ describe("make an order: made on the court's own initiative or without notice", 
     expect(text).toContain('The hearing is adjourned generally');
     expect(text.split('\n').at(-1)).toBe(`${WITHOUT_NOTICE} ${shown(due)}.`);
     expect((await app.post(`${PAGE}?genAppId=gen-app-1`, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
-    const [{ order }] = submittedOrders() as { order: Record<string, unknown> }[];
-    await app.close();
-
-    // Court staff review the order as the judge left it, and can change the date.
-    app = await bootApp({
-      caseworker: true,
-      application: APPLICATION,
-      order: { ...order, id: 'order-awaiting-review', version: 3 },
-    });
-    await app.get(`${REVIEW}?orderId=order-awaiting-review&taskId=task-1`);
-    const review = await openPage((await app.get(`${REVIEW}/review`)).text);
-    expect(control('[name="order-notice"][value="without-notice"]').checked).toBe(true);
-    expect(review.documentText()).toContain('The hearing is adjourned generally');
-    expect(review.documentText()).toContain(`${WITHOUT_NOTICE} ${shown(due)}.`);
-    const later = futureDate(26);
-    typeDate('without-notice-by', later.day, later.month, later.year);
-    expect(review.documentText()).toContain(`${WITHOUT_NOTICE} ${shown(later)}.`);
-    expect(review.documentText()).toContain('The hearing is adjourned generally');
   });
 
   it('offers the default date, not one kept from before, on a draft saved with neither', async () => {
@@ -257,6 +239,7 @@ describe("make an order: made on the court's own initiative or without notice", 
     const page = await openPage((await app.get(PAGE)).text);
     expect(control('[name="own-initiative-by-day"]').value).toBe(String(yesterday.day));
     recordAttendance();
+    const docweaveSnapshot = JSON.parse(control<HTMLTextAreaElement>('#order-document').value);
 
     const refused = await app.post(PAGE, page.body('SUBMIT_FOR_REVIEW'));
     expect(refused.status).toBe(400);
@@ -269,16 +252,23 @@ describe("make an order: made on the court's own initiative or without notice", 
     // Nor will court staff issue an order whose date passed while it waited for review.
     app = await bootApp({
       caseworker: true,
-      order: { id: 'order-awaiting-review', version: 3, orderType: 'FREE_FORM', formData: passed },
+      order: {
+        id: 'order-awaiting-review',
+        version: 3,
+        orderType: 'FREE_FORM',
+        formData: {
+          ...passed,
+          'claimant-claimant-id-attendance': 'litigant-in-person',
+          'defendant-defendant-id-attendance': 'not-present',
+        },
+        docweaveSnapshot,
+      },
     });
     await app.get(`${REVIEW}?orderId=order-awaiting-review&taskId=task-1`);
     const review = await openPage((await app.get(`${REVIEW}/review`)).text);
-    recordAttendance();
     const notIssued = await app.post(`${REVIEW}/review`, review.body('ISSUE'));
     expect(notIssued.status).toBe(400);
-    expect(notIssued.text).toContain(
-      'must be today or in the future. If the date needs to change, you can send a query to the Judge to return the order to them'
-    );
+    expect(notIssued.text).toContain('must be today or in the future. Return the order to the Judge with a query.');
   });
 
   it('starts with the answer the judges agreed for how the order is made', async () => {
