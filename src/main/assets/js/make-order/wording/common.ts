@@ -1,6 +1,13 @@
 import { type DocBuilder, type InlineBuilder } from '@hmcts-cft/docweave';
 
-import { formatDate, formatMoney, parseDate, parseMoney } from '../../../../utils/makeOrderFormat';
+import {
+  formatDate,
+  formatMoney,
+  formatTime,
+  parseDate,
+  parseMoney,
+  parseTime,
+} from '../../../../utils/makeOrderFormat';
 import { type AttendanceEntry, type OrderData, type OrderParty } from '../data';
 
 import { describeApplication } from './application';
@@ -100,6 +107,16 @@ function addApplicationRecitals(order: DocBuilder, data: OrderData, after: boole
 }
 
 export function addPreamble(order: DocBuilder, data: OrderData): void {
+  const { judge, court, date: madeOn } = data.before;
+  order.paragraph('before', content =>
+    content
+      .text('Before ')
+      .fact('before-judge', judge)
+      .text(' sitting at the ')
+      .fact('before-court', court)
+      .text(' on ')
+      .fact('before-date', madeOn)
+  );
   if (data.withoutHearing) {
     order.paragraph('papers-considered', 'UPON the Court considering the papers without a hearing');
   }
@@ -233,4 +250,22 @@ export function addCosts(content: InlineBuilder, data: OrderData, wording: Costs
   } else {
     content.fact('choice', wording.fixed[choice] || wording.missing || '', { sourceId });
   }
+}
+
+/**
+ * When possession is ordered by: the time the judge gave, if any, then the day, as in "4pm on 4 December 2026". The
+ * time is a fact of its own, so it can be shown as the time field's.
+ */
+export function addPossessionDeadline(
+  content: InlineBuilder,
+  data: OrderData,
+  factId: string,
+  dateField: string,
+  timeField: string
+): void {
+  const time = parseTime(value(data, timeField));
+  if (time) {
+    content.fact(`${factId}-time`, formatTime(time), { sourceId: timeField }).text(' on ');
+  }
+  content.fact(factId, date(data, dateField), { sourceId: dateField });
 }

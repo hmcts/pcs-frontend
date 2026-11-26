@@ -8,6 +8,7 @@ import {
   type CostsWording,
   addCosts,
   addPaymentTerm,
+  addPossessionDeadline,
   date,
   hasCosts,
   money,
@@ -51,9 +52,8 @@ export function addOutrightClauses(list: OrderedListBuilder, data: OrderData): v
       if (possession === 'forthwith') {
         content.fact('deadline', 'forthwith', { sourceId: 'outright-possession' });
       } else {
-        content
-          .text('on or before ')
-          .fact('deadline', date(data, 'outright-by-date'), { sourceId: 'outright-by-date' });
+        content.text('on or before ');
+        addPossessionDeadline(content, data, 'deadline', 'outright-by-date', 'outright-by-time');
       }
       content.text('.');
     });
@@ -141,11 +141,5 @@ export function addOutrightClauses(list: OrderedListBuilder, data: OrderData): v
       }
       content.text('.');
     });
-  }
-  if (options.includes('transfer-high-court')) {
-    list.item(
-      'high-court-transfer',
-      'The order for possession is transferred to the High Court solely for the purpose of enforcement.'
-    );
   }
 }
