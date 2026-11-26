@@ -8,6 +8,7 @@ import { addApplicationDecisions } from './application';
 import { addCosts, addPreamble, caseManCosts, hasCosts, partyLabels } from './common';
 import { addEnforcementTransfer } from './enforcement-transfer';
 import { addFreeFormClauses } from './free-form';
+import { addNoticeStatement } from './notice';
 import { addOutrightClauses } from './outright';
 import { addStrikeOutDismissalClauses } from './strike-out';
 import { addSuspendedClauses } from './suspended';
@@ -28,7 +29,8 @@ const OWN_COSTS: readonly MakeOrderType[] = ['OUTRIGHT_POSSESSION', 'SUSPENDED_P
  * The order the form's answers make, one document whatever its type: the preamble, the claim's clauses, then each
  * application's. The claim's clauses are always one list, so switching type changes the clauses within it and keeps
  * whatever the judge wrote around them. An order that leaves the claim as it is orders the costs of the application,
- * after the decisions.
+ * after the decisions. Any order ends with what a party may do about it if it was made on the court's own initiative
+ * or without notice.
  */
 export function buildOrder(type: MakeOrderType, data: OrderData): DocWeaveDocument {
   const { claimant, defendant } = partyLabels(data);
@@ -51,5 +53,6 @@ export function buildOrder(type: MakeOrderType, data: OrderData): DocWeaveDocume
         list.item('application-costs', content => addCosts(content, data, costs))
       );
     }
+    addNoticeStatement(order, data);
   });
 }

@@ -28,8 +28,8 @@ describe('make an order: drafting', () => {
 
   it('rejects an incomplete order for review but saves it as a draft and restores it', async () => {
     const page = await openPage((await app.get(PAGE)).text);
-    type('hearing-notes', 'Defendant asked for time to pay');
-    check('outright-options', 'transfer-high-court');
+    type('hearing-1-notes', 'Defendant asked for time to pay');
+    check('transfer-enforcement', 'yes');
 
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
@@ -42,7 +42,7 @@ describe('make an order: drafting', () => {
     expect(summary).toContain('Select when the defendant must give up possession');
     expect(summary).toContain('Select mandatory or discretionary grounds');
     expect(control('#outright-possession-error').textContent).toContain('give up possession');
-    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('Defendant asked for time to pay');
+    expect(control<HTMLTextAreaElement>('[name="hearing-1-notes"]').value).toBe('Defendant asked for time to pay');
 
     body.set('action', 'SAVE_DRAFT');
     const saved = await app.post(PAGE, body);
@@ -50,10 +50,10 @@ describe('make an order: drafting', () => {
     expect(saved.location).toBe(MANAGE_CASE_URL);
 
     const restored = await openPage((await app.get(PAGE)).text);
-    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('Defendant asked for time to pay');
-    expect(control('[name="outright-options"][value="transfer-high-court"]').checked).toBe(true);
+    expect(control<HTMLTextAreaElement>('[name="hearing-1-notes"]').value).toBe('Defendant asked for time to pay');
+    expect(control<HTMLInputElement>('[name="transfer-enforcement"]').checked).toBe(true);
     expect(restored.orderText()).toContain(
-      'The order for possession is transferred to the High Court solely for the purpose of enforcement.'
+      'Enforcement of the Order of Possession is transferred to the High Court pursuant to section 42 of the County Courts Act 1984.'
     );
   });
 
@@ -144,15 +144,15 @@ describe('make an order: drafting', () => {
     expect(submittedOrders()).toHaveLength(0);
   });
 
-  it('shows the saved order, and why, when pcs-api refuses a save', async () => {
+  it('keeps what the judge sent, and says why, when pcs-api refuses a save', async () => {
     const saved = await openPage((await app.get(PAGE)).text);
-    type('hearing-notes', 'Saved earlier');
+    type('hearing-1-notes', 'Saved earlier');
     const first = saved.body();
     first.set('action', 'SAVE_DRAFT');
     expect((await app.post(PAGE, first)).status).toBe(302);
 
     const page = await openPage((await app.get(PAGE)).text);
-    type('hearing-notes', 'Typed since');
+    type('hearing-1-notes', 'Typed since');
     const body = page.body();
     body.set('action', 'SAVE_DRAFT');
     refuseNextEvent('The order draft has been updated by another user. Reload it and try again');
@@ -166,7 +166,9 @@ describe('make an order: drafting', () => {
     expect(control('#make-order-error-summary').textContent).toContain(
       'The order draft has been updated by another user. Reload it and try again'
     );
-    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('Saved earlier');
+    // What the judge typed stays, against the version they worked from, so it is never saved over the newer one.
+    expect(control<HTMLTextAreaElement>('[name="hearing-1-notes"]').value).toBe('Typed since');
+    expect(control('[name="orderVersion"]').value).toBe(body.get('orderVersion'));
   });
 
   it('keeps the version the answers were made against when review validation fails', async () => {
@@ -224,8 +226,8 @@ describe('make an order: drafting', () => {
     const toggle = control<HTMLButtonElement>('[data-case-facts-toggle]');
     toggle.click();
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
-    expect(control('#case-facts-content').hidden).toBe(true);
+    expect(control('#hearing-1-case-facts-content').hidden).toBe(true);
     toggle.click();
-    expect(control('#case-facts-content').hidden).toBe(false);
+    expect(control('#hearing-1-case-facts-content').hidden).toBe(false);
   });
 });

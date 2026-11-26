@@ -4,9 +4,15 @@
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% import "make-order/_compact.njk" as compact with context %}
 
+{#
+  One hearing's facts and notes, its fields named for it (record.prefix): shown, and sent, while the order is made at
+  that hearing. A macro, as an included template is not given the loop's hearing.
+#}
+{% macro panel(record) %}
 {# A blank first option, so a fact the judge has not chosen is not recorded as the first one. A case in Wales has
    the claim's contracts, and one in England its tenancies. #}
-{% if hearing.inWales %}
+{% set p = record.prefix %}
+{% if record.inWales %}
   {% set tenancyTypes = [
     { value: "", text: "" },
     { value: "SECURE_CONTRACT", text: "Secure contract" },
@@ -33,99 +39,101 @@
   { value: "OTHER", text: "Other" }
 ] %}
 
-<section class="pcs-case-facts" aria-labelledby="case-facts-heading" data-case-facts>
+<fieldset class="pcs-case-facts" aria-labelledby="{{ p }}case-facts-heading" data-case-facts
+          data-made-at="{{ record.id }}" {%- if not record.chosen %} hidden disabled{% endif %}>
+  <input type="hidden" name="{{ p }}version" value="{{ draftValue(p + "version") }}">
   <div class="pcs-case-facts__header">
     <div>
-      <h2 class="govuk-heading-s" id="case-facts-heading">Case facts (tenancy/contract) <span class="govuk-!-font-weight-regular">(optional)</span></h2>
-      <p class="govuk-body-s pcs-case-facts__source" id="case-facts-source">{{ factsRecordedDisplay }}.</p>
+      <h2 class="govuk-heading-s" id="{{ p }}case-facts-heading">Case facts (tenancy/contract) <span class="govuk-!-font-weight-regular">(optional)</span></h2>
+      <p class="govuk-body-s pcs-case-facts__source" id="{{ p }}case-facts-source">{{ record.factsRecordedDisplay }}.</p>
     </div>
     <button
       type="button"
       class="pcs-case-facts__toggle"
       aria-expanded="true"
-      aria-controls="case-facts-content"
+      aria-controls="{{ p }}case-facts-content"
       data-case-facts-toggle
     >Hide case facts</button>
   </div>
 
-  <div class="pcs-case-facts__layout" id="case-facts-content">
+  <div class="pcs-case-facts__layout" id="{{ p }}case-facts-content">
     <div class="pcs-case-facts__grid">
       {{ govukDateInput({
-        id: "date-tenancy",
-        namePrefix: "date-tenancy",
-        items: draftDate("date-tenancy"),
-        errorMessage: validationErrors["date-tenancy-day"],
+        id: p + "date-tenancy",
+        namePrefix: p + "date-tenancy",
+        items: draftDate(p + "date-tenancy"),
+        errorMessage: validationErrors[p + "date-tenancy-day"],
         fieldset: { legend: { text: "Date of tenancy/contract", classes: "govuk-fieldset__legend--s" } }
       }) }}
 
       {{ govukSelect({
-        id: "tenancy-type",
-        name: "tenancy-type",
+        id: p + "tenancy-type",
+        name: p + "tenancy-type",
         label: { text: "Tenancy/contract type", classes: "govuk-label--s" },
-        items: draftSelect(tenancyTypes, "tenancy-type")
+        items: draftSelect(tenancyTypes, p + "tenancy-type")
       }) }}
 
       {{ govukDateInput({
-        id: "date-notice",
-        namePrefix: "date-notice",
-        items: draftDate("date-notice"),
-        errorMessage: validationErrors["date-notice-day"],
+        id: p + "date-notice",
+        namePrefix: p + "date-notice",
+        items: draftDate(p + "date-notice"),
+        errorMessage: validationErrors[p + "date-notice-day"],
         fieldset: { legend: { text: "Date of service of notice", classes: "govuk-fieldset__legend--s" } }
       }) }}
 
       {{ compact.money({
-        id: "arrears-notice",
+        id: p + "arrears-notice",
         optional: true,
         label: "Arrears at notice",
         labelClasses: "govuk-label--s"
       }) }}
 
       {{ compact.money({
-        id: "current-rent",
+        id: p + "current-rent",
         optional: true,
         label: "Current rent",
         labelClasses: "govuk-label--s"
       }) }}
 
       {{ govukSelect({
-        id: "rent-frequency",
-        name: "rent-frequency",
+        id: p + "rent-frequency",
+        name: p + "rent-frequency",
         label: { text: "Rent frequency", classes: "govuk-label--s" },
-        items: draftSelect(rentFrequencies, "rent-frequency")
+        items: draftSelect(rentFrequencies, p + "rent-frequency")
       }) }}
 
       {{ govukInput({
-        id: "grounds-pleaded",
-        name: "grounds-pleaded",
+        id: p + "grounds-pleaded",
+        name: p + "grounds-pleaded",
         label: { text: "Grounds pleaded", classes: "govuk-label--s" },
         classes: "govuk-input--width-10",
-        value: draftValue("grounds-pleaded")
+        value: draftValue(p + "grounds-pleaded")
       }) }}
 
       {{ compact.money({
-        id: "arrears-issue",
+        id: p + "arrears-issue",
         optional: true,
         label: "Arrears on issue",
         labelClasses: "govuk-label--s"
       }) }}
 
       {{ govukDateInput({
-        id: "date-last-payment",
-        namePrefix: "date-last-payment",
-        items: draftDate("date-last-payment"),
-        errorMessage: validationErrors["date-last-payment-day"],
+        id: p + "date-last-payment",
+        namePrefix: p + "date-last-payment",
+        items: draftDate(p + "date-last-payment"),
+        errorMessage: validationErrors[p + "date-last-payment-day"],
         fieldset: { legend: { text: "Date last payment made", classes: "govuk-fieldset__legend--s" } }
       }) }}
 
       {{ compact.money({
-        id: "last-payment",
+        id: p + "last-payment",
         optional: true,
         label: "Last payment",
         labelClasses: "govuk-label--s"
       }) }}
 
       {{ compact.money({
-        id: "arrears-today",
+        id: p + "arrears-today",
         optional: true,
         label: "Arrears today",
         labelClasses: "govuk-label--s"
@@ -137,25 +145,25 @@
       <h3 class="govuk-heading-s govuk-!-margin-bottom-0">Judicial notes</h3>
 
       {{ govukTextarea({
-        id: "hearing-notes",
-        name: "hearing-notes",
+        id: p + "notes",
+        name: p + "notes",
         rows: 4,
-        value: draftValue("hearing-notes"),
+        value: draftValue(p + "notes"),
         label: {
-          text: "Note for this hearing – " + hearingDateDisplay + " (optional, internal use only)",
+          text: "Note for this hearing – " + record.hearingDateDisplay + " (optional, internal use only)",
           classes: "govuk-visually-hidden"
         },
-        errorMessage: validationErrors["hearing-notes"],
+        errorMessage: validationErrors[p + "notes"],
         formGroup: { classes: "govuk-!-margin-bottom-0" },
         classes: "govuk-!-margin-bottom-0"
       }) }}
 
       <div class="pcs-hearing-notes__stack">
-        {% if earlierNotes | length %}
+        {% if record.earlierNotes | length %}
           <ol class="pcs-hearing-notes__list" aria-label="Earlier judicial notes, newest first">
-            {% for note in earlierNotes %}
+            {% for note in record.earlierNotes %}
               <li class="pcs-hearing-notes__note">
-                <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-1">{{ note.when }} &ndash; {{ note.by }}</p>
+                <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-1">{{ note.by }} on {{ note.dateMade }}</p>
                 <p class="govuk-body-s govuk-!-margin-bottom-0 pcs-hearing-notes__text">{{ note.note }}</p>
               </li>
             {% endfor %}
@@ -166,4 +174,5 @@
       </div>
     </div>
   </div>
-</section>
+</fieldset>
+{% endmacro %}

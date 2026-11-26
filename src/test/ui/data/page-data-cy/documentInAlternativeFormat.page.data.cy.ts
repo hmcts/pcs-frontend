@@ -1,0 +1,15 @@
+export const documentInAlternativeFormat = {
+  mainHeader: `Rwyf angen dogfennau mewn fformat amgen`,
+  backLink: `Yn ôl`,
+  continueButton: `Parhau`,
+  cancelLink: `Canslo`,
+  audioTranslationOfDocumentsCheckbox: `Cyfieithiad sain o ddogfennau`,
+  brailleDocumentsCheckbox: `Dogfennau Braille`,
+  documentsInASpecifiedColourCheckbox: `Dogfennau mewn lliw penodol`,
+  documentsInAnEasyReadFormatCheckbox: `Dogfennau mewn fformat hawdd i’w darllen`,
+  documentsInLargePrintCheckbox: `Dogfennau mewn print bras`,
+  documentsReadOutToMeCheckbox: `Dogfennau yn cael eu darllen yn uchel i mi`,
+  informationEmailedToMeCheckbox: `Gwybodaeth yn cael ei hanfon ataf drwy e-bost`,
+  otherCheckbox: `Arall`,
+  noDocumentsInAlternativeFormatCheckbox: `Nid oes arnaf angen dogfennau mewn fformat amgen ar hyn o bryd`,
+};
