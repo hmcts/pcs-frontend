@@ -1,19 +1,20 @@
 {#
   An open application the order can decide, as a row of the applications section: what was applied for and by
-  whom, the applicant's answers, documents and the order they asked for, then what the judge decides about it.
+  whom, the applicant's answers, documents and what they asked for, then what the judge decides about it.
   Each application's answers start with its prefix (app-<id>), so an order made at a hearing keeps each one's.
 
   The details are folded away, as the judge has the file, but for the application the judge's task asked them to
   decide, which is open and which the order must decide. Any other may be left as it is.
 
-  Granting reveals a button that puts the applicant's wording in the order preview as the judge's own clauses, after
-  the clauses the decision generated, to amend or delete. Listing it for a hearing on notice asks when, as the adjournment tab
-  does, and leaves the application open. For an application to suspend enforcement, granting it suspends
-  enforcement on the conditions a suspended possession order has. Inline radios can't reveal a question, so what follows a
-  decision is on its own rows, shown while it is chosen (initApplicationDecisions in make-order.ts).
+  Each decision but freeform puts its own wording in the order, which says what was decided: there is no bare
+  "granted"; a freeform decision leaves the wording to the judge. Adjourning, offered on an application to adjourn a
+  hearing, adjourns it to a further hearing or generally, as the adjournment tab does. Suspending
+  enforcement, offered on an application to suspend it, does so on the conditions a suspended possession order has.
+  Listing it for a hearing asks when, as the adjournment tab does, and leaves the application open, as not dealing with
+  it does; any other decision closes it. Inline radios can't reveal a question, so what follows a decision is on its own
+  rows, shown while it is chosen (initApplicationDecisions in make-order.ts).
 #}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% import "make-order/_compact.njk" as compact with context %}
@@ -22,7 +23,7 @@
 
 {% macro details(application) %}
   {% if application.withoutNotice == "YES" %}
-    {{ govukWarningText({ text: "The applicant asked for this application to be made without notice. Only the applicant will be told of it." }) }}
+    {{ govukWarningText({ text: "The applicant asked for this application to be made without notice." }) }}
   {% endif %}
 
   {% set documentLinks %}
@@ -38,8 +39,8 @@
   {% endset %}
 
   {% set rows = [
-    { key: { text: "Submitted by" }, value: { text: application.applicant or "Not known" } },
-    { key: { text: "Submitted on" }, value: { text: application.submittedOnDisplay or "Not known" } }
+    { key: { text: "Submitted by" }, value: { text: application.applicant } },
+    { key: { text: "Submitted on" }, value: { text: application.submittedOnDisplay } }
   ] %}
   {% if application.somethingElseDetails %}
     {% set rows = rows.concat([{ key: { text: "What the application is for" }, value: { text: application.somethingElseDetails } }]) %}
@@ -49,20 +50,14 @@
   {% endif %}
   {% set rows = rows.concat([
     { key: { text: "Other parties agree" }, value: { text: application.otherPartiesAgreedDisplay or "Not answered" } },
-    { key: { text: "Without notice" }, value: { text: (application.withoutNoticeDisplay or "No") + ((": " + application.withoutNoticeReason) if application.withoutNoticeReason else "") } },
+    { key: { text: "Without notice requested" }, value: { text: (application.withoutNoticeDisplay or "Not recorded") + ((": " + application.withoutNoticeReason) if application.withoutNoticeReason else "") } },
     { key: { text: "Application documents" }, value: { html: documentLinks } }
   ]) %}
   {{ govukSummaryList({ rows: rows, classes: "govuk-!-margin-bottom-4", attributes: { id: application.prefix + "-details" } }) }}
 
-  <h4 class="govuk-heading-s">The order the applicant asked for</h4>
-  {% if application.whatOrderWanted %}
-    {# As the applicant wrote it, line by line, so their numbering is the numbering they refer to. #}
-    {{ govukInsetText({
-      html: application.whatOrderWantedHtml,
-      attributes: { id: application.prefix + "-requested" }
-    }) }}
-  {% else %}
-    <p class="govuk-body">The applicant did not say what order they want. Read the application documents.</p>
+  {% if application.explanationHtml %}
+    <h4 class="govuk-heading-s">What they asked the court for and why</h4>
+    <div class="govuk-body" id="{{ application.prefix }}-explanation">{{ application.explanationHtml | safe }}</div>
   {% endif %}
 {% endmacro %}
 
@@ -73,42 +68,104 @@
 {% macro decision(application) %}
   {% set prefix = application.prefix %}
   {% set name = prefix + "-decision" %}
+  {#
+    Striking out is a decision on the papers, so an order made at a hearing offers none, and an application to
+    suspend enforcement is never struck out (judicial feedback, November 2026).
+  #}
+  {% set items = [{ value: "none", text: "Not dealt with" }] %}
+  {% if application.adjournment %}
+    {% set items = items.concat([{ value: "adjourn", text: "Adjourned" }]) %}
+  {% endif %}
+  {% if application.enforcementSuspension %}
+    {% set items = items.concat([{ value: "suspend", text: "Suspended on conditions" }]) %}
+  {% endif %}
+  {% set items = items.concat([{ value: "dismiss", text: "Dismissed" }]) %}
+  {% if not application.enforcementSuspension %}
+    {% set items = items.concat([{
+      value: "strike-out",
+      text: "Struck out",
+      disabled: not withoutHearing,
+      attributes: { required: true, "data-made-at": "without-hearing" }
+    }]) %}
+  {% endif %}
+  {% set items = items.concat([
+    { value: "list", text: "Listed for a hearing" },
+    { value: "freeform", text: "Freeform" }
+  ]) %}
   {{ compact.radios(name, {
     legend: "What do you decide about application " + application.reference + "?",
     classes: "govuk-radios--small govuk-radios--inline",
     default: none if application.required else "none",
-    items: [
-      { value: "none", text: "Not dealt with" },
-      { value: "grant", text: "Granted" },
-      { value: "dismiss", text: "Dismissed" },
-      { value: "strike-out", text: "Struck out" },
-      { value: "list", text: "Listed for a hearing on notice" },
-      { value: "other", text: "Something else" }
-    ]
+    items: items
   }) }}
 
-  {% if application.whatOrderWanted %}
-    {# Revealed by granting; the wording goes in only when the judge asks. #}
-    <div data-decision-shows="grant" {%- if not draftChecked(name, "grant") %} hidden{% endif %}>
-      <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-3" data-insert-requested-wording>
-        Insert applicant’s wording
-      </button>
+  {#
+    Adjourning a hearing on an application to adjourn it asks, as the adjournment tab does, whether it is adjourned
+    to another hearing, and when, or generally.
+  #}
+  {% if application.adjournment %}
+    {% set furtherHearingHtml %}
+      {{ listing.listing(prefix + "-adjourn", "When the hearing is", [
+        "Adjourned to next available possession list after",
+        "Adjourned to next available date (non-possession list) after",
+        "Adjourned to specific date"
+      ]) }}
+    {% endset %}
+    <div data-decision-shows="adjourn" {%- if not draftChecked(name, "adjourn") %} hidden{% endif %}>
+      {{ compact.radios(prefix + "-adjourn-type", {
+        legend: "Adjournment type",
+        classes: "govuk-radios--small",
+        items: [
+          { value: "further-hearing", text: "Adjourned for further hearing", conditional: { html: furtherHearingHtml } },
+          { value: "generally", text: "Adjourned generally" }
+        ]
+      }) }}
     </div>
   {% endif %}
 
   {% if application.enforcementSuspension %}
-    <div data-decision-shows="grant" {%- if not draftChecked(name, "grant") %} hidden{% endif %}>
+    <div data-decision-shows="suspend" {%- if not draftChecked(name, "suspend") %} hidden{% endif %}>
       {{ conditions.paymentConditions(prefix + "-suspension", "Enforcement suspended on condition of") }}
     </div>
   {% endif %}
 
+  {#
+    Listed at a new hearing, the judge says when and whether the other parties are given notice of it; listed at one of
+    the case's hearings still to come, which already has its parties, the order only says which. The hearing the
+    order is made at is not one to list it at, so the page takes that one away.
+  #}
   <div data-decision-shows="list" data-application-listing {%- if not draftChecked(name, "list") %} hidden{% endif %}>
-    {{ listing.listing(prefix + "-list", "When the hearing is", [
-      "Next available possession list after",
-      "Next available date (non-possession list) after",
-      "Specific date"
-    ]) }}
+    {% if upcomingHearings | length %}
+      {% set atItems = [{ value: "new", text: "A new hearing", conditional: { html: newHearing(prefix) } }] %}
+      {% for option in upcomingHearings %}
+        {% set atItems = atItems.concat([{
+          value: option.id,
+          text: "The hearing on " + option.text,
+          attributes: { required: true, "data-made-at": "not-" + option.id }
+        }]) %}
+      {% endfor %}
+      {{ compact.radios(prefix + "-list-at", {
+        legend: "Which hearing?",
+        classes: "govuk-radios--small",
+        default: "new",
+        items: atItems
+      }) }}
+    {% else %}
+      {{ newHearing(prefix) }}
+    {% endif %}
   </div>
+{% endmacro %}
+
+{# When a new hearing the application is listed for is, and whether the other parties are given notice of it. #}
+{% macro newHearing(prefix) %}
+  {{ compact.checkboxes(prefix + "-list-without-notice", {
+    items: [{ value: "yes", text: "Without notice to the other parties" }]
+  }) }}
+  {{ listing.listing(prefix + "-list", "When the hearing is", [
+    "Next available possession list after",
+    "Next available date (non-possession list) after",
+    "Specific date"
+  ]) }}
 {% endmacro %}
 
 {% macro row(application) %}
@@ -116,17 +173,13 @@
   <section class="pcs-application" aria-labelledby="{{ prefix }}-heading"
            data-application
            data-application-prefix="{{ prefix }}"
-           data-application-reference="{{ application.reference }}"
-           data-application-applicant="{{ application.applicant or 'the applicant' }}"
-           data-application-submitted="{{ application.submittedOnDisplay or '' }}"
-           data-application-wording-html="{{ application.whatOrderWantedHtml }}"
-           {%- if application.enforcementSuspension %} data-application-suspension{% endif %}>
+           data-application-reference="{{ application.reference }}">
     <h3 class="govuk-heading-m govuk-!-margin-bottom-1" id="{{ prefix }}-heading">
       {{ application.reference }}: {{ application.type }}{% if application.somethingElseDetails %} – {{ application.somethingElseDetails }}{% endif %}
+      {% if application.listed %}<strong class="govuk-tag govuk-tag--blue govuk-!-margin-left-2">Listed for hearing</strong>{% endif %}
     </h3>
     <p class="govuk-body-s govuk-!-margin-bottom-2">
-      {{ application.applicant or "Applicant not known" }}{% if application.submittedOnDisplay %}, {{ application.submittedOnDisplay }}{% endif %}
-      {%- if application.withoutNotice == "YES" %}, without notice{% endif %}
+      {{ application.applicant }}, {{ application.submittedOnDisplay }}
     </p>
     {{ govukDetails({
       summaryText: "Application details and the order asked for",
