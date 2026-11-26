@@ -6,8 +6,8 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      {% if error %}
-        {{ govukErrorSummary({ titleText: "There is a problem", errorList: [{ text: error, href: "#eviction-date-day" }] }) }}
+      {% if errorSummary %}
+        {{ govukErrorSummary(errorSummary) }}
       {% endif %}
 
       {{ caseDetailsHeader({

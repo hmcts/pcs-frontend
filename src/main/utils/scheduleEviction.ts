@@ -13,7 +13,7 @@ export interface ScheduleEvictionStart {
 
 /** The bailiff's answers, kept as typed so the page can show them back. */
 export interface EvictionAnswers {
-  dispenseWithService?: 'YES' | 'NO';
+  dispenseWithService: 'YES' | 'NO';
   day: string;
   month: string;
   year: string;
@@ -32,7 +32,9 @@ export const DATE_REQUIRED = 'Enter the date and time you want to schedule the e
 export const DATE_INVALID = 'Enter a real date and time for the eviction';
 export const DATE_IN_PAST = 'The date and time of the eviction must be in the future';
 
+/** The dispense with service question starts on No (AC02), and a radio cannot be unset, so it is always answered. */
 export const NEW_ANSWERS: EvictionAnswers = {
+  dispenseWithService: 'NO',
   day: '',
   month: '',
   year: '',
@@ -44,10 +46,7 @@ const text = (value: unknown): string => (typeof value === 'string' ? value.trim
 
 export function postedAnswers(body: Record<string, unknown>): EvictionAnswers {
   return {
-    dispenseWithService:
-      body['dispense-with-service'] === 'YES' || body['dispense-with-service'] === 'NO'
-        ? body['dispense-with-service']
-        : undefined,
+    dispenseWithService: body['dispense-with-service'] === 'YES' ? 'YES' : 'NO',
     day: text(body['eviction-date-day']),
     month: text(body['eviction-date-month']),
     year: text(body['eviction-date-year']),
@@ -81,6 +80,15 @@ export function dateError(answers: EvictionAnswers, now: DateTime = DateTime.now
     return DATE_IN_PAST;
   }
   return undefined;
+}
+
+export interface EvictionErrors {
+  date: string;
+}
+
+export function evictionErrors(answers: EvictionAnswers, now: DateTime = DateTime.now()): EvictionErrors | undefined {
+  const date = dateError(answers, now);
+  return date ? { date } : undefined;
 }
 
 export function requestDateTime(dateTime: DateTime): string {

@@ -143,19 +143,19 @@ describe('staffXuiRedirectMiddleware', () => {
     '/cases/1234567890123456/event/ext%3AscheduleEviction',
   ];
 
-  it.each(SCHEDULE_EVICTION_PATHS)('returns staff to the case from %s while release 1B is off', async path => {
+  it.each(SCHEDULE_EVICTION_PATHS)('returns staff to the case from %s while eviction scheduling is off', async path => {
     mockIsStaffUser.mockReturnValue(true);
     mockGetLaunchDarklyFlag.mockResolvedValue(false);
 
     await invokeMiddleware(path);
 
-    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(expect.anything(), 'release-1b-enabled', false);
+    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(expect.anything(), 'eviction-scheduling-enabled', false);
     expect(res.redirect).toHaveBeenCalledWith(303, `${CASE_DETAILS_BASE_URL}/1234567890123456`);
   });
 
-  it.each(SCHEDULE_EVICTION_PATHS)('lets staff through to %s while release 1B is on', async path => {
+  it.each(SCHEDULE_EVICTION_PATHS)('lets staff through to %s while eviction scheduling is on', async path => {
     mockIsStaffUser.mockReturnValue(true);
-    mockGetLaunchDarklyFlag.mockImplementation(async (_req: unknown, flag: string) => flag === 'release-1b-enabled');
+    mockGetLaunchDarklyFlag.mockImplementation(async (_req: unknown, flag: string) => flag === 'eviction-scheduling-enabled');
 
     await invokeMiddleware(path);
 

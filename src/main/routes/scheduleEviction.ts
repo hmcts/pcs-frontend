@@ -11,13 +11,13 @@ import {
   NEW_ANSWERS,
   type ScheduleEvictionSession,
   type ScheduleEvictionStart,
-  dateError,
   displayDateTime,
   evictionDateTime,
+  evictionErrors,
   postedAnswers,
   requestDateTime,
 } from '@utils/scheduleEviction';
-import { manageCaseDetailsUrl, refusedXuiEvent, xuiHeaderModel } from '@utils/xuiUtils';
+import { errorSummary, manageCaseDetailsUrl, refusedXuiEvent, xuiHeaderModel } from '@utils/xuiUtils';
 
 /*
  * The Schedule eviction event, reached from XUI. The start page starts the event and keeps it on the session;
@@ -25,6 +25,8 @@ import { manageCaseDetailsUrl, refusedXuiEvent, xuiHeaderModel } from '@utils/xu
  */
 
 const EVENT_ID = 'ext:scheduleEviction';
+// The answers list on check your answers, which its errors link to.
+const ANSWERS_ID = 'schedule-eviction-answers';
 
 const PAGES = {
   start: '',
@@ -42,14 +44,13 @@ function evictionOf(req: Request): ScheduleEvictionSession | undefined {
   return req.session.scheduleEvictions?.[req.params.caseReference as string];
 }
 
-/** The pages after the start need a journey in progress; without one, the bailiff starts again. */
 const inProgress: RequestHandler = (req, res, next) => {
   const eviction = evictionOf(req);
   return eviction && !eviction.scheduledFor ? next() : res.redirect(pageUrl(req, 'start'));
 };
 
-// The release 1B flag is checked for staff by staffXuiRedirect, and by pcs-api for everyone.
-const inJourney = [oidcMiddleware, inProgress];
+const journey = [oidcMiddleware];
+const inJourney = [...journey, inProgress];
 
 function pageModel(req: Request, eviction: ScheduleEvictionSession) {
   return {
@@ -61,8 +62,17 @@ function pageModel(req: Request, eviction: ScheduleEvictionSession) {
   };
 }
 
+function checkYourAnswersModel(req: Request, eviction: ScheduleEvictionSession) {
+  return {
+    ...pageModel(req, eviction),
+    dispenseWithService: eviction.answers.dispenseWithService === 'YES' ? 'Yes' : 'No',
+    scheduledEviction: displayDateTime(evictionDateTime(eviction.answers)!),
+    changeUrl: pageUrl(req, 'evictionDetails'),
+  };
+}
+
 export default function scheduleEvictionRoutes(app: Application): void {
-  app.get(route('start'), oidcMiddleware, async (req: Request, res: Response, next) => {
+  app.get(route('start'), ...journey, async (req: Request, res: Response, next) => {
     const caseReference = req.params.caseReference as string;
     try {
       const started = await ccdCaseService.startCaseEvent(req.session.user!.accessToken, caseReference, EVENT_ID);
@@ -84,7 +94,7 @@ export default function scheduleEvictionRoutes(app: Application): void {
     }
   });
 
-  app.get(route('cancel'), oidcMiddleware, (req: Request, res: Response) => {
+  app.get(route('cancel'), ...journey, (req: Request, res: Response) => {
     delete req.session.scheduleEvictions?.[req.params.caseReference as string];
     res.redirect(manageCaseDetailsUrl(req.params.caseReference as string));
   });
@@ -97,12 +107,13 @@ export default function scheduleEvictionRoutes(app: Application): void {
   app.post(route('evictionDetails'), ...inJourney, (req: Request, res: Response) => {
     const eviction = evictionOf(req)!;
     eviction.answers = postedAnswers(req.body);
-    const error = dateError(eviction.answers);
-    if (error) {
+    const errors = evictionErrors(eviction.answers);
+    if (errors) {
       return res.status(400).render('schedule-eviction/eviction-details', {
         ...pageModel(req, eviction),
         answers: eviction.answers,
-        error,
+        errors,
+        errorSummary: errorSummary([{ id: 'eviction-date-day', message: errors.date }]),
       });
     }
     res.redirect(pageUrl(req, 'checkYourAnswers'));
@@ -110,21 +121,24 @@ export default function scheduleEvictionRoutes(app: Application): void {
 
   app.get(route('checkYourAnswers'), ...inJourney, (req: Request, res: Response) => {
     const eviction = evictionOf(req)!;
-    if (dateError(eviction.answers)) {
+    if (evictionErrors(eviction.answers)) {
       return res.redirect(pageUrl(req, 'evictionDetails'));
     }
-    res.render('schedule-eviction/check-your-answers', {
-      ...pageModel(req, eviction),
-      dispenseWithService: eviction.answers.dispenseWithService === 'YES' ? 'Yes' : 'No',
-      scheduledEviction: displayDateTime(evictionDateTime(eviction.answers)!),
-      changeUrl: pageUrl(req, 'evictionDetails'),
-    });
+    res.render('schedule-eviction/check-your-answers', checkYourAnswersModel(req, eviction));
   });
 
   app.post(route('checkYourAnswers'), ...inJourney, async (req: Request, res: Response, next) => {
     const eviction = evictionOf(req)!;
     if (req.body.action === 'previous') {
       return res.redirect(pageUrl(req, 'evictionDetails'));
+    }
+    // The date may have passed while the bailiff was on this page.
+    const errors = evictionErrors(eviction.answers);
+    if (errors) {
+      return res.status(400).render('schedule-eviction/check-your-answers', {
+        ...checkYourAnswersModel(req, eviction),
+        errorSummary: errorSummary([{ id: ANSWERS_ID, message: errors.date }]),
+      });
     }
     const dateTime = evictionDateTime(eviction.answers)!;
     try {
@@ -136,20 +150,25 @@ export default function scheduleEvictionRoutes(app: Application): void {
         {
           sdkEventPayload: JSON.stringify({
             enforcementApplicationId: eviction.start.enforcementApplicationId,
-            courtGivenPermissionToDispenseWithService: eviction.answers.dispenseWithService ?? 'NO',
+            courtGivenPermissionToDispenseWithService: eviction.answers.dispenseWithService,
             scheduledEvictionDate: requestDateTime(dateTime),
           }),
         }
       );
-      // Kept so a refresh of the confirmation still shows it.
       eviction.scheduledFor = displayDateTime(dateTime);
       res.redirect(pageUrl(req, 'confirmed'));
     } catch (error) {
-      refusedXuiEvent(res, next, error, refusalPage(req, res));
+      // pcs-api's reasons are shown on this page, so the bailiff can change their answers.
+      refusedXuiEvent(res, next, error, rejected =>
+        res.status(rejected.status).render('schedule-eviction/check-your-answers', {
+          ...checkYourAnswersModel(req, eviction),
+          errorSummary: errorSummary(rejected.reasons.map(message => ({ id: ANSWERS_ID, message }))),
+        })
+      );
     }
   });
 
-  app.get(route('confirmed'), oidcMiddleware, (req: Request, res: Response) => {
+  app.get(route('confirmed'), ...journey, (req: Request, res: Response) => {
     const eviction = evictionOf(req);
     const closeUrl = manageCaseDetailsUrl(req.params.caseReference as string);
     if (!eviction?.scheduledFor) {

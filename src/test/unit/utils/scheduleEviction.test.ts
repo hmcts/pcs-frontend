@@ -9,6 +9,7 @@ import {
   dateError,
   displayDateTime,
   evictionDateTime,
+  evictionErrors,
   postedAnswers,
   requestDateTime,
 } from '@utils/scheduleEviction';
@@ -20,12 +21,12 @@ function answers(day: string, month: string, year: string, hour: string, minute:
 }
 
 describe('scheduleEviction', () => {
-  it('starts with the dispense with service question unanswered', () => {
-    expect(NEW_ANSWERS.dispenseWithService).toBeUndefined();
+  it('starts with the dispense with service question on No', () => {
+    expect(NEW_ANSWERS.dispenseWithService).toBe('NO');
   });
 
-  it('leaves the dispense with service question unanswered when nothing is picked', () => {
-    expect(postedAnswers({}).dispenseWithService).toBeUndefined();
+  it('treats the dispense with service question as No when nothing is posted', () => {
+    expect(postedAnswers({}).dispenseWithService).toBe('NO');
   });
 
   it('reads the posted answers', () => {
@@ -70,6 +71,14 @@ describe('scheduleEviction', () => {
     ['a later day', answers('1', '7', '2027', '09', '00')],
   ])('takes today or a later date and time: %s', (_, given) => {
     expect(dateError(given, NOW)).toBeUndefined();
+  });
+
+  it('requires the date', () => {
+    expect(evictionErrors(NEW_ANSWERS, NOW)).toEqual({ date: DATE_REQUIRED });
+  });
+
+  it('has no errors once the date is answered', () => {
+    expect(evictionErrors(answers('25', '6', '2027', '17', '30'), NOW)).toBeUndefined();
   });
 
   it('sends pcs-api the UK date and time', () => {

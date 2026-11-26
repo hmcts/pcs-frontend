@@ -24,6 +24,14 @@
   <form method="post" action="{{ formAction }}" novalidate>
     {{ csrfProtection(csrfToken) }}
 
+    {{ dateInput(
+      "eviction-date",
+      "When do you want to schedule the eviction for?",
+      "Use the 24-hour clock. For example, use 17:30 instead of 5:30pm.",
+      answers,
+      errors.date
+    ) }}
+
     {{ govukRadios({
       name: "dispense-with-service",
       idPrefix: "dispense-with-service",
@@ -34,14 +42,6 @@
         { value: "NO", text: "No", checked: answers.dispenseWithService == "NO" }
       ]
     }) }}
-
-    {{ dateInput(
-      "eviction-date",
-      "When do you want to schedule the eviction for?",
-      "Use the 24-hour clock. For example, use 17:30 instead of 5:30pm.",
-      answers,
-      error
-    ) }}
 
     {{ buttons.eventButtons(previousDisabled=true) }}
   </form>

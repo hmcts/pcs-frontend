@@ -24,7 +24,7 @@ const FLAGGED_STAFF_JOURNEYS: readonly { flag: string; paths: readonly RegExp[] 
     paths: [/^\/cases\/\d+\/event\/ext:recordWarrantReturn$/, /^\/case\/\d+\/record-warrant-return(?:\/.*)?$/],
   },
   {
-    flag: 'release-1b-enabled',
+    flag: 'eviction-scheduling-enabled',
     paths: [/^\/cases\/\d+\/event\/ext:scheduleEviction$/, /^\/case\/\d+\/schedule-eviction(?:\/.*)?$/],
   },
 ];

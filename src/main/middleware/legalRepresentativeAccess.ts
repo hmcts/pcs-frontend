@@ -5,8 +5,6 @@ import { isLegalRepresentativeUser } from '../steps/utils';
 const LEGAL_REPRESENTATIVE_ALLOWED_PATHS = [
   /^\/case\/[^/]+\/respond-to-claim(?:\/.*)?$/,
   /^\/case\/[^/]+\/view-documents(?:\/.*)?$/,
-  // TODO HDPI-7344: temporary, to test locally as pcs-solicitor1 until the bailiff roles are in
-  /^\/case\/[^/]+\/schedule-eviction(?:\/.*)?$/,
   /^\/cases\/[^/]+\/event\/[^/]+(?:\/.*)?$/,
   /^\/payment\/return\/[^/]+(?:\/.*)?$/,
   /^\/api\/postcode-lookup(?:\/.*)?$/,
