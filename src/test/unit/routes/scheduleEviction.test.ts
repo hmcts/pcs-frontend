@@ -66,7 +66,12 @@ describe('scheduleEvictionRoutes', () => {
 
   beforeEach(() => {
     app = { get: jest.fn(), post: jest.fn() } as unknown as Application;
-    res = { redirect: jest.fn(), render: jest.fn(), send: jest.fn(), status: jest.fn().mockReturnThis() } as unknown as Response;
+    res = {
+      redirect: jest.fn(),
+      render: jest.fn(),
+      send: jest.fn(),
+      status: jest.fn().mockReturnThis(),
+    } as unknown as Response;
     scheduleEvictionRoutes(app);
   });
 
@@ -135,7 +140,11 @@ describe('scheduleEvictionRoutes', () => {
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.render).toHaveBeenCalledWith(
       'schedule-eviction/check-your-answers',
-      expect.objectContaining({ errorSummary: expect.objectContaining({ errorList: [{ text: DATE_IN_PAST, href: '#schedule-eviction-answers' }] }) })
+      expect.objectContaining({
+        errorSummary: expect.objectContaining({
+          errorList: [{ text: DATE_IN_PAST, href: '#schedule-eviction-answers' }],
+        }),
+      })
     );
   });
 
@@ -144,13 +153,19 @@ describe('scheduleEvictionRoutes', () => {
 
     await handler('post', '/check-your-answers')(request(inProgress(validAnswers)), res, jest.fn());
 
-    expect(ccdCaseService.submitCaseEvent).toHaveBeenCalledWith('token', '1234', 'ext:scheduleEviction', 'event-token', {
-      sdkEventPayload: JSON.stringify({
-        enforcementApplicationId: 'app-1',
-        courtGivenPermissionToDispenseWithService: 'NO',
-        scheduledEvictionDate: '2099-01-01T10:00',
-      }),
-    });
+    expect(ccdCaseService.submitCaseEvent).toHaveBeenCalledWith(
+      'token',
+      '1234',
+      'ext:scheduleEviction',
+      'event-token',
+      {
+        sdkEventPayload: JSON.stringify({
+          enforcementApplicationId: 'app-1',
+          courtGivenPermissionToDispenseWithService: 'NO',
+          scheduledEvictionDate: '2099-01-01T10:00',
+        }),
+      }
+    );
     expect(res.redirect).toHaveBeenCalledWith(`${CASE_URL}/confirmed`);
   });
 
@@ -164,7 +179,11 @@ describe('scheduleEvictionRoutes', () => {
     expect(res.status).toHaveBeenCalledWith(422);
     expect(res.render).toHaveBeenCalledWith(
       'schedule-eviction/check-your-answers',
-      expect.objectContaining({ errorSummary: expect.objectContaining({ errorList: [{ text: 'The warrant has expired', href: '#schedule-eviction-answers' }] }) })
+      expect.objectContaining({
+        errorSummary: expect.objectContaining({
+          errorList: [{ text: 'The warrant has expired', href: '#schedule-eviction-answers' }],
+        }),
+      })
     );
   });
 

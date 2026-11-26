@@ -155,7 +155,9 @@ describe('staffXuiRedirectMiddleware', () => {
 
   it.each(SCHEDULE_EVICTION_PATHS)('lets staff through to %s while eviction scheduling is on', async path => {
     mockIsStaffUser.mockReturnValue(true);
-    mockGetLaunchDarklyFlag.mockImplementation(async (_req: unknown, flag: string) => flag === 'eviction-scheduling-enabled');
+    mockGetLaunchDarklyFlag.mockImplementation(
+      async (_req: unknown, flag: string) => flag === 'eviction-scheduling-enabled'
+    );
 
     await invokeMiddleware(path);
 
