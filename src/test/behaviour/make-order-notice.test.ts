@@ -256,11 +256,7 @@ describe("make an order: made on the court's own initiative or without notice", 
         id: 'order-awaiting-review',
         version: 3,
         orderType: 'FREE_FORM',
-        formData: {
-          ...passed,
-          'claimant-claimant-id-attendance': 'litigant-in-person',
-          'defendant-defendant-id-attendance': 'not-present',
-        },
+        formData: passed,
         docweaveSnapshot,
       },
     });

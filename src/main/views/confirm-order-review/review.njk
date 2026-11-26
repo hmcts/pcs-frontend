@@ -59,6 +59,13 @@
       </p>
 
       {% include "make-order/_editor.njk" %}
+      {% if judgeDocument %}
+        <script type="application/json" id="judge-order-document">{{ judgeDocument | jsonScript | safe }}</script>
+        {# Shown by the page's script, which runs the editor it restores. #}
+        <button type="button" class="govuk-button govuk-button--secondary" id="restore-judge-wording" hidden>
+          Restore the Judge's wording
+        </button>
+      {% endif %}
 
       {% set queryHtml %}
         {{ govukCharacterCount({

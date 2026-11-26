@@ -1,4 +1,9 @@
-import { type CreateDocEditorOptions, type DocWeaveDocument, createDocEditor } from '@hmcts-cft/docweave';
+import {
+  type CreateDocEditorOptions,
+  type DocWeaveDocument,
+  createDocEditor,
+  parseSnapshot,
+} from '@hmcts-cft/docweave';
 
 import { WITHOUT_HEARING, parseMoney, workingDayOnOrAfter } from '../../utils/makeOrderFormat';
 import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation';
@@ -296,12 +301,21 @@ function bindOrderEditor(form: HTMLFormElement, options?: Pick<CreateDocEditorOp
   return editor;
 }
 
-/** Review the judge's saved document without regenerating it from form answers. */
+/** Review the judge's saved document without regenerating it from form answers, and offer to start again from it. */
 export function initOrderReview(): void {
   const form = document.querySelector<HTMLFormElement>('#review-order-form');
-  if (form) {
-    bindOrderEditor(form);
+  const editor = form && bindOrderEditor(form);
+  const restore = form?.querySelector<HTMLButtonElement>('#restore-judge-wording');
+  const judges = form?.querySelector('#judge-order-document')?.textContent;
+  if (!editor || !restore || !judges) {
+    return;
   }
+  const snapshot = parseSnapshot(judges);
+  restore.hidden = false;
+  restore.addEventListener('click', () => {
+    form.querySelector<HTMLTextAreaElement>('#order-document')!.value = judges;
+    editor.load(snapshot);
+  });
 }
 
 export function initMakeOrder(): void {

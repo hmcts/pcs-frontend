@@ -423,6 +423,20 @@ describe('confirm order review', () => {
       expect(submitted).not.toContain('The Court heard from the claimant.');
     });
 
+    it("restores the Judge's wording over the caseworker's edits", async () => {
+      app = await caseworkerReviewing(await judgesOrder({ edit: () => writeInPreview('The claim is adjourned.') }));
+      const page = await openReview(app);
+      changeGeneratedWording('Wording the caseworker rewrote');
+      writeInPreview('The claimant may apply to restore the claim.');
+
+      control<HTMLButtonElement>('#restore-judge-wording').click();
+
+      const wording = page.documentText();
+      expect(wording).toContain('The claim is adjourned.');
+      expect(wording).not.toContain('Wording the caseworker rewrote');
+      expect(wording).not.toContain('The claimant may apply to restore the claim.');
+    });
+
     it("refuses a page left open for one order once another order's review is opened, keeping that review", async () => {
       app = await caseworkerReviewing();
       const first = await openReview(app);

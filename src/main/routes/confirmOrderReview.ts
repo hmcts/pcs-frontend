@@ -7,8 +7,8 @@ import { CONFIRM_ORDER_REVIEW_ROUTE } from '../constants/caseRoutes';
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
-import { applicationsToDecide, attendanceParties, caseBundleModel, upcomingHearings } from '@utils/makeOrderForm';
-import { validateFreeformWording, validateMakeOrder } from '@utils/makeOrderValidation';
+import { applicationsToDecide, caseBundleModel, upcomingHearings } from '@utils/makeOrderForm';
+import { validateFreeformWording, validateStillCurrent } from '@utils/makeOrderValidation';
 import {
   COSTS,
   FREQUENCIES,
@@ -356,6 +356,7 @@ const VIEWS = {
     orderDocumentJson:
       review.answers.orderDocumentJson ??
       (review.order.docweaveSnapshot ? JSON.stringify(review.order.docweaveSnapshot) : ''),
+    judgeDocument: review.order.docweaveSnapshot,
     caseBundle: review.caseContext.caseBundle
       ? caseBundleModel(review.caseContext.caseBundle, review.caseContext.caseReference)
       : undefined,
@@ -442,10 +443,14 @@ function atOrderEditor(message: string): ValidationIssue {
   return { id: 'order-editor', message };
 }
 
+/**
+ * What stops the edited order being issued: the judge's answers were checked when they sent it, so only what time
+ * has overtaken since, and wording a freeform decision needs.
+ */
 function orderIssues(review: OrderReviewSession): ValidationIssue[] {
-  const { orderType, formData } = review.order;
+  const { formData } = review.order;
   const { orderDocumentJson } = review.answers;
-  if (!orderType || !orderDocumentJson) {
+  if (!orderDocumentJson) {
     return [atOrderEditor(NO_WORDING)];
   }
   const open = new Set(review.caseContext.applications.map(({ id }) => id));
@@ -454,18 +459,15 @@ function orderIssues(review: OrderReviewSession): ValidationIssue[] {
   }
   const applications = applicationsToDecide(review);
   return [
-    ...validateMakeOrder(
-      orderType,
+    ...validateStillCurrent(
       formData,
-      review.hearing ? attendanceParties(review) : [],
-      !review.hearing,
       applications,
       upcomingHearings(review).map(({ id }) => id)
+    ).map(({ message }) => atOrderEditor(`${message}. ${RETURN_FOR_CORRECTION}`)),
+    ...validateFreeformWording(formData, applications, postedSnapshot(orderDocumentJson)).map(({ message }) =>
+      atOrderEditor(message)
     ),
-    ...validateFreeformWording(formData, applications, postedSnapshot(orderDocumentJson)),
-  ].map(({ message }) =>
-    atOrderEditor(`${message.replace(/\. Select another hearing$/, '')}. ${RETURN_FOR_CORRECTION}`)
-  );
+  ];
 }
 
 /** What stops the order being issued from the record page's answers, in the order the page asks them. */
