@@ -125,7 +125,7 @@ export const step: StepDefinition = createFormStep({
       clientReference: applicationId,
     };
 
-    const makeAnApplicationResponse = await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
+    const makeAnApplicationResponse = await ccdCaseService.submitGeneralApplication(req.session?.user!.accessToken, {
       id: ccdCase.id,
       data: {
         citizenGenAppRequest,
