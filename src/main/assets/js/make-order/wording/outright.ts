@@ -96,7 +96,7 @@ export function addOutrightClauses(list: OrderedListBuilder, data: OrderData): v
   }
   if (plans.includes('lump') || plans.includes('instalments')) {
     list.item('payment-terms', content => {
-      content.text(`The judgment is to be paid by ${defendant} to ${claimant} `);
+      content.text(`The sums ordered above are to be paid by ${defendant} to ${claimant} `);
       if (plans.includes('lump')) {
         addPaymentTerm(content, data, {
           kind: 'one-off',

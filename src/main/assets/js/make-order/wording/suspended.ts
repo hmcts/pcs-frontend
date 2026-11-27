@@ -57,7 +57,12 @@ export function addSuspendedClauses(list: OrderedListBuilder, data: OrderData): 
   if (selected(data, 'costs', 'yes') && SAME_TERMS_COSTS.has(value(data, 'costs-choice'))) {
     suspended.push('any costs order');
   }
-  addPaymentConditions(list, data, 'suspended', `${sentenceCase(claimant)} may not enforce ${joinList(suspended)} if`);
+  addPaymentConditions(
+    list,
+    data,
+    'suspended',
+    `${sentenceCase(claimant)} may not enforce ${joinList(suspended)} for as long as`
+  );
   list.item(
     'suspended-paid-in-full',
     `Once ${defendant} ${data.defendants.length > 1 ? 'have' : 'has'} paid all the sums ordered, ${claimant} may no longer enforce this order.`

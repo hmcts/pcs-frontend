@@ -212,7 +212,7 @@ describe('make an order: outright possession', () => {
         'This order for possession was made on mandatory grounds, namely Ground 8.',
         'There is judgment for the Claimant against the Defendant in the sum of £2,500.00.',
         "The Defendant shall pay the Claimant's fixed costs of £300.00.",
-        'The judgment is to be paid by the Defendant to the Claimant by instalment payments of £50.00 every week, the first instalment to be paid on or before 8 October 2026.',
+        'The sums ordered above are to be paid by the Defendant to the Claimant by instalment payments of £50.00 every week, the first instalment to be paid on or before 8 October 2026.',
       ].join('\n')
     );
 

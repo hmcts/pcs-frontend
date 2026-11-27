@@ -50,7 +50,7 @@ export function sentenceCase(text: string): string {
   return text ? `${text.charAt(0).toUpperCase()}${text.slice(1)}` : text;
 }
 
-function possessive(text: string): string {
+export function possessive(text: string): string {
   return text.endsWith('s') ? `${text}'` : `${text}'s`;
 }
 
@@ -147,7 +147,11 @@ function addAttendance(order: DocBuilder, data: OrderData): void {
     return name ? `${name}, ${description}` : description;
   });
   if (spoken.length || letters.length) {
-    const heardFrom = spoken.length ? `heard from ${joinList(spoken)}` : '';
+    const speakers =
+      spoken.length > 1 && spoken.some(speaker => speaker.includes(','))
+        ? `${spoken.slice(0, -1).join(', ')}, and ${spoken[spoken.length - 1]}`
+        : joinList(spoken);
+    const heardFrom = spoken.length ? `heard from ${speakers}` : '';
     const readFrom = letters.length
       ? `read ${letters.length === 1 ? 'a letter' : 'letters'} from ${joinList(
           letters.map(entry => entry.representativeName || entry.partyName)

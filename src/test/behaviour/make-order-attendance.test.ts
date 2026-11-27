@@ -74,7 +74,7 @@ describe('make an order: attendance', () => {
     check('defendant-second-attendance', 'not-present');
 
     expect(page.orderText().split('\n').slice(0, 2)).toEqual([
-      'The Court heard from Sam Solicitor, solicitor for the Claimant and the First Defendant in person.',
+      'The Court heard from Sam Solicitor, solicitor for the Claimant, and the First Defendant in person.',
       'The Second Defendant did not attend.',
     ]);
   });

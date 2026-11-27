@@ -64,7 +64,7 @@ describe('make an order: suspended possession', () => {
         'The Defendant must leave and give up possession of 10 Test Street, Bristol, BS1 1AA to the Claimant on or before 4pm on 1 December 2026.',
         'Judgment is entered for the Claimant against the Defendant in the sum of £1,200.00.',
         "The Defendant shall pay the Claimant's costs of the claim in the fixed sum of £250.00.",
-        'The Claimant may not enforce the possession order, the money judgment and any costs order if the Defendant pays (i) the rent as it falls due plus (ii) the arrears of £1,200.00 by payments of £100.00 to the Claimant every month, the first instalment to be paid on or before 1 November 2026.',
+        'The Claimant may not enforce the possession order, the money judgment and any costs order for as long as the Defendant pays (i) the rent as it falls due plus (ii) the arrears of £1,200.00 by payments of £100.00 to the Claimant every month, the first instalment to be paid on or before 1 November 2026.',
         'Payment of the above instalments made to the Claimant shall be applied first to any arrears prior to any order for costs.',
         'Once the Defendant has paid all the sums ordered, the Claimant may no longer enforce this order.',
         'Any application for a warrant of possession must be heard on notice to all parties unless the Court orders otherwise.',

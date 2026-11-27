@@ -8,13 +8,13 @@ import { date, partyLabels, sentenceCase, value, values } from './common';
 /** When the hearing is, after what the order says happens to its subject. */
 const WHEN: Record<string, string> = {
   'next-list': 'the next available possession list after ',
-  'next-date': 'the next available date after ',
+  'next-date': 'the next available date (non-possession list) after ',
   specific: '',
 };
 
 const HEARING_FORMATS: Record<string, string> = {
   'in-person': 'in person',
-  video: 'by video hearing',
+  video: 'by video',
   telephone: 'by telephone',
 };
 

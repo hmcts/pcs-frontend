@@ -92,6 +92,10 @@ describe('make an order: free form and strike out', () => {
     await app.close();
     app = await bootApp({
       openCounterclaim: true,
+      defendants: [
+        { id: 'defendant-id', name: 'Alex Example' },
+        { id: 'second-defendant', name: 'Blake Example' },
+      ],
       applications: [
         {
           id: 'gen-app-1',
@@ -112,9 +116,7 @@ describe('make an order: free form and strike out', () => {
     check('strike-counterclaim-outcome', 'dismissed');
     expect(document.querySelector('[name="strike-subjects"][value="application"]')).toBeNull();
     expect(page.orderText()).toBe(
-      ['IT IS ORDERED THAT:', 'The Claimant’s claim is struck out.', 'The Defendant’s counterclaim is dismissed.'].join(
-        '\n'
-      )
+      ['IT IS ORDERED THAT:', "The Claimant's claim is struck out.", 'The counterclaim is dismissed.'].join('\n')
     );
 
     uncheck('strike-subjects', 'claim');
@@ -133,7 +135,7 @@ describe('make an order: free form and strike out', () => {
     check('costs', 'yes');
     check('costs-choice', 'reserved');
     expect(page.orderText()).toBe(
-      ['IT IS ORDERED THAT:', 'The Claimant’s claim is dismissed.', 'Costs reserved.'].join('\n')
+      ['IT IS ORDERED THAT:', "The Claimant's claim is dismissed.", 'Costs reserved.'].join('\n')
     );
 
     const body = page.body();
@@ -141,7 +143,7 @@ describe('make an order: free form and strike out', () => {
     expect((await app.post(PAGE, body)).status).toBe(302);
     const reopened = await openPage((await app.get(PAGE)).text);
     expect(reopened.documentText()).toBe(
-      ['IT IS ORDERED THAT:', 'The Claimant’s claim is dismissed.', 'Costs reserved.'].join('\n')
+      ['IT IS ORDERED THAT:', "The Claimant's claim is dismissed.", 'Costs reserved.'].join('\n')
     );
 
     recordAttendance();
