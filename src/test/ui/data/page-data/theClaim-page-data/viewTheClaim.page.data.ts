@@ -25,11 +25,11 @@ export const viewTheClaim = {
   defendant1SubHeader: 'Defendant 1 details',
   defendant2SubHeader: whenLdFlag(RELEASE_1_4_ENABLED, {
     on: 'Defendant 2 details',
-    off: 'Additional defendant 2 details',
+    off: 'Additional defendant 1 details',
   }),
   defendant3SubHeader: whenLdFlag(RELEASE_1_4_ENABLED, {
     on: 'Defendant 3 details',
-    off: 'Additional defendant 3 details',
+    off: 'Additional defendant 2 details',
   }),
   claimDetailsSubHeader: 'Claim details',
   rentArrearsSubHeader: 'Details of rent arrears',

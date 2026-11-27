@@ -40,7 +40,7 @@ export class CitizenDashboardAction implements IAction {
 
   private async verifyRespondToClaimNotificationAndTag(_page: Page, notificationData: actionRecord) {
     await performValidation('text', {
-      elementType: 'paragraph',
+      elementType: 'paragraphWithLink',
       text: notificationData.notificationText,
     });
     const isCompleted = String(notificationData.tag).toLowerCase() === 'completed';
@@ -138,7 +138,10 @@ export class CitizenDashboardAction implements IAction {
     }
     const defendantName = `${selectedDefendant.firstName} ${selectedDefendant.lastName}`;
     const defendantNumber = getSelectedDefendantNumber();
-    const defendantDetailsSubHeader = `Defendant ${defendantNumber} details`;
+    const release14Enabled = await getLdFlag(RELEASE_1_4_ENABLED);
+    const defendantDetailsSubHeader = release14Enabled
+      ? `Defendant ${defendantNumber} details`
+      : viewTheResponse.defendant1SubHeader;
     await performValidation('text', {
       elementType: 'paragraph',
       text: `Property address: ${viewTheClaim.dateAndCaseDetails['Property address']}`,
@@ -160,7 +163,6 @@ export class CitizenDashboardAction implements IAction {
       defendantDetailsSubHeader,
       getDefendantDetails(selectedDefendant.firstName, selectedDefendant.lastName, selectedDefendant.address)
     );
-    const release14Enabled = await getLdFlag(RELEASE_1_4_ENABLED);
     for (const defendant of pinUsers) {
       const otherDefendantName = `${defendant.firstName} ${defendant.lastName}`;
       if (otherDefendantName === defendantName) {
@@ -206,8 +208,7 @@ export class CitizenDashboardAction implements IAction {
   }
 
   private async verifyClaimDetailsOnViewTheClaimPage(): Promise<void> {
-    const defendants = getPinUsersInClaimOrder();
-    const defendantDetails = defendants.map((defendant, index) => ({
+    const defendantDetails = getPinUsersInClaimOrder().map((defendant, index) => ({
       ...viewTheClaim[
         `defendant${index + 1}Details` as 'defendant1Details' | 'defendant2Details' | 'defendant3Details'
       ],
