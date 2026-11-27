@@ -4,6 +4,7 @@ import { Page, test } from '@playwright/test';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 export const DEFENDANT_GENERAL_APPLICATIONS_R2_FLAG = 'defendant-general-applications-r-2';
+export const RELEASE_1_4_ENABLED = 'release-1.4-enabled';
 
 let ldClient: LaunchDarkly.LDClient | null = null;
 
@@ -11,6 +12,22 @@ export type LdFlagged<T> = { ldFlag: string; on: T; off: T };
 
 export function whenLdFlag<T>(ldFlag: string, values: { on: T; off: T }): LdFlagged<T> {
   return { ldFlag, on: values.on, off: values.off };
+}
+
+/**
+ * Keeps a page's ON and OFF expectations together while retaining the existing
+ * page-data API, where specs read values such as `pageData.mainHeader`.
+ */
+export function whenLdFlagPageData<T extends Record<string, unknown>>(ldFlag: string, values: { on: T; off: T }): T {
+  const keys = Object.keys(values.on) as (keyof T)[];
+  return Object.fromEntries(
+    keys.map(key => [
+      key,
+      Object.is(values.on[key], values.off[key])
+        ? values.on[key]
+        : whenLdFlag(ldFlag, { on: values.on[key], off: values.off[key] }),
+    ])
+  ) as T;
 }
 
 export function isLdFlagged(value: unknown): value is LdFlagged<unknown> {

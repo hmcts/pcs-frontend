@@ -1,6 +1,7 @@
+import { RELEASE_1_4_ENABLED, whenLdFlagPageData } from '../../../utils/actions/custom-actions/launchDarkly.action';
 import { generateRandomString } from '../../../utils/common/string.utils';
 
-export const whatRegularIncomeDoYouReceive = {
+const whatRegularIncomeDoYouReceiveDefault = {
   mainHeader: `Income`,
   whatRegularIncomeDoesDefendantReceiveQuestion: `What regular income does the defendant receive? (Optional)`,
   selectAllThatApplyHintText: `Select all that apply. The information the defendant provides must be truthful and accurate.`,
@@ -53,3 +54,14 @@ export const whatRegularIncomeDoYouReceive = {
   feedbackLink: `feedback`,
   pageSlug: `what-regular-income-do-you-receive`,
 };
+
+const whatRegularIncomeDoYouReceiveLegacy = {
+  ...whatRegularIncomeDoYouReceiveDefault,
+  weekHiddenRadioOption: `Week`,
+  monthHiddenRadioOption: `Month`,
+};
+
+export const whatRegularIncomeDoYouReceive = whenLdFlagPageData(RELEASE_1_4_ENABLED, {
+  on: whatRegularIncomeDoYouReceiveDefault,
+  off: whatRegularIncomeDoYouReceiveLegacy,
+});

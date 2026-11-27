@@ -1,4 +1,6 @@
-export const whatOtherRegularExpensesDoYouHave = {
+import { RELEASE_1_4_ENABLED, whenLdFlagPageData } from '../../../utils/actions/custom-actions/launchDarkly.action';
+
+const whatOtherRegularExpensesDoYouHaveDefault = {
   mainHeader: `Expenses`,
   whatOtherRegularExpensesQuestion: `What regular monthly expenses does the defendant have? (Optional)`,
   selectAllThatApplyHintText: `Select all that apply. The information the defendant provides must be truthful and accurate.`,
@@ -124,3 +126,30 @@ export const whatOtherRegularExpensesDoYouHave = {
   feedbackLink: `feedback`,
   pageSlug: `what-other-regular-expenses-do-you-have`,
 };
+
+const whatOtherRegularExpensesDoYouHaveLegacy = {
+  ...whatOtherRegularExpensesDoYouHaveDefault,
+  householdBillsWeekHiddenRadioOption: `Week`,
+  householdBillsMonthHiddenRadioOption: `Month`,
+  loanPaymentsWeekHiddenRadioOption: `Week`,
+  loanPaymentsMonthHiddenRadioOption: `Month`,
+  childSpousalMaintenanceWeekHiddenRadioOption: `Week`,
+  childSpousalMaintenanceMonthHiddenRadioOption: `Month`,
+  mobilePhoneWeekHiddenRadioOption: `Week`,
+  mobilePhoneMonthHiddenRadioOption: `Month`,
+  groceryShoppingWeekHiddenRadioOption: `Week`,
+  groceryShoppingMonthHiddenRadioOption: `Month`,
+  fuelParkingTransportWeekHiddenRadioOption: `Week`,
+  fuelParkingTransportMonthHiddenRadioOption: `Month`,
+  schoolCostsWeekHiddenRadioOption: `Week`,
+  schoolCostsMonthHiddenRadioOption: `Month`,
+  clothingWeekHiddenRadioOption: `Week`,
+  clothingMonthHiddenRadioOption: `Month`,
+  otherExpensesWeekHiddenRadioOption: `Week`,
+  otherExpensesMonthHiddenRadioOption: `Month`,
+};
+
+export const whatOtherRegularExpensesDoYouHave = whenLdFlagPageData(RELEASE_1_4_ENABLED, {
+  on: whatOtherRegularExpensesDoYouHaveDefault,
+  off: whatOtherRegularExpensesDoYouHaveLegacy,
+});
