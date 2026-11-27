@@ -2,7 +2,7 @@
   "pageTitle": "Datganiad Hygyrchedd - Gwasanaeth Llysoedd a Thribiwnlysoedd EF - GOV.UK",
   "accessibilityStatement": {
     "title": "Datganiad Hygyrchedd",
-    "description1": "Mae’r datganiad hygyrchedd hwn yn berthnasol i’r Gwasanaeth Hawliadau Meddiant (Rhyngwyneb Defnyddiwr).",
+    "description1": "Mae’r datganiad hygyrchedd hwn yn berthnasol i Wasanaeth Hawliadau Meddiant.",
     "description2": "Gwasanaeth Llysoedd a Thribiwnlysoedd EF sy’n gyfrifol am y wefan hon. Rydym eisiau i gymaint o bobl â phosibl allu defnyddio’r wefan hon. Er enghraifft, mae hynny’n golygu y dylech allu",
     "description3": "Rydym hefyd wedi gwneud testun y wefan mor hawdd â phosibl i’w ddeall.",
     "description4": "Mae gan <a class=\"govuk-link\" href=\"https://mcmw.abilitynet.org.uk/\" target=\"_blank\">AbilityNet (yn agor mewn tab newydd)</a> gyngor ar sut i wneud eich dyfais yn haws i’w defnyddio os oes gennych anabledd.",
@@ -60,6 +60,6 @@
   "preparationOfThisAccessibilityStatement": {
     "title": "Paratoi’r datganiad hygyrchedd hwn",
     "description1": "Paratowyd y datganiad hwn ar 8 Medi 2026 yn dilyn gwerthusiad o’r gwasanaeth ar-lein y mae’n berthnasol iddo. Cynhaliwyd yr asesiad gan dimau mewnol o fewn Gwasanaeth Llysoedd a Thribiwnlysoedd EF a chyflenwyr TG cysylltiedig.",
-    "description2": "Adolygwyd y datganiad ddiwethaf ar 16 Medi 2026."
+    "description2": "Adolygwyd y datganiad ddiwethaf ar 20 Tachwedd 2026."
   }
 }

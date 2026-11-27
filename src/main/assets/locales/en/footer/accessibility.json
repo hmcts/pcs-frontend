@@ -2,7 +2,7 @@
   "pageTitle": "Accessibility Statement - HM Courts & Tribunals Service - GOV.UK",
   "accessibilityStatement": {
     "title": "Accessibility Statement",
-    "description1": "This accessibility statement applies to Possession Claim Service (Frontend).",
+    "description1": "This accessibility statement applies to Possession Claims Service.",
     "description2": "This website is run by HM Courts & Tribunals Service. We want as many people as possible to be able to use this website. For example, that means you should be able to:",
     "description3": "We’ve also made the website text as simple as possible to understand.",
     "description4": "<a class=\"govuk-link\" href=\"https://mcmw.abilitynet.org.uk/\" target=\"_blank\">AbilityNet (opens in a new tab)</a> has advice on making your device easier to use if you have a disability.",
@@ -60,6 +60,6 @@
   "preparationOfThisAccessibilityStatement": {
     "title": "Preparation of this accessibility statement",
     "description1": "This statement was prepared on 8th Sept 2026 following an evaluation of the web application to which it applies. The assessment was conducted by internal teams within the HM Courts & Tribunals Service organisation and associated IT suppliers.",
-    "description2": "The statement was last reviewed on 16<sup>th</sup> Sept 2026."
+    "description2": "The statement was last reviewed on 20<sup>th</sup> Nov 2026."
   }
 }
