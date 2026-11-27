@@ -99,7 +99,7 @@
     },
     "counterClaimAppliedForHwf": {
       "label": "A ydy’r diffynnydd eisoes wedi gwneud cais am help i dalu eu ffi gwrth-hawliad?",
-      "changeHidden": "wedi gwneud cais am help i dalu ffioedd"
+      "changeHidden": "wedi gwneud cais am Help i Dalu Ffioedd"
     },
     "counterClaimHwfReference": {
       "label": "Nodwch gyfeirnod Help i Dalu Ffioedd y diffynnydd",
