@@ -24,12 +24,12 @@ const makeReq = (counterClaim: Record<string, unknown> | undefined): FakeReq =>
   }) as unknown as FakeReq;
 
 describe('shouldShowCounterClaimNeedToApplyStep', () => {
-  it('returns true when user needs help with fees and has not applied for HWF', () => {
+  it('returns true when user needs Help with Fees and has not applied for HWF', () => {
     const req = makeReq({ needHelpWithFees: 'YES', appliedForHwf: 'NO' });
     expect(shouldShowCounterClaimNeedToApplyStep(req)).toBe(true);
   });
 
-  it('returns false when user does not need help with fees even if appliedForHwf is stale NO', () => {
+  it('returns false when user does not need Help with Fees even if appliedForHwf is stale NO', () => {
     const req = makeReq({ needHelpWithFees: 'NO', appliedForHwf: 'NO' });
     expect(shouldShowCounterClaimNeedToApplyStep(req)).toBe(false);
   });

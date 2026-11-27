@@ -12,6 +12,11 @@ jest.mock('@steps', () => ({
   shouldShowStep: jest.fn(),
 }));
 
+jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
+  ...jest.requireActual('@utils/isRespondToClaimEnabledForUser'),
+  isRespondToClaimEnabledForRelease: jest.fn(),
+}));
+
 jest.mock('../../../../main/steps/utils', () => ({
   ...jest.requireActual('../../../../main/steps/utils'),
   getUserType: jest.fn(),
@@ -19,16 +24,21 @@ jest.mock('../../../../main/steps/utils', () => ({
 
 import { respondToClaimAccessGuard } from '../../../../main/steps/respond-to-claim/accessGuard';
 import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
+import { stepRegistry } from '../../../../main/steps/respond-to-claim/stepRegistry';
 import { getUserType } from '../../../../main/steps/utils';
 
 import { getAllSectionStatuses, getFirstVisibleStep, safeIsAnswered } from '@services/sectionStatus';
 import { shouldShowStep } from '@steps';
+import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 
 const mockGetUserType = getUserType as jest.MockedFunction<typeof getUserType>;
 const mockShouldShowStep = shouldShowStep as jest.MockedFunction<typeof shouldShowStep>;
 const mockGetAllSectionStatuses = getAllSectionStatuses as jest.MockedFunction<typeof getAllSectionStatuses>;
 const mockGetFirstVisibleStep = getFirstVisibleStep as jest.MockedFunction<typeof getFirstVisibleStep>;
 const mockSafeIsAnswered = safeIsAnswered as jest.MockedFunction<typeof safeIsAnswered>;
+const mockIsRespondToClaimEnabledForRelease = isRespondToClaimEnabledForRelease as jest.MockedFunction<
+  typeof isRespondToClaimEnabledForRelease
+>;
 
 interface MakeReqArgs {
   path?: string;
@@ -290,5 +300,106 @@ describe('respondToClaimAccessGuard', () => {
       expect(next).toHaveBeenCalledTimes(1);
       expect(res.redirect).not.toHaveBeenCalled();
     });
+  });
+
+  describe('post-submission pages', () => {
+    it.each([
+      'response-submitted',
+      'response-and-counter-claim-submitted',
+      'response-submitted-counter-claim-fee-payment-needed',
+      'counter-claim-application-fee-amount',
+      'counter-claim-payment-successful',
+    ])('passes through %s although the submitted draft no longer marks the section available', async stepName => {
+      mockGetAllSectionStatuses.mockResolvedValue(new Map([['checkYourAnswersAndSubmit', 'NOT_AVAILABLE_YET']]));
+      mockGetFirstVisibleStep.mockReturnValue('language-used');
+      const req = makeReq({ path: `/case/123/respond-to-claim/${stepName}` });
+      const res = makeRes();
+      await respondToClaimAccessGuard()(req, res, next);
+      expect(next).toHaveBeenCalledTimes(1);
+      expect(res.redirect).not.toHaveBeenCalled();
+    });
+
+    it('passes through a post-submission page even when its showCondition is false (draft cleared on submit)', async () => {
+      mockShouldShowStep.mockReturnValue(false);
+      const req = makeReq({ path: '/case/123/respond-to-claim/response-submitted-counter-claim-fee-payment-needed' });
+      const res = makeRes();
+      await respondToClaimAccessGuard()(req, res, next);
+      expect(next).toHaveBeenCalledTimes(1);
+      expect(res.redirect).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('end-of-journey CYA submit outcome', () => {
+    it.each<Record<string, string>>([{ submitError: 'failed' }, { draftChanged: '1' }])(
+      'passes through end-of-journey-cya returned to with %p',
+      async query => {
+        mockGetAllSectionStatuses.mockResolvedValue(new Map([['checkYourAnswersAndSubmit', 'AVAILABLE']]));
+        mockGetFirstVisibleStep.mockReturnValue('language-used');
+        const req = makeReq({ path: '/case/123/respond-to-claim/end-of-journey-cya', query });
+        const res = makeRes();
+        await respondToClaimAccessGuard()(req, res, next);
+        expect(next).toHaveBeenCalledTimes(1);
+        expect(res.redirect).not.toHaveBeenCalled();
+      }
+    );
+  });
+
+  describe('section CYA answer check', () => {
+    it('ignores hidden always-answered steps when deciding whether a section CYA has answers', async () => {
+      const hiddenSteps = ['what-regular-income-do-you-receive', 'what-other-regular-expenses-do-you-have'];
+      mockGetAllSectionStatuses.mockResolvedValue(new Map([['incomeAndExpenditure', 'AVAILABLE']]));
+      mockGetFirstVisibleStep.mockReturnValue('income-and-expenses');
+      mockShouldShowStep.mockImplementation((_req, stepName) => !hiddenSteps.includes(stepName));
+      mockSafeIsAnswered.mockImplementation(def =>
+        hiddenSteps.some(stepName => stepRegistry[stepName as keyof typeof stepRegistry] === def)
+      );
+      const req = makeReq({
+        path: '/case/123/respond-to-claim/check-your-answers-income-and-expenses',
+        query: { nav: '1' },
+      });
+      const res = makeRes();
+      await respondToClaimAccessGuard()(req, res, next);
+      expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/income-and-expenses');
+      expect(next).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('release 1.2 flag', () => {
+    it('sets res.locals.release12Enabled before evaluating showConditions', async () => {
+      mockIsRespondToClaimEnabledForRelease.mockResolvedValue(true);
+      let flagSeenByShowCondition: unknown;
+      mockShouldShowStep.mockImplementation(req => {
+        flagSeenByShowCondition = req.res?.locals.release12Enabled;
+        return true;
+      });
+      const req = makeReq({ path: '/case/123/respond-to-claim/exempt-landlord', query: { nav: '1' } });
+      const res = makeRes();
+      await respondToClaimAccessGuard()(req, res, next);
+      expect(flagSeenByShowCondition).toBe(true);
+      expect(next).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps an already-resolved release12Enabled value', async () => {
+      const req = makeReq({ path: '/case/123/respond-to-claim/exempt-landlord', query: { nav: '1' } });
+      (req.res as Response).locals.release12Enabled = false;
+      const res = makeRes();
+      await respondToClaimAccessGuard()(req, res, next);
+      expect(mockIsRespondToClaimEnabledForRelease).not.toHaveBeenCalled();
+      expect(req.res?.locals.release12Enabled).toBe(false);
+    });
+  });
+
+  describe('step name normalisation', () => {
+    it.each(['/case/123/respond-to-claim/exempt-landlord/', '/case/123/respond-to-claim/EXEMPT-LANDLORD'])(
+      'redirects a directly-accessed mid-section step typed as %s',
+      async path => {
+        mockGetFirstVisibleStep.mockReturnValue('dispute-claim-interstitial');
+        const req = makeReq({ path });
+        const res = makeRes();
+        await respondToClaimAccessGuard()(req, res, next);
+        expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/dispute-claim-interstitial');
+        expect(next).not.toHaveBeenCalled();
+      }
+    );
   });
 });

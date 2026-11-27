@@ -5,7 +5,7 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 {% from "xui-header/macro.njk" import hmctsXuiHeader %}
-{% from "footer/macro.njk" import hmctsUiFooter %}
+{% from "components/pcs-footer.njk" import pcsFooter %}
 
 {% set bodyAttributes = {
   "data-session-timeout": sessionTimeout.sessionTimeoutMinutes,
@@ -101,14 +101,13 @@
 {% endblock %}
 
 {% block footer %}
-    {% if isLegalRepresentative %}
-      {{ hmctsUiFooter(footerModel) }}
-    {% else %}
-      {{ super() }}
-    {% endif %}
+  {{ pcsFooter(isLegalRepresentative, footerModel) }}
 {% endblock %}
 
 {% block bodyEnd %}
+
+  {# Form submission confirmation pages opt in via `redirectOnBack` #}
+  {% include "components/redirect-on-back.njk" %}
 
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
   {% include "webpack/js.njk" %}

@@ -1,0 +1,15 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{#
+  The buttons at the foot of a page of an XUI event. Continue comes first, so pressing Enter in a field
+  continues rather than going back.
+#}
+{% macro eventButtons(continueText="Continue", previous=true) %}
+  <div class="govuk-button-group">
+    {{ govukButton({ text: continueText, name: "action", value: "continue", preventDoubleClick: true }) }}
+    {% if previous %}
+      {{ govukButton({ text: "Previous", classes: "govuk-button--secondary", name: "action", value: "previous" }) }}
+    {% endif %}
+    <a class="govuk-link" href="{{ cancelUrl }}">Cancel</a>
+  </div>
+{% endmacro %}

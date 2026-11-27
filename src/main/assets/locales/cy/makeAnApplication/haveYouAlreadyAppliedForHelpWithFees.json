@@ -10,5 +10,9 @@
   "errors": {
     "haveYouAlreadyApplied": "Cadarnhewch a ydych chi eisoes wedi gwneud cais am help i dalu ffi’ch cais",
     "hwfReference": "Rhaid i chi roi cyfeirnod ar gyfer Help i Dalu Ffioedd"
+  },
+  "options": {
+    "yes": "Do",
+    "no": "Naddo"
   }
 }

@@ -72,8 +72,18 @@ function setupDOM() {
            data-error-summary-title="There is a problem"
            data-delete-button-text="Remove">
       </div>
+      <button name="action" value="continue">Continue</button>
+      <button name="action" value="saveForLater">Save for later</button>
     </form>
   `;
+}
+
+function getContinueButton(): HTMLButtonElement {
+  return document.querySelector('button[name="action"][value="continue"]')!;
+}
+
+function getSaveForLaterButton(): HTMLButtonElement {
+  return document.querySelector('button[name="action"][value="saveForLater"]')!;
 }
 
 function setupDOMWithMediaAndFilenameCaps() {
@@ -207,6 +217,26 @@ describe('multi-file-upload', () => {
     });
   });
 
+  describe('inline field error', () => {
+    it('uses the page-language hidden error prefix', () => {
+      // jsdom has no CSS.escape
+      Object.defineProperty(globalThis, 'CSS', { value: { escape: (value: string) => value }, configurable: true });
+      setupDOM();
+      const container = getContainer();
+      container.dataset.errorPrefix = 'Gwall';
+      container.innerHTML =
+        '<div class="govuk-form-group"><input id="documents" class="moj-multi-file-upload__input" type="file" /></div>';
+      initMultiFileUpload();
+
+      expect(() => capturedHooks.entryHook(null, { name: 'video.mp4', size: 100 })).toThrow('blocked');
+
+      const inlineError = document.getElementById('documents-error')!;
+      expect(inlineError.querySelector('.govuk-visually-hidden')!.textContent).toBe('Gwall:');
+      expect(inlineError.textContent).toContain('Wrong file type');
+      expect(inlineError.textContent).not.toContain('Error:');
+    });
+  });
+
   describe('entryHook with media + filename caps', () => {
     beforeEach(() => {
       setupDOMWithMediaAndFilenameCaps();
@@ -333,6 +363,54 @@ describe('multi-file-upload', () => {
       const summary = document.querySelector('.govuk-error-summary');
       expect(summary).toBeNull();
     });
+  });
+
+  describe('Continue button disabled while uploading', () => {
+    beforeEach(() => {
+      setupDOM();
+      document.getElementById('upload-container')!.setAttribute('data-disable-continue-while-uploading', 'true');
+      initMultiFileUpload();
+    });
+
+    it('disables Continue while uploading, then re-enables it', () => {
+      capturedHooks.entryHook(null, { name: 'test.pdf', size: 100 });
+      expect(getContinueButton().disabled).toBe(true);
+      expect(getSaveForLaterButton().disabled).toBe(false);
+
+      capturedHooks.exitHook(null, {}, makeXhr(200, {}));
+      expect(getContinueButton().disabled).toBe(false);
+    });
+
+    it('re-enables Continue when an upload fails', () => {
+      capturedHooks.entryHook(null, { name: 'test.pdf', size: 100 });
+
+      capturedHooks.errorHook(null, {}, makeXhr(500, {}));
+      expect(getContinueButton().disabled).toBe(false);
+    });
+
+    it('keeps Continue disabled until every upload has finished', () => {
+      capturedHooks.entryHook(null, { name: 'first.pdf', size: 100 });
+      capturedHooks.entryHook(null, { name: 'second.pdf', size: 100 });
+
+      capturedHooks.exitHook(null, {}, makeXhr(200, {}));
+      expect(getContinueButton().disabled).toBe(true);
+
+      capturedHooks.exitHook(null, {}, makeXhr(200, {}));
+      expect(getContinueButton().disabled).toBe(false);
+    });
+
+    it('never disables Continue when the browser rejects a file', () => {
+      expect(() => capturedHooks.entryHook(null, { name: 'video.mp4', size: 100 })).toThrow('blocked');
+      expect(getContinueButton().disabled).toBe(false);
+    });
+  });
+
+  it('leaves Continue enabled while uploading when release 1.4 is disabled', () => {
+    setupDOM();
+    initMultiFileUpload();
+
+    capturedHooks.entryHook(null, { name: 'test.pdf', size: 100 });
+    expect(getContinueButton().disabled).toBe(false);
   });
 
   describe('deleteHook', () => {

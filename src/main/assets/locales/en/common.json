@@ -1,5 +1,6 @@
 {
   "serviceName": "Possession Claims",
+  "pageTitleSuffix": "HM Courts & Tribunals Service – GOV.UK",
   "phase": "ALPHA",
   "feedback": "This is a new service – your <a href=\"https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl={{pageTrackingUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">feedback (opens in new tab)</a> will help us to improve it.",
   "opensInNewTab": "opens in new tab",
@@ -209,5 +210,16 @@
     "yourSupport": "Your support",
     "uploadFiles": "Upload documents",
     "checkYourAnswersAndSubmit": "Check your answers and submit"
+  },
+  "errorPrefix": "Error",
+  "fileUpload": {
+    "dropzoneHint": "Drag and drop files here or",
+    "dropzoneButton": "Choose files",
+    "uploadStatus": "Uploading files, please wait"
+  },
+  "addressLookup": {
+    "oneFound": "1 address found",
+    "manyFound": "{count} addresses found",
+    "noneFound": "No addresses found"
   }
 }

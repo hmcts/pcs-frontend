@@ -1,68 +1,39 @@
 import type { Request } from 'express';
 
-import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
-import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
+import { validateAmount } from '../../../constants/validation';
+import { fromYesNoEnum, isLegalRepresentativeUser, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { noEmojiValidator } from '../../utils/fieldValidators';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-
-const createAmountValidator =
-  (negativeErrorKey: string, largeAmountErrorKey: string) =>
-  (value: unknown): boolean | string => {
-    if (typeof value !== 'string') {
-      return true;
-    }
-
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return true;
-    } // Let required validation handle empty values
-
-    const normalized = trimmed.replace(/,/g, '');
-    const numericValue = parseFloat(normalized);
-
-    if (!Number.isNaN(numericValue)) {
-      if (numericValue < 0) {
-        return negativeErrorKey;
-      }
-      if (numericValue >= MAX_INCOME_AMOUNT) {
-        return largeAmountErrorKey;
-      }
-    }
-
-    if (!AMOUNT_FORMAT_REGEX.test(normalized)) {
-      return 'errors.amount.invalidFormat';
-    }
-
-    return true;
-  };
+import { release14RadioWording } from '@utils/featureFlags';
 
 const validateMoneyFromElsewhereDetails = noEmojiValidator('errors.moneyFromElsewhereDetails.invalidCharacters');
-
-const validateIncomeFromJobsAmount = createAmountValidator(
-  'errors.incomeFromJobsAmount.negative',
-  'errors.incomeFromJobsAmount.largeAmount'
-);
-const validatePensionAmount = createAmountValidator(
-  'errors.pensionAmount.negative',
-  'errors.pensionAmount.largeAmount'
-);
-const validateUniversalCreditAmount = createAmountValidator(
-  'errors.universalCreditAmount.negative',
-  'errors.universalCreditAmount.largeAmount'
-);
-const validateOtherBenefitsAmount = createAmountValidator(
-  'errors.otherBenefitsAmount.negative',
-  'errors.otherBenefitsAmount.largeAmount'
-);
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'what-regular-income-do-you-receive',
   isAnswered: () => true,
   stepDir: __dirname,
   showCancelButton: false,
+
+  // Show the question as the legend heading for citizens so screen readers read it with the checkboxes.
+  // Legal reps: no change.
+  extendGetContent: (req, formContent) => {
+    const wording = release14RadioWording(req);
+    const checkboxField = formContent.fields.find(f => f.componentType === 'checkboxes');
+    if (isLegalRepresentativeUser(req) || !checkboxField?.component) {
+      return wording;
+    }
+    checkboxField.component.fieldset = {
+      legend: {
+        text: formContent.heading,
+        isPageHeading: true,
+        classes: 'govuk-fieldset__legend--l govuk-!-margin-bottom-6',
+      },
+    };
+    return { ...wording, heading: '' };
+  },
 
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
@@ -248,6 +219,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'incomeFromJobs',
           translationKey: 'options.incomeFromJobs',
+          subFieldsLegendKey: 'subFieldsLegend.incomeFromJobs',
           subFields: {
             incomeFromJobsAmount: {
               name: 'incomeFromJobsAmount',
@@ -265,15 +237,21 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateIncomeFromJobsAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.incomeFromJobsAmount.negative',
+                  maxAmountError: 'errors.incomeFromJobsAmount.largeAmount',
+                }),
             },
             incomeFromJobsFrequency: {
               name: 'incomeFromJobsFrequency',
               type: 'radio',
               required: true,
               errorMessage: 'errors.incomeFromJobsFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.incomeFromJobs',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -286,6 +264,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'pension',
           translationKey: 'options.pension',
+          subFieldsLegendKey: 'subFieldsLegend.pension',
           subFields: {
             pensionAmount: {
               name: 'pensionAmount',
@@ -303,15 +282,21 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validatePensionAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.pensionAmount.negative',
+                  maxAmountError: 'errors.pensionAmount.largeAmount',
+                }),
             },
             pensionFrequency: {
               name: 'pensionFrequency',
               type: 'radio',
               required: true,
               errorMessage: 'errors.pensionFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.pension',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -324,6 +309,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'universalCredit',
           translationKey: 'options.universalCredit',
+          subFieldsLegendKey: 'subFieldsLegend.universalCredit',
           subFields: {
             universalCreditAmount: {
               name: 'universalCreditAmount',
@@ -341,15 +327,21 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateUniversalCreditAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.universalCreditAmount.negative',
+                  maxAmountError: 'errors.universalCreditAmount.largeAmount',
+                }),
             },
             universalCreditFrequency: {
               name: 'universalCreditFrequency',
               type: 'radio',
               required: true,
               errorMessage: 'errors.universalCreditFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.universalCredit',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -362,6 +354,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'otherBenefits',
           translationKey: 'options.otherBenefits',
+          subFieldsLegendKey: 'subFieldsLegend.otherBenefits',
           subFields: {
             otherBenefitsAmount: {
               name: 'otherBenefitsAmount',
@@ -379,15 +372,21 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateOtherBenefitsAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.otherBenefitsAmount.negative',
+                  maxAmountError: 'errors.otherBenefitsAmount.largeAmount',
+                }),
             },
             otherBenefitsFrequency: {
               name: 'otherBenefitsFrequency',
               type: 'radio',
               required: true,
               errorMessage: 'errors.otherBenefitsFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.otherBenefits',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -400,6 +399,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'moneyFromElsewhere',
           translationKey: 'options.moneyFromElsewhere',
+          subFieldsLegendKey: 'subFieldsLegend.moneyFromElsewhere',
           subFields: {
             moneyFromElsewhereDetails: {
               name: 'moneyFromElsewhereDetails',

@@ -3,7 +3,7 @@
   "heading": "What regular income do you receive? (Optional)",
   "incomeQuestion": "",
   "groupName": "Regular income options",
-  "hintText": "Select all that apply. Enter total amount in pounds and pence, for example £148.00 or £148.50. The information you provide must be truthful and accurate.",
+  "hintText": "Select all that apply. Enter total amount in pounds and pence, for example £148 or £148.50. The information you provide must be truthful and accurate.",
   "options": {
     "incomeFromJobs": "Income from all jobs you do",
     "pension": "Pension – state and private",
@@ -17,7 +17,24 @@
     "moneyFromElsewhereDetailsLabel": "Give details",
     "moneyFromElsewhereDetailsHint": "Give details about the other sources of income and how much you usually receive"
   },
+  "subFieldsLegend": {
+    "incomeFromJobs": "Income from jobs details",
+    "pension": "Pension details",
+    "universalCredit": "Universal Credit details",
+    "otherBenefits": "Other benefits and credits details",
+    "moneyFromElsewhere": "Money from somewhere else details"
+  },
+  "frequencyLegend": {
+    "incomeFromJobs": "How often do you receive income from all jobs you do?",
+    "pension": "How often do you receive income from a state or private pension?",
+    "universalCredit": "How often do you receive Universal Credit?",
+    "otherBenefits": "How often do you receive income from other benefits and credits?"
+  },
   "frequency": {
+    "week": "Received every week",
+    "month": "Received every month"
+  },
+  "previousFrequency": {
     "week": "Week",
     "month": "Month"
   },
@@ -60,7 +77,7 @@
       "invalidCharacters": "Give details about the other sources of income and how much you usually receive must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
     },
     "amount": {
-      "invalidFormat": "Enter an amount in the correct format, for example 148.00 or 148.50"
+      "invalidFormat": "Enter an amount in the correct format, for example 148 or 148.50"
     }
   }
 }

@@ -1,0 +1,23 @@
+{% import "make-order/_compact.njk" as compact with context %}
+
+<h3 class="govuk-heading-m">Strike out/dismiss</h3>
+
+{% macro outcome(subject, legend) %}
+  {{ compact.radios("strike-" + subject + "-outcome", {
+    legend: legend,
+    classes: "govuk-radios--small govuk-radios--inline",
+    optional: true,
+    items: [
+      { value: "struck-out", text: legend + " struck out" },
+      { value: "dismissed", text: legend + " dismissed" }
+    ]
+  }) }}
+{% endmacro %}
+
+{% set strikeItems = [{ value: "claim", text: "Claim", conditional: { html: outcome("claim", "Claim") } }] %}
+{% if openCounterclaim %}
+  {% set strikeItems = strikeItems.concat([
+    { value: "counterclaim", text: "Counterclaim", conditional: { html: outcome("counterclaim", "Counterclaim") } }
+  ]) %}
+{% endif %}
+{{ compact.checkboxes("strike-subjects", { legend: "Outcome", default: "claim", items: strikeItems }) }}

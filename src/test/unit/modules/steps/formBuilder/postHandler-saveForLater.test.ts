@@ -171,7 +171,9 @@ describe('PostHandler - Save for Later Fix', () => {
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
       expect(
-        (mockRequest.session as { formData?: Record<string, unknown> } | undefined)?.formData?.['free-legal-advice']
+        (mockRequest.session as Request['session'] | undefined)?.formData?.default?.['1771325608502536']?.[
+          'free-legal-advice'
+        ]
       ).toBeUndefined();
       expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/next-step');
     });
@@ -200,6 +202,57 @@ describe('PostHandler - Save for Later Fix', () => {
       expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/case/1771325608502536/respond-to-claim/task-list');
     });
 
+    it('lets a step override the save-for-later destination', async () => {
+      const hubFlowConfig: JourneyFlowConfig = { ...flowConfig, hubStepName: 'task-list' };
+      const resolveSaveForLaterRedirect = jest.fn().mockResolvedValue('/case/1771325608502536/dashboard');
+      const { post } = createPostHandler(
+        fields,
+        'reasonable-adjustments-confirmation',
+        'test.njk',
+        'respondToClaim',
+        hubFlowConfig,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        resolveSaveForLaterRedirect
+      );
+      mockRequest.body = { action: 'saveForLater' };
+
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
+
+      expect(resolveSaveForLaterRedirect).toHaveBeenCalledWith(mockRequest);
+      expect(flowModule.getStepUrl).not.toHaveBeenCalled();
+      expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/case/1771325608502536/dashboard');
+    });
+
+    it('falls back to the hub step when the save-for-later override returns no path', async () => {
+      const hubFlowConfig: JourneyFlowConfig = { ...flowConfig, hubStepName: 'task-list' };
+      const resolveSaveForLaterRedirect = jest.fn().mockResolvedValue(undefined);
+      const { post } = createPostHandler(
+        fields,
+        'reasonable-adjustments-confirmation',
+        'test.njk',
+        'respondToClaim',
+        hubFlowConfig,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        resolveSaveForLaterRedirect
+      );
+      mockRequest.body = { action: 'saveForLater' };
+
+      await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
+
+      expect(resolveSaveForLaterRedirect).toHaveBeenCalledWith(mockRequest);
+      expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/case/1771325608502536/respond-to-claim/task-list');
+    });
+
     it('should save valid data and redirect to dashboard', async () => {
       const mockBeforeRedirect = jest.fn().mockResolvedValue(undefined);
       const { post } = createPostHandler(
@@ -221,7 +274,9 @@ describe('PostHandler - Save for Later Fix', () => {
 
       // Should save to session
       expect(
-        (mockRequest.session as { formData?: Record<string, unknown> } | undefined)?.formData?.['free-legal-advice']
+        (mockRequest.session as Request['session'] | undefined)?.formData?.default?.['1771325608502536']?.[
+          'free-legal-advice'
+        ]
       ).toEqual({
         hadLegalAdvice: 'yes',
       });

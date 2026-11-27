@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { AxiosRequestConfig } from 'axios';
 
 export const paymentApiData = {
@@ -15,17 +16,29 @@ export const paymentApiData = {
 
   updatePaymentApiEndPoint: '/payment-update',
 
-  paymentUpdatePayload: (requestReference: string) => ({
-    service_request_reference: requestReference,
-    ccd_case_number: process.env.CASE_NUMBER,
-    service_request_amount: 40400,
-    service_request_status: 'Paid',
-    payments: {
-      payment_amount: 2500,
-      payment_reference: 'RC-1780-3235-2218-3722',
-      payment_method: 'payment by account',
-      case_reference: '098DC868',
-      account_number: 'PBA0084541',
-    },
-  }),
+  paymentUpdatePayload: (requestReference: string, feeAmountInPounds: number) => {
+    // fee-payment-info returns pounds; the payload expects pence
+    if (!Number.isFinite(feeAmountInPounds) || feeAmountInPounds <= 0) {
+      throw new Error(`Invalid fee amount received for service request ${requestReference}: ${feeAmountInPounds}`);
+    }
+    const serviceRequestAmount = Math.round(feeAmountInPounds * 100);
+    const accountNumber = process.env.PBA_ACCOUNT_NUMBER || 'PBA0084541';
+
+    console.log('[PAYMENT API] fee (pounds) =', feeAmountInPounds, '-> pence =', serviceRequestAmount);
+    console.log('[PAYMENT API] account_number =', accountNumber);
+
+    return {
+      service_request_reference: requestReference,
+      ccd_case_number: process.env.CASE_NUMBER,
+      service_request_amount: serviceRequestAmount,
+      service_request_status: 'Paid',
+      payments: {
+        payment_amount: serviceRequestAmount,
+        payment_reference: `TEST-${requestReference}`,
+        payment_method: 'payment by account',
+        case_reference: process.env.CASE_NUMBER,
+        account_number: accountNumber,
+      },
+    };
+  },
 };

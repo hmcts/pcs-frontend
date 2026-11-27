@@ -16,7 +16,8 @@ nodejs:
   keyVaults:
     pcs:
       secrets:
-        - redis-connection-string
+        - name: azure-managed-redis-connection-string
+          alias: redis-connection-string
         - pcs-session-secret
         - app-insights-connection-string
         - pcs-frontend-s2s-secret

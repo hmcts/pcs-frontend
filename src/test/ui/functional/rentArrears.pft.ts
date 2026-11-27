@@ -32,11 +32,11 @@ export async function rentArrearsErrorValidation(): Promise<void> {
     header: rentArrears.thereIsAProblemErrorMessageHeader,
     message: rentArrears.theAmountYouBelieveErrorMessage,
   });
-  //incorrect format
+  //validations --incorrect format for 3 decimals
   await performAction(
     'inputText',
     rentArrears.howMuchDoYouBelieveHiddenTextLabel,
-    rentArrears.incorrectFormatTextInput
+    rentArrears.threeDecimalsIncorrectFormatTextInput
   );
   await performAction('clickButton', rentArrears.saveAndContinueButton);
   await performValidation('errorMessage', {

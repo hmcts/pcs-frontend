@@ -30,12 +30,15 @@ jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
   isRespondToClaimEnabledForUser: (...args: unknown[]) => mockIsRespondToClaimEnabledForUser(...args),
 }));
 
+// Translate from the real accessCode locale files, in the language set by mockLanguage.
+let mockLanguage: 'en' | 'cy' = 'en';
 jest.mock('@modules/i18n', () => ({
   getTranslationFunction: jest.fn(() => {
-    const strings: Record<string, string> = {
-      'accessCode:errors.respondToClaimUnavailable': 'The option to respond to a claim is not available at the moment.',
-    };
-    return ((key: string) => strings[key] ?? key) as import('i18next').TFunction;
+    const errors = require(`../../../main/assets/locales/${mockLanguage}/accessCode.json`).errors as Record<
+      string,
+      string
+    >;
+    return ((key: string) => errors[key.replace('accessCode:errors.', '')] ?? key) as import('i18next').TFunction;
   }),
 }));
 
@@ -50,6 +53,7 @@ describe('citizenCaseLink routes', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockLanguage = 'en';
     mockIsRespondToClaimEnabledForUser.mockResolvedValue(true);
 
     mockGet = jest.fn();
@@ -269,6 +273,49 @@ describe('citizenCaseLink routes', () => {
         'accessCode',
         expect.objectContaining({ errors: expect.objectContaining({ claimNumber: expect.any(Object) }) })
       );
+    });
+  });
+
+  describe('POST /access-your-case in Welsh', () => {
+    const post = async (body: Record<string, string>) => {
+      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const req = { body, session: { user: { accessToken: 'mock-token' } } } as unknown as Request;
+      const res = { render: jest.fn() } as unknown as Response;
+      await handler(req, res);
+      return (res.render as jest.Mock).mock.calls[0][1];
+    };
+
+    beforeEach(() => {
+      mockLanguage = 'cy';
+    });
+
+    const cyErrors = require('../../../main/assets/locales/cy/accessCode.json').errors as Record<string, string>;
+
+    it('shows field validation errors from the Welsh locale file', async () => {
+      const view = await post({ claimNumber: '', accessCode: 'ABCD' });
+
+      expect(view.errors).toEqual({
+        claimNumber: { text: cyErrors.claimNumberRequired },
+        accessCode: { text: cyErrors.accessCodeLength },
+      });
+      expect(view.errorList.map((e: { text: string }) => e.text)).toEqual([
+        cyErrors.claimNumberRequired,
+        cyErrors.accessCodeLength,
+      ]);
+    });
+
+    it.each([
+      ['not_found', 'claimNotFound'],
+      ['expired', 'accessCodeExpired'],
+      ['already_used', 'accessCodeAlreadyUsed'],
+      ['mismatch', 'accessCodeMismatch'],
+      ['unknown', 'claimNotFound'],
+    ])('shows the Welsh locale message for the %s result', async (error, key) => {
+      mockValidateAccessCode.mockResolvedValueOnce({ valid: false, error });
+
+      const view = await post({ claimNumber: '1234567890123456', accessCode: 'ABCD12345678' });
+
+      expect((view.errors.claimNumber ?? view.errors.accessCode).text).toBe(cyErrors[key]);
     });
   });
 });

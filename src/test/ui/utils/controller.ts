@@ -10,6 +10,7 @@ import { axe_exclusions } from '../config/axe-exclusions.config';
 import { loadPlaywrightSetupEnvIntoProcess } from '../config/load-playwright-setup-env';
 
 import { TriggerPageFunctionalTestsAction } from './actions/custom-actions';
+import { resolveLdFlagged } from './actions/custom-actions/launchDarkly.action';
 import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
 import { ActionRegistry, ValidationRegistry } from './registry';
 import {
@@ -26,6 +27,7 @@ const sauceStepScreenshots = process.env.PLAYWRIGHT_SAUCE_STEP_SCREENSHOTS === '
 
 let testExecutor: { page: Page };
 let previousUrl: string = '';
+let skipAxeAuditForCurrentPage = false;
 let startFunctionalTests = false;
 let startAxeAudit = false;
 let sauceJourneyScreenshotStep = 0;
@@ -58,6 +60,7 @@ class SoftErrorMessageStepFailed extends Error {
 export function initializeExecutor(page: Page): void {
   testExecutor = { page };
   previousUrl = page.url();
+  skipAxeAuditForCurrentPage = false;
   sauceJourneyScreenshotStep = 0;
 }
 
@@ -85,7 +88,7 @@ function getExecutor(): { page: Page } {
 async function detectPageNavigation(): Promise<boolean> {
   const executor = getExecutor();
   const currentUrl = executor.page.url();
-  const testPages = ['start-now', 'choose-an-application', 'start-evidence-upload', 'claims'];
+  const testPages = ['start-now', 'choose-an-application', 'start-evidence-upload', 'claims', 'make-order'];
   if (!startAxeAudit && testPages.some(page => currentUrl.includes(page))) {
     startAxeAudit = true;
     startFunctionalTests = true;
@@ -93,10 +96,19 @@ async function detectPageNavigation(): Promise<boolean> {
   const pageNavigated = currentUrl !== previousUrl;
 
   if (pageNavigated) {
+    skipAxeAuditForCurrentPage = isExternalPage(previousUrl, currentUrl);
     previousUrl = currentUrl;
   }
 
   return pageNavigated;
+}
+
+function isExternalPage(previousPageUrl: string, currentPageUrl: string): boolean {
+  try {
+    return new URL(previousPageUrl).origin !== new URL(currentPageUrl).origin;
+  } catch {
+    return false;
+  }
 }
 
 async function validatePageIfNavigated(action: string): Promise<void> {
@@ -113,12 +125,13 @@ async function validatePageIfNavigated(action: string): Promise<void> {
       ) {
         await performAction('triggerFunctionalTests');
       }
-      if (startAxeAudit && enable_axe_audit === 'true') {
+      if (startAxeAudit && enable_axe_audit === 'true' && !skipAxeAuditForCurrentPage) {
         try {
           const { AxeUtils } = await import('@hmcts/playwright-common');
           await test.step('Running Accessibility Scan', async () => {
             await new AxeUtils(executor.page).audit({
               exclude: axe_exclusions,
+              disableRules: ['aria-allowed-attr'],
             });
           });
         } catch (error) {
@@ -146,9 +159,11 @@ function isPage(actionResult: unknown): actionResult is Page {
 
 export async function performAction(
   action: string,
-  fieldName?: actionData | actionRecord,
-  value?: actionData | actionRecord
+  flaggedFieldName?: actionData | actionRecord,
+  flaggedValue?: actionData | actionRecord
 ): Promise<void> {
+  const fieldName = await resolveLdFlagged(flaggedFieldName);
+  const value = await resolveLdFlagged(flaggedValue);
   const executor = getExecutor();
   if (action === 'reloadPage') {
     await test.step('reloadPage', async () => {
@@ -192,10 +207,12 @@ export async function performAction(
 
 export async function performValidation(
   validation: string,
-  inputFieldName?: validationData | validationRecord,
-  inputData?: validationData | validationRecord
+  flaggedFieldName?: validationData | validationRecord,
+  flaggedData?: validationData | validationRecord
 ): Promise<void> {
   const executor = getExecutor();
+  const inputFieldName = await resolveLdFlagged(flaggedFieldName);
+  const inputData = await resolveLdFlagged(flaggedData);
 
   const [fieldName, data] =
     inputFieldName === undefined

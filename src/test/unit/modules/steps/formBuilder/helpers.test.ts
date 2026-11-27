@@ -487,8 +487,12 @@ describe('formBuilder helpers', () => {
       const req = {
         session: {
           formData: {
-            step1: {
-              field1: 'value1',
+            default: {
+              default: {
+                step1: {
+                  field1: 'value1',
+                },
+              },
             },
           },
         },
@@ -534,7 +538,7 @@ describe('formBuilder helpers', () => {
       };
 
       setFormData(req, 'step1', data);
-      expect((req.session as { formData?: Record<string, unknown> }).formData?.['step1']).toEqual(data);
+      expect(req.session.formData?.default?.default?.['step1']).toEqual(data);
     });
 
     it('should create formData object if it does not exist', () => {
@@ -547,15 +551,19 @@ describe('formBuilder helpers', () => {
       };
 
       setFormData(req, 'step1', data);
-      expect((req.session as { formData?: Record<string, unknown> }).formData?.['step1']).toEqual(data);
+      expect(req.session.formData?.default?.default?.['step1']).toEqual(data);
     });
 
     it('should overwrite existing step data', () => {
       const req = {
         session: {
           formData: {
-            step1: {
-              field1: 'oldValue',
+            default: {
+              default: {
+                step1: {
+                  field1: 'oldValue',
+                },
+              },
             },
           },
         },
@@ -566,7 +574,7 @@ describe('formBuilder helpers', () => {
       };
 
       setFormData(req, 'step1', data);
-      expect((req.session as { formData?: Record<string, unknown> }).formData?.['step1']).toEqual(data);
+      expect(req.session.formData?.default?.default?.['step1']).toEqual(data);
     });
   });
 
@@ -575,7 +583,7 @@ describe('formBuilder helpers', () => {
       return {
         body,
         session: {
-          formData: sessionFormData,
+          formData: { default: { default: sessionFormData } },
         },
       } as unknown as Request;
     };

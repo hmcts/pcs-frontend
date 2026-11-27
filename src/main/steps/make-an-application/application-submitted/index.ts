@@ -31,6 +31,9 @@ export const step: StepDefinition = createFormStep({
 
     let receivedYourApplicationMessage;
     switch (typeOfApplication) {
+      case 'SUSPEND':
+        receivedYourApplicationMessage = t('suspendRequestReceived');
+        break;
       case 'ADJOURN':
         receivedYourApplicationMessage = t('adjournRequestReceived');
         break;
@@ -45,6 +48,7 @@ export const step: StepDefinition = createFormStep({
     return {
       confirmationPanelTitle,
       receivedYourApplicationMessage,
+      redirectOnBack: true,
     };
   },
 });

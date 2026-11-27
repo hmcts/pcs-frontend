@@ -1,13 +1,13 @@
 {
   "pageTitle": "Enw eich cleient",
-  "nameConfirmationLabel": "Ai enw eich cleient yw {{defendantName}}?",
+  "nameConfirmationLabel": "Ai {{defendantName}} yw enw eich cleient?",
   "firstNameLabel": "Enw cyntaf y diffynnydd",
-  "lastNameLabel": "Cyfenw'r diffynnydd",
-  "nameConfirmationHint": "Dyma'r enw a ddarparwyd gan {{organisationName}}",
-  "yesOption": "Ydy",
-  "noOption": "Nac ydy",
+  "lastNameLabel": "Cyfenw’r diffynnydd",
+  "nameConfirmationHint": "Dyma’r enw a ddarparwyd gan {{organisationName}}",
+  "yesOption": "Ie",
+  "noOption": "Na",
   "errors": {
-    "nameConfirmation": "Mae'n rhaid i chi ddweud os mai enw eich cleient yw {{defendantName}}",
+    "nameConfirmation": "Mae’n rhaid i chi ddweud os mai enw eich cleient yw {{defendantName}}",
     "firstName": "Enw cyntaf eich cleient",
     "lastName": "Cyfenw eich cleient"
   }

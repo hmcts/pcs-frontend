@@ -50,8 +50,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       translationKey: { label: 'question' },
       errorMessage: 'errors.havePriorityDebts',
       options: [
-        { value: 'yes', translationKey: 'common:options.yes' },
-        { value: 'no', translationKey: 'common:options.no' },
+        { value: 'yes', translationKey: 'options.yes' },
+        { value: 'no', translationKey: 'options.no' },
       ],
     },
   ],

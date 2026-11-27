@@ -1,0 +1,651 @@
+/**
+ * Runs the make-order and confirm order review pages as the application does: real route, real middleware, real
+ * templates, real client code in jsdom. Only the boundary is faked: CCD is a tiny HTTP server
+ * and the signed-in user is placed on the session.
+ */
+import { randomUUID } from 'node:crypto';
+import * as http from 'node:http';
+import { type AddressInfo } from 'node:net';
+
+import { renderText } from '@hmcts-cft/docweave';
+import express, { type Express, type Request, type Response } from 'express';
+import { DateTime } from 'luxon';
+
+import { workingDayOnOrAfter } from '../../main/utils/makeOrderFormat';
+
+export const CASE_REFERENCE = '1777027600017760';
+export const MANAGE_CASE_URL = `http://manage-case.test/cases/case-details/PCS/PCS/${CASE_REFERENCE}`;
+
+// IDAM gives a judge the same roles as a caseworker; CCD knows them from their role assignments.
+const JUDGE = { uid: 'judge-uid', sub: 'judge-uid', roles: ['caseworker', 'caseworker-pcs'] };
+const CITIZEN = { uid: 'citizen-uid', sub: 'citizen-uid', roles: ['citizen'] };
+const CASEWORKER = { uid: 'caseworker-uid', sub: 'caseworker-uid', roles: ['caseworker', 'caseworker-pcs'] };
+
+function jwt(claims: Record<string, unknown>): string {
+  const encode = (value: unknown): string => Buffer.from(JSON.stringify(value)).toString('base64url');
+  return `${encode({ alg: 'none' })}.${encode(claims)}.`;
+}
+
+interface Envelope {
+  order: {
+    id?: string;
+    version: number;
+    state?: string;
+    orderType?: string;
+    formData?: Record<string, unknown>;
+    docweaveSnapshot?: unknown;
+    queryFromCaseworker?: string;
+  };
+  caseContext: Record<string, unknown>;
+  hearing?: Record<string, unknown> | null;
+  otherHearings?: Record<string, unknown>[];
+  taskGenAppId?: string;
+  judge: string;
+  bankHolidays?: string[];
+}
+
+const blankCase = (): Envelope => ({
+  order: { version: 0, formData: {} },
+  caseContext: {
+    caseReference: Number(CASE_REFERENCE),
+    propertyAddress: { AddressLine1: '10 Test Street', PostTown: 'Bristol', PostCode: 'BS1 1AA' },
+    claimants: [{ id: 'claimant-id', name: 'Example Housing' }],
+    defendants: [{ id: 'defendant-id', name: 'Alex Example' }],
+    court: 'County Court at Bristol',
+  },
+  judge: 'District Judge Sam Judge',
+  // The hearing the order is made for, starting from the claim's facts.
+  hearing: {
+    id: 1,
+    date: '2026-10-13T10:00:00',
+    version: null,
+    caseFacts: { tenancyStartDate: '2024-01-09', currentRent: 750 },
+    recorded: null,
+    note: null,
+    earlierNotes: [],
+  },
+});
+
+/**
+ * Minimal CCD and pcs-api: hands out the stored envelope and applies posted make order events to it, by pcs-api's
+ * rules. The judge has one draft on the case, which every link opens where it was saved, whatever hearing the link
+ * names; a link's hearing is only where a new order starts. Every start comes with the case's other hearings, each
+ * with its facts and notes, for the judge to choose on the page. A change must name that order and the version last
+ * handed out, so a page opened before the draft was saved elsewhere starts no second one; and sending
+ * the draft leaves the judge's next order a new one.
+ */
+let envelope = blankCase();
+
+/** The case's hearings by id, which have not been cancelled, any of which the judge can choose. */
+let hearings = new Map<number, Record<string, unknown>>();
+
+/** The hearing a new order starts at when the link names none, as the test booted the case. */
+let newOrderHearing: Record<string, unknown> | null | undefined;
+
+const ALREADY_DRAFTING =
+  'You already have a draft order on this case, saved since this page was opened. Nothing on this page was saved. ' +
+  'Copy anything you want to keep, then reload the page to open your draft';
+
+const NOT_THE_CASES_HEARING = "The hearing is not one of this case's hearings";
+
+/** The tokens CCD has handed out for starting the make order event, in order. */
+let startTokens: string[] = [];
+
+/** The tokens the make order event has been submitted with, in order. */
+let submittedTokens: string[] = [];
+
+/** The client context each event start was given, in order: what the user's link chose. */
+let startContexts: (Record<string, unknown> | undefined)[] = [];
+
+export function startClientContexts(): (Record<string, unknown> | undefined)[] {
+  return startContexts;
+}
+
+/** What CCD answered each event token it has taken, so it can answer a repeat without applying it again. */
+let answers = new Map<string, Record<string, unknown>>();
+
+/** How many times the make order event has been started. */
+export function eventStarts(): number {
+  return startTokens.length;
+}
+
+/** The start tokens the make order event has been submitted with, in order. */
+export function submittedEventTokens(): string[] {
+  return submittedTokens;
+}
+
+/** The confirm order review requests caseworkers have submitted, in order. */
+let reviewRequests: Record<string, unknown>[] = [];
+/** The make order requests judges have submitted, in order. */
+let orderRequests: Record<string, unknown>[] = [];
+
+export function submittedOrders(): Record<string, unknown>[] {
+  return orderRequests;
+}
+
+export function submittedReviews(): Record<string, unknown>[] {
+  return reviewRequests;
+}
+
+/** The reasons pcs-api gives for refusing the next event start and submission, if a test has asked it to. */
+let startRefusal: string | undefined;
+let refusal: string | undefined;
+
+/** Has the next order event's start refused, as pcs-api does when the chosen order is not waiting for the user. */
+export function refuseNextStart(reason: string): void {
+  startRefusal = reason;
+}
+
+/** Has pcs-api start events with another order from now on, as it does when the user opens another order's task. */
+export function startWithOrder(order: Partial<Envelope['order']>): void {
+  envelope.order = { ...envelope.order, ...order };
+}
+
+/** Cancels one of the case's hearings, which pcs-api then neither offers nor makes a new order at. */
+export function cancelHearing(id: number): void {
+  hearings.delete(id);
+}
+
+/** Another judge records the hearing's note, as saving their own order for it does, which moves its facts on. */
+export function recordHearingNoteElsewhere(id: number, note: string): void {
+  const recorded = hearings.get(id)!;
+  const changed = { ...recorded, version: Number(recorded.version ?? -1) + 1, note };
+  hearings.set(id, changed);
+  if (envelope.hearing?.id === id) {
+    envelope.hearing = changed;
+  }
+  if (newOrderHearing?.id === id) {
+    newOrderHearing = changed;
+  }
+}
+
+/** Has the next order event refused, as pcs-api does when the order changed elsewhere. */
+export function refuseNextEvent(reason: string): void {
+  refusal = reason;
+}
+
+/**
+ * CCD lets only the judge, whom it knows by their role assignments, use the make order event: anyone
+ * else can start it but is not shown its payload, and cannot submit it.
+ */
+function uid(req: Request): string | undefined {
+  const token = (req.headers.authorization ?? '').replace(/^Bearer /, '');
+  return JSON.parse(Buffer.from(token.split('.')[1] ?? '', 'base64url').toString() || '{}').uid;
+}
+
+function isJudge(req: Request): boolean {
+  return uid(req) === JUDGE.uid;
+}
+
+/** Likewise CCD lets only caseworkers, by their role assignments, use the confirm order review event. */
+function isCaseworker(req: Request): boolean {
+  return uid(req) === CASEWORKER.uid;
+}
+
+const CONFIRM_ORDER_REVIEW = 'ext:confirmOrderReview';
+
+/** Whether this user may use the event, as CCD decides from their role assignments. */
+function mayUse(req: Request, event: string): boolean {
+  return event === CONFIRM_ORDER_REVIEW ? isCaseworker(req) : isJudge(req);
+}
+
+function ccdStub(): Express {
+  const ccd = express();
+  // CCD takes events far larger than express's 100kb default.
+  ccd.use(express.json({ limit: '10mb' }));
+  ccd.get('/cases/:id/event-triggers/:event', (req: Request, res: Response) => {
+    const event = req.params.event as string;
+    const clientContext = req.headers['client-context'];
+    startContexts.push(typeof clientContext === 'string' ? JSON.parse(clientContext) : undefined);
+    if (startRefusal && mayUse(req, event)) {
+      const reason = startRefusal;
+      startRefusal = undefined;
+      return res.status(422).json({ callbackErrors: [reason] });
+    }
+    // A saved order stays where it is made, even at a hearing cancelled since; the link's hearing is only a new
+    // order's.
+    const context = startContexts.at(-1) ?? {};
+    const linked = context.hearingId === undefined ? envelope.hearing : hearings.get(Number(context.hearingId));
+    const hearing = envelope.order.id ? envelope.hearing : linked;
+    if (hearing === undefined) {
+      return res.status(422).json({ callbackErrors: [NOT_THE_CASES_HEARING] });
+    }
+    const started = {
+      ...envelope,
+      hearing,
+      otherHearings: [...hearings.values()].filter(other => other.id !== hearing?.id),
+      // The application the link names is the one the order must decide, opened new or as the saved draft.
+      taskGenAppId: (context.genAppId as string | undefined) ?? envelope.taskGenAppId,
+    };
+    const caseData = mayUse(req, event) ? { sdkEventPayload: JSON.stringify(started) } : {};
+    const token = `event-token-${startTokens.length + 1}`;
+    startTokens.push(token);
+    res.json({ token, case_details: { case_data: caseData } });
+  });
+  ccd.post('/cases/:id/events', (req: Request, res: Response) => {
+    const event = req.body.event?.id as string;
+    if (!mayUse(req, event)) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+    submittedTokens.push(req.body.event_token);
+    // CCD only takes an event it started.
+    if (!startTokens.includes(req.body.event_token)) {
+      return res.status(404).json({ message: 'Cannot find matching start trigger' });
+    }
+    // CCD keys a submission by its token: a repeat gets the first one's answer and changes nothing.
+    const answered = answers.get(req.body.event_token);
+    if (answered) {
+      return res.json(answered);
+    }
+    if (refusal) {
+      const reason = refusal;
+      refusal = undefined;
+      return res.status(422).json({ callbackErrors: [reason] });
+    }
+    const posted = JSON.parse(req.body.data.sdkEventPayload);
+    if (event === CONFIRM_ORDER_REVIEW) {
+      reviewRequests.push(posted);
+      answers.set(req.body.event_token, { id: req.params.id, data: {} });
+      return res.json(answers.get(req.body.event_token));
+    }
+    // A change is to the order as last handed out, and only one already saved has an id.
+    const refused = !posted.order.id
+      ? envelope.order.id && ALREADY_DRAFTING
+      : posted.order.id !== envelope.order.id
+        ? 'The order draft does not exist for this case'
+        : posted.order.version !== envelope.order.version &&
+          'The order has been updated by another user. Reload it and try again';
+    if (refused) {
+      return res.status(422).json({ callbackErrors: [refused] });
+    }
+    // The order stays at its own hearing, or moves to another the case still has.
+    if (posted.hearing && posted.hearing.id !== envelope.hearing?.id && !hearings.has(posted.hearing.id)) {
+      return res.status(422).json({ callbackErrors: [NOT_THE_CASES_HEARING] });
+    }
+    orderRequests.push(posted);
+    answers.set(req.body.event_token, { id: req.params.id, data: {} });
+    if (posted.action === 'SUBMIT_FOR_REVIEW') {
+      // Out of the judge's hands, it is no longer their draft either.
+      envelope = { ...envelope, order: { version: 0 }, hearing: newOrderHearing };
+      return res.json(answers.get(req.body.event_token));
+    }
+    // The order is made at the hearing the judge chose, or none. pcs-api records the hearing's facts and note only
+    // when changed, apart from the order.
+    envelope.hearing = posted.hearing ? (hearings.get(posted.hearing.id) ?? envelope.hearing) : null;
+    if (posted.hearing?.caseFacts && envelope.hearing) {
+      envelope.hearing = {
+        ...envelope.hearing,
+        version: Number(envelope.hearing.version ?? -1) + 1,
+        caseFacts: posted.hearing.caseFacts,
+        note: posted.hearing.note,
+      };
+      hearings.set(Number(envelope.hearing.id), envelope.hearing);
+    }
+    envelope = {
+      ...envelope,
+      order: {
+        id: posted.order.id ?? `order-${randomUUID()}`,
+        version: posted.order.version + 1,
+        // A saved order stays a draft, or returned to its judge, until it is sent.
+        state: envelope.order.state ?? 'DRAFT',
+        queryFromCaseworker: envelope.order.queryFromCaseworker,
+        orderType: posted.order.orderType,
+        formData: posted.order.formData,
+        docweaveSnapshot: posted.order.docweaveSnapshot,
+      },
+    };
+    res.json(answers.get(req.body.event_token));
+  });
+  return ccd;
+}
+
+/**
+ * Listens on loopback by address, not the wildcard: the kernel can hand a server bound to the wildcard's
+ * port to another process binding 127.0.0.1 at the same moment, which then answers this process's requests.
+ */
+function listen(app: Express): Promise<http.Server> {
+  return new Promise(resolve => {
+    const server = app.listen(0, '127.0.0.1', () => resolve(server));
+  });
+}
+
+export interface HttpResponse {
+  status: number;
+  location?: string;
+  text: string;
+}
+
+export interface TestApp {
+  get(path: string): Promise<HttpResponse>;
+  post(path: string, body: URLSearchParams): Promise<HttpResponse>;
+  close(): Promise<void>;
+}
+
+// config reads the environment once, so the stub keeps one address for the whole test file.
+let ccd: http.Server | undefined;
+afterAll(() => ccd?.close());
+
+export async function bootApp(
+  options: {
+    judge?: boolean;
+    caseworker?: boolean;
+    makeOrderEnabled?: boolean;
+    defendants?: { id: string; name: string }[];
+    /** Whether the case has an open counterclaim or application. */
+    openCounterclaim?: boolean;
+    /** The order pcs-api starts the event with, over a blank one. */
+    order?: Partial<Envelope['order']>;
+    /** The case's open applications, any of which the order can decide. */
+    applications?: (Record<string, unknown> & { id: string })[];
+    /** The application the judge's task, from court staff's message, asks them to decide, without a hearing. */
+    application?: Record<string, unknown> & { id: string };
+    /** The hearing pcs-api starts the event for, over the default one, or null for an order made without one. */
+    hearing?: Record<string, unknown> | null;
+    /** The case bundle pcs-api gives a judge, once the case has one. */
+    caseBundle?: Record<string, unknown>;
+    /** The case's hearings, over the one the order is made at, which the judge can choose to make it at. */
+    hearings?: (Record<string, unknown> & { id: number; date: string })[];
+    /** The judge pcs-api names the order made by, over the default, or null when it names none. */
+    /** The judge as pcs-api names them, over the default. */
+    judge?: string;
+    /** The court managing the case as pcs-api names it, over the default. */
+    court?: string;
+    /** The bank holidays pcs-api sends, as ISO days; none by default. */
+    bankHolidays?: string[];
+  } = {}
+): Promise<TestApp> {
+  envelope = blankCase();
+  if (options.judge !== undefined) {
+    envelope.judge = options.judge;
+  }
+  if (options.court !== undefined) {
+    envelope.caseContext.court = options.court;
+  }
+  envelope.bankHolidays = options.bankHolidays ?? [];
+  if (options.defendants) {
+    envelope.caseContext.defendants = options.defendants;
+  }
+  envelope.caseContext.openCounterclaim = options.openCounterclaim ?? false;
+  envelope.order = { ...envelope.order, ...options.order };
+  if (envelope.order.id && !options.caseworker) {
+    // An order the judge's link opens is their draft, or one a caseworker returned to them with a query.
+    envelope.order.state ??= envelope.order.queryFromCaseworker ? 'RETURNED_TO_JUDGE' : 'DRAFT';
+  }
+  envelope.caseContext.applications = [
+    ...(options.application ? [options.application] : []),
+    ...(options.applications ?? []),
+  ];
+  if (options.application) {
+    envelope.taskGenAppId = options.application.id;
+    envelope.hearing = null;
+  }
+  if (options.caseBundle) {
+    envelope.caseContext.caseBundle = options.caseBundle;
+  }
+  if (options.hearing !== undefined) {
+    envelope.hearing = options.hearing && { ...envelope.hearing, ...options.hearing };
+  }
+  hearings = new Map(
+    [...(envelope.hearing ? [envelope.hearing] : []), ...(options.hearings ?? [])].map(hearing => [
+      Number(hearing.id),
+      { ...blankCase().hearing, ...hearing },
+    ])
+  );
+  // pcs-api always lists the case's hearings, the one the order is made at among them.
+  envelope.caseContext.hearings = [...hearings.values()].map(({ id, date }) => ({ id, date }));
+  newOrderHearing = envelope.hearing;
+  startTokens = [];
+  startContexts = [];
+  submittedTokens = [];
+  answers = new Map();
+  reviewRequests = [];
+  orderRequests = [];
+  startRefusal = undefined;
+  refusal = undefined;
+  ccd ??= await listen(ccdStub());
+  process.env.CCD_URL = `http://127.0.0.1:${(ccd.address() as AddressInfo).port}`;
+  process.env.REDIRECTS_MANAGE_CASE_RETURN_URL = MANAGE_CASE_URL.slice(0, MANAGE_CASE_URL.lastIndexOf('/'));
+
+  // config reads the environment when first loaded, so import the application after setting it.
+  const [
+    { Nunjucks },
+    { http: httpService },
+    { default: makeOrderRoutes },
+    { default: confirmOrderReviewRoutes },
+    { default: decentralisedEventRoutes },
+    { default: docweaveTemplateRoutes },
+    { setupErrorHandlers },
+    middleware,
+  ] = await Promise.all([
+    import('../../main/modules/nunjucks'),
+    import('../../main/modules/http'),
+    import('../../main/routes/makeOrder'),
+    import('../../main/routes/confirmOrderReview'),
+    import('../../main/routes/decentralisedEvent'),
+    import('../../main/routes/docweaveTemplates'),
+    import('../../main/modules/error-handler'),
+    import('../../main/middleware'),
+  ]);
+  httpService.setToken('s2s-token', Date.now() + 60 * 60 * 1000);
+
+  const app = express();
+  app.use(middleware.formBodyMiddleware);
+  new Nunjucks(false).enableFor(app);
+  app.locals.nunjucksEnv.addGlobal('sessionTimeout', {});
+  // LaunchDarkly, with the make order flag on unless a test turns it off.
+  app.locals.launchDarklyClient = {
+    variation: async (flag: string, _context: unknown, fallback: unknown) =>
+      flag === 'make-order-enabled' ? options.makeOrderEnabled !== false : fallback,
+  };
+  app.locals.nunjucksEnv.addGlobal('t', (key: string, fallback?: unknown) =>
+    typeof fallback === 'string' ? fallback : key
+  );
+  // One signed-in session for the whole test, as the browser's session cookie would keep it.
+  const user = options.caseworker ? CASEWORKER : options.judge === false ? CITIZEN : JUDGE;
+  const session = { user: { ...user, accessToken: jwt({ ...user, exp: Math.floor(Date.now() / 1000) + 3600 }) } };
+  app.use((req: Request, res: Response, next) => {
+    Object.assign(req, { session });
+    res.locals.csrfToken = 'csrf-test';
+    next();
+  });
+  app.param('caseReference', middleware.caseReferenceParamMiddleware);
+  makeOrderRoutes(app);
+  confirmOrderReviewRoutes(app);
+  decentralisedEventRoutes(app);
+  docweaveTemplateRoutes(app);
+  setupErrorHandlers(app, 'test');
+  const server = await listen(app);
+  const baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+
+  const request = (method: string, path: string, body?: string): Promise<HttpResponse> =>
+    new Promise((resolve, reject) => {
+      const req = http.request(
+        `${baseUrl}${path}`,
+        { method, agent: false, headers: body ? { 'content-type': 'application/x-www-form-urlencoded' } : {} },
+        res => {
+          let text = '';
+          res.setEncoding('utf8');
+          res.on('data', chunk => (text += chunk));
+          res.on('end', () => resolve({ status: res.statusCode ?? 0, location: res.headers.location, text }));
+        }
+      );
+      req.on('error', reject);
+      req.end(body);
+    });
+
+  return {
+    get: path => request('GET', path),
+    post: (path, body) => request('POST', path, body.toString()),
+    close: () => {
+      server.closeAllConnections();
+      return new Promise<void>(resolve => server.close(() => resolve()));
+    },
+  };
+}
+
+export interface Page {
+  form: HTMLFormElement;
+  /** The order the form's answers build, after its opening line, which openingText gives. */
+  orderText(): string;
+  /** The order's opening line: before whom, where and when it was made. */
+  openingText(): string;
+  /** The order document the page will submit (the editor's current snapshot), as plain text. */
+  documentText(): string;
+  /** The form as the browser would submit it, with the named button if the page has several. */
+  body(action?: string): URLSearchParams;
+}
+
+/** An order's text after its opening line, "Before …", which the clauses' tests leave to make-order-before's. */
+function withoutOpening(text: string): string {
+  return text.startsWith('Before ') ? text.slice(text.indexOf('\n') + 1) : text;
+}
+
+/**
+ * Loads a served page with the make order form into jsdom and starts its JavaScript, as a browser would: the judge's
+ * make order page, or the caseworker's review of an order.
+ */
+export async function openPage(html: string): Promise<Page> {
+  window.history.replaceState(null, '', '/');
+  document.open();
+  document.write(html);
+  document.close();
+  const { initAll } = await import('govuk-frontend');
+  const { initMakeOrder, buildOrderDocument, startWithSavedOrderTab } = await import('../../main/assets/js/make-order');
+  // The template's inline script adds these; jsdom does not run it.
+  document.body.classList.add('js-enabled', 'govuk-frontend-supported');
+  startWithSavedOrderTab(initAll);
+  initMakeOrder();
+  const form = document.querySelector<HTMLFormElement>('#make-order-form');
+  if (!form) {
+    throw new Error(`The make order form is not on the page: ${document.body?.textContent?.trim().slice(0, 200)}`);
+  }
+  // Tests post the submitted form through the app harness, since jsdom cannot navigate.
+  form.addEventListener('submit', event => event.preventDefault());
+  return {
+    form,
+    orderText: () => withoutOpening(buildOrderDocument(form).textContent),
+    documentText: () => withoutOpening(renderText(JSON.parse(control<HTMLTextAreaElement>('#order-document').value))),
+    openingText: () => buildOrderDocument(form).textContent.split('\n')[0],
+    body: action => {
+      const body = new URLSearchParams();
+      form.dispatchEvent(new Event('submit', { cancelable: true }));
+      const data = new FormData(form);
+      // jsdom does not emit the native formdata event.
+      form.dispatchEvent(Object.assign(new Event('formdata'), { formData: data }));
+      data.forEach((value, name) => body.append(name, String(value)));
+      if (action) {
+        body.set('action', action);
+      }
+      return body;
+    },
+  };
+}
+
+export function control<T extends HTMLElement = HTMLInputElement>(selector: string): T {
+  const element = document.querySelector<T>(selector);
+  if (!element) {
+    throw new Error(`No control matches ${selector}`);
+  }
+  return element;
+}
+
+/**
+ * Whether the part of the form the control is in is shown and sent, for where the order is made: the page has every
+ * part, and takes out those the judge's choice of hearing does not ask for.
+ */
+export function offered(selector: string): boolean {
+  const part = control(selector).closest<HTMLFieldSetElement>('fieldset[data-made-at]')!;
+  return !part.hidden && !part.disabled;
+}
+
+export function check(name: string, value: string, checked = true): void {
+  const input = control(`input[name="${name}"][value="${value}"]`);
+  if (input.checked !== checked) {
+    input.click();
+  }
+}
+
+export function uncheck(name: string, value: string): void {
+  check(name, value, false);
+}
+
+export function type(name: string, value: string): void {
+  const input = control<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(`[name="${name}"]`);
+  input.value = value;
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+  input.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+export function typeDate(prefix: string, day: string, month: string, year: string): void {
+  type(`${prefix}-day`, day);
+  type(`${prefix}-month`, month);
+  type(`${prefix}-year`, year);
+}
+
+/** Records how the case's claimant and defendant attended, which every order needs before review. */
+export function recordAttendance(): void {
+  check('claimant-claimant-id-attendance', 'litigant-in-person');
+  check('defendant-defendant-id-attendance', 'not-present');
+}
+
+/**
+ * Writes paragraphs into the order preview after "IT IS ORDERED THAT:", as a judge writes a free form order there.
+ * jsdom cannot type into the editor, so this changes the document the page submits, as the editor would. The next
+ * change to the form regenerates that document, so call it after the other answers.
+ */
+export function writeInPreview(...paragraphs: string[]): void {
+  const field = control<HTMLTextAreaElement>('#order-document');
+  const snapshot = JSON.parse(field.value);
+  const content: { attrs?: { id?: string | null } }[] = snapshot.current.content;
+  const orderedThat = content.findIndex(node => node.attrs?.id === 'paragraph:ordered-that');
+  if (orderedThat === -1) {
+    throw new Error('The order preview has no "IT IS ORDERED THAT:"');
+  }
+  content.splice(
+    orderedThat + 1,
+    0,
+    ...paragraphs.map(text => ({ type: 'paragraph', attrs: { id: null }, content: [{ type: 'text', text }] }))
+  );
+  field.value = JSON.stringify(snapshot);
+}
+
+/** Switches order type the way GOV.UK tabs do: by changing the fragment. */
+export function selectTab(id: string): void {
+  window.location.hash = `#${id}`;
+  window.dispatchEvent(new HashChangeEvent('hashchange'));
+}
+
+export function futureDate(days: number): { day: string; month: string; year: string } {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return {
+    day: String(date.getDate()).padStart(2, '0'),
+    month: String(date.getMonth() + 1).padStart(2, '0'),
+    year: String(date.getFullYear()),
+  };
+}
+
+/** The order's first sentence, before the judge the harness signs in, at its court, on the date given. */
+export function before(date: string): string {
+  return `Before District Judge Sam Judge sitting at the County Court at Bristol on ${date}`;
+}
+
+/** The first sentence of an order made at the harness's hearing. */
+export const BEFORE_HEARING = before('13 October 2026');
+
+/** The first sentence of an order made today without a hearing. */
+export function beforeToday(): string {
+  return before(DateTime.now().setZone('Europe/London').toFormat('d MMMM yyyy'));
+}
+
+/** The working day on or after a number of days from today, skipping the bank holidays, as a date input's parts. */
+export function workingDate(days: number, bankHolidays: string[] = []): { day: string; month: string; year: string } {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  const working = workingDayOnOrAfter(date, bankHolidays);
+  return {
+    day: String(working.getDate()).padStart(2, '0'),
+    month: String(working.getMonth() + 1).padStart(2, '0'),
+    year: String(working.getFullYear()),
+  };
+}

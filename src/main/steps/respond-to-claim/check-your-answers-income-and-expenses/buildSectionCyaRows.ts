@@ -164,7 +164,7 @@ function addRegularIncomeRows({ rows, hc, t, change }: RowContext): void {
   pushHeadingWithItems(rows, 'rows.regularIncome', step, itemRows, t, change);
 }
 
-function addAppliedForUcRow({ rows, hc, t, change, yesNoNotSure }: RowContext): void {
+function addAppliedForUcRow({ rows, hc, t, lang, change, yesNoNotSure }: RowContext): void {
   // The step is skipped (and the field absent) when the defendant is already on UC,
   // so a presence check is correct.
   if (!hc.hasAppliedForUniversalCredit) {
@@ -185,7 +185,7 @@ function addAppliedForUcRow({ rows, hc, t, change, yesNoNotSure }: RowContext): 
   }
   const detailRow: SummaryListRow = {
     key: { text: t('rows.universalCreditApplicationDate.label') },
-    value: { text: formatIsoDate(hc.ucApplicationDate) },
+    value: { text: formatIsoDate(hc.ucApplicationDate, lang) },
     actions: {
       items: [change('have-you-applied-for-universal-credit', 'rows.universalCreditApplicationDate.changeHidden')],
     },

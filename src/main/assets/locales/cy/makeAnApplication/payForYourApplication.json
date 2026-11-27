@@ -1,10 +1,10 @@
 {
-  "pageTitle": "cyPay for your application",
-  "heading": "cyPay for your application",
-  "applicationFee": "cyApplication fee:",
+  "pageTitle": "Talu am eich cais",
+  "heading": "Talu am eich cais",
+  "applicationFee": "Ffi gwneud cais:",
   "formattedFeeAmount": "{{feeAmount, currency(currency: GBP)}}",
-  "youWillBeRedirected": "cyYou will be redirected to GOV.UK Pay to complete your payment securely.",
-  "govPayIsASecureService": "cyGOV.UK Pay is a secure payment service used by government services.",
+  "youWillBeRedirected": "Byddwch yn cael eich ailgyfeirio i GOV.UK Talu i gwblhau eich taliad yn ddiogel.",
+  "govPayIsASecureService": "Mae GOV.UK Talu yn wasanaeth talu diogel a ddefnyddir gan wasanaethau’r llywodraeth.",
   "buttons": {
     "continueToPayment": "Parhau i dalu"
   }

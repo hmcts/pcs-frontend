@@ -34,12 +34,13 @@ import { AxiosError } from 'axios';
 import config from 'config';
 
 import { ClientContextHeaders } from '../../types/global';
-import { HTTPError } from '../HttpError';
+import { CallbackRejectedError, HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import { GenAppType, MakeAnApplicationResponse } from '@services/ccdCase.interface';
-import type { CcdCase, CcdCaseData, StartCallbackData } from '@services/ccdCase.interface';
+import type { CcdCase, CcdCaseData, CcdPartySupportEntry, StartCallbackData } from '@services/ccdCase.interface';
+import type { CcdFlags } from '@services/cuiRa/cuiRa.interface';
 import type {
   DashboardNotification,
   DashboardRelatedApplication,
@@ -134,11 +135,23 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   const axiosError = error as AxiosError;
   const status = axiosError.response?.status;
-  const responseData = axiosError.response?.data as CcdErrorResponseData | undefined;
+  const rawBody: unknown = axiosError.response?.data;
+  const responseData = rawBody as CcdErrorResponseData | undefined;
+  // Every CCD URL carries the case reference, so take it from the request that failed rather
+  // than threading it through each call site. Logged as a field: the span exception picks it up.
+  const caseReference = /\/cases\/(\d{16})/.exec(axiosError.config?.url ?? '')?.[1];
 
-  logger.error(`Error in ${context}: ${axiosError.message}`);
-  if (responseData) {
-    logger.error(`Error response data: ${JSON.stringify(responseData, null, 2)}`);
+  logger.error(`Error in ${context}: ${axiosError.message}`, { caseReference });
+  if (rawBody) {
+    // CCD error bodies can carry case data - log only what identifies the failure. `details` is
+    // left out deliberately: it echoes the submitted field values.
+    const summary =
+      typeof rawBody === 'string'
+        ? `body=${rawBody.slice(0, 200)}`
+        : `message=${responseData?.message ?? 'none'} exception=${responseData?.exception ?? 'none'}`;
+    logger.error(`Error response from CCD in ${context}: status=${status ?? 'unknown'} ${summary}`, {
+      caseReference,
+    });
   }
 
   if (status === 403) {
@@ -151,7 +164,7 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   const callbackMessages = [...(responseData?.callbackErrors ?? []), ...(responseData?.callbackWarnings ?? [])];
   if (callbackMessages.length > 0) {
-    return new HTTPError(`CCD callback rejected request: ${callbackMessages.join('; ')}`, status || 422);
+    return new CallbackRejectedError(callbackMessages, status || 422);
   }
 
   const retryAfterHeader = axiosError.response?.headers?.['retry-after'];
@@ -190,7 +203,6 @@ async function getEventToken(userToken: string, url: string): Promise<string> {
   try {
     logger.info(`Calling getEventToken with URL: ${url}`);
     const response = await http.get<EventTokenResponse>(url, getCaseHeaders(userToken));
-    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data.token;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'getEventToken');
@@ -234,13 +246,53 @@ async function submitEvent(
   };
 
   try {
-    logger.info(`Calling submitEvent with URL: ${url}`);
-    logger.info(`Payload: ${JSON.stringify(payload, null, 2)}`);
+    logger.info(`Calling submitEvent with URL: ${url}, eventId: ${eventId}`);
     const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
-    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'submitEvent');
+  }
+}
+
+export const DEFENDANT_SUPPORT_EVENT_ID = 'requestSupport';
+
+export interface DefendantSupport {
+  partyId: string;
+  supportFlags?: CcdFlags;
+}
+
+interface DefendantSupportStart extends DefendantSupport {
+  eventToken: string;
+}
+
+/**
+ * START the citizen `requestSupport` event. pcs-api's about-to-start narrows `partySupport` to the
+ * defendant parties the logged-in user owns, so for a citizen defendant it holds their own party id
+ * and that party's current external flags
+ */
+async function startDefendantSupport(userToken: string, caseId: string): Promise<DefendantSupportStart> {
+  const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${DEFENDANT_SUPPORT_EVENT_ID}?ignore-warning=false`;
+
+  try {
+    const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(userToken));
+
+    const partySupport = (response.data.case_details?.case_data?.partySupport ?? []).filter(entry => entry?.id);
+    const [party] = partySupport;
+    if (!party) {
+      throw new HTTPError('No defendant party eligible for support on this case', 403);
+    }
+    // Your Support is citizen-only: citizenOnlyStepsAccessMiddleware keeps legal representatives off every
+    // route that reaches here, and a citizen defendant owns exactly one party. More than one entry can
+    // therefore only mean malformed data or a bypassed guard, and choosing one could attach flags to the
+    // wrong defendant, so refuse rather than guess.
+    if (partySupport.length > 1) {
+      logger.error(`Case ${caseId}: user owns ${partySupport.length} support parties; refusing to choose one`);
+      throw new HTTPError('More than one defendant party eligible for support on this case', 403);
+    }
+
+    return { eventToken: response.data.token, partyId: party.id, supportFlags: party.value?.supportFlags };
+  } catch (error) {
+    throw convertReadErrorToHttpError(error, 'startDefendantSupport');
   }
 }
 
@@ -280,6 +332,36 @@ export const ccdCaseService = {
     }
   },
 
+  /**
+   * Starts an event, for a later `submitCaseEvent` with the token it returns. CCD passes the client
+   * context on to the event's start, as it passes no parameters.
+   */
+  async startCaseEvent(
+    accessToken: string,
+    caseId: string,
+    eventId: string,
+    clientContext?: ClientContextHeaders
+  ): Promise<CcdCase & { eventToken: string }> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    try {
+      const caseHeaders = getCaseHeaders(accessToken);
+      if (clientContext) {
+        caseHeaders.headers['Client-Context'] = JSON.stringify(clientContext);
+      }
+      const response = await http.get<StartCallbackData>(
+        `${getBaseUrl()}/cases/${safeCaseId}/event-triggers/${eventId}?ignore-warning=false`,
+        caseHeaders
+      );
+      return { id: safeCaseId, data: response.data.case_details?.case_data ?? {}, eventToken: response.data.token };
+    } catch (error) {
+      throw convertReadErrorToHttpError(error, 'startCaseEvent');
+    }
+  },
+
   async getCaseById(accessToken: string, caseId: string): Promise<CcdCase> {
     const safeCaseId = sanitiseCaseReference(caseId);
     if (!safeCaseId) {
@@ -291,7 +373,6 @@ export const ccdCaseService = {
     try {
       logger.debug(`Fetching case by id for read view: ${safeCaseId}`);
       const response = await http.get<CcdCase>(caseUrl, getCaseHeaders(accessToken));
-      logger.debug(`Read case response for ${safeCaseId}: ${JSON.stringify(response.data, null, 2)}`);
       const caseData = response.data.data ?? {};
 
       return {
@@ -391,6 +472,55 @@ export const ccdCaseService = {
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
 
     return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
+  },
+
+  /**
+   * The logged-in defendant's party id and current external ("support") flags, read through the
+   * requestSupport START callback.
+   */
+  async getDefendantSupport(accessToken: string | undefined, caseId: string): Promise<DefendantSupport> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    const { partyId, supportFlags } = await startDefendantSupport(accessToken || '', safeCaseId);
+    return { partyId, supportFlags };
+  },
+
+  /**
+   * Write a defendant's support flags straight to their party via the citizen requestSupport event
+   */
+  async submitDefendantSupportFlags(
+    accessToken: string | undefined,
+    caseId: string,
+    supportFlags: CcdFlags
+  ): Promise<CcdCase> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    const { eventToken, partyId } = await startDefendantSupport(accessToken || '', safeCaseId);
+    const url = `${getBaseUrl()}/cases/${safeCaseId}/events`;
+    const partySupport: CcdPartySupportEntry[] = [{ id: partyId, value: { supportFlags } }];
+
+    return submitEvent(accessToken || '', url, DEFENDANT_SUPPORT_EVENT_ID, eventToken, { partySupport });
+  },
+
+  /** Submits an event with the token from the `startCaseEvent` the change was based on. */
+  async submitCaseEvent(
+    accessToken: string,
+    caseId: string,
+    eventId: string,
+    eventToken: string,
+    data: Record<string, unknown>
+  ): Promise<CcdCase> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+    return submitEvent(accessToken, `${getBaseUrl()}/cases/${safeCaseId}/events`, eventId, eventToken, data);
   },
 
   async getExistingCaseData(

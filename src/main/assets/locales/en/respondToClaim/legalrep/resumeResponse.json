@@ -8,5 +8,9 @@
   "question": "Do you want to resume the response using your saved answers?",
   "errors": {
     "resumeResponse": "Select if you want to resume the response using your saved answers?"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   }
 }

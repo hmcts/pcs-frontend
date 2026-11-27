@@ -88,7 +88,7 @@
   {{ partyGenAppCard(t('viewAllApplications:yourApplications'), userGenApps, t('viewAllApplications:youDoNotHaveAnyApplicationsYet')) }}
 
   {% for partyId, partyGenApps in otherPartyGenAppsMap %}
-    {% set partyName = partyGenApps.party.firstName + ' ' + partyGenApps.party.lastName %}
+    {% set partyName = partyGenApps.party.orgName or (partyGenApps.party.firstName + ' ' + partyGenApps.party.lastName) %}
     {% set cardTitle = t('viewAllApplications:applicationsMadeBy') + ' ' + partyName %}
     {{ partyGenAppCard(cardTitle, partyGenApps.genApps) }}
   {% endfor %}

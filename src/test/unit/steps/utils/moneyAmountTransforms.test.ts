@@ -11,18 +11,11 @@ jest.mock('@modules/logger', () => ({
   },
 }));
 
-import { ccdPenceToPoundsString, poundsStringToPence } from '../../../../main/steps/utils/moneyAmountTransforms';
+import { ccdPenceToPoundsString } from '../../../../main/steps/utils/moneyAmountTransforms';
 
 describe('moneyAmountTransforms', () => {
   beforeEach(() => {
     mockWarn.mockClear();
-  });
-
-  describe('poundsStringToPence', () => {
-    it('converts pounds string to integer pence', () => {
-      expect(poundsStringToPence('148.50')).toBe(14850);
-      expect(poundsStringToPence(' 20 ')).toBe(2000);
-    });
   });
 
   describe('ccdPenceToPoundsString', () => {

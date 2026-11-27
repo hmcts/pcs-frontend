@@ -220,6 +220,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         pba: t('labels.pba'),
         customerReferenceHeading: t('labels.customerReferenceHeading'),
         customerReferenceHint: t('labels.customerReferenceHint'),
+        errorPrefix: t('common:errorPrefix'),
         selectPba: t('labels.selectPba'),
       },
       pageTitle: t('pageTitle'),

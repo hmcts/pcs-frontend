@@ -1,0 +1,15 @@
+export const responseAndCounterClaimSubmitted = {
+  mainHeader: `Cyflwynwyd yr ymateb a'r gwrth-hawliad`,
+  confirmationEmailParagraph: `Rydym wedi anfon e-bost cadarnhau atoch.`,
+  reviewHwfApplicationParagraph: `Cyn y gall y llys anfon y gwrth-hawliad at y partïon eraill neu cyn y gall barnwr ei ystyried, rhaid i'r llys adolygu'r cais Help with Fees sy'n gysylltiedig â'r gwrth-hawliad.`,
+  payCounterclaimFeeIfNotApproveParagraph: `Os na fydd y llys yn cymeradwyo eich cais Help with Fees, efallai y bydd angen i chi dalu'r ffi gwrth-hawliad i gyd neu ran ohoni.`,
+  notifyOutcomeParagraph: `Byddwn yn rhoi gwybod i chi am ganlyniad eich cais Help with Fees.`,
+  whatToDoNextHeader: `Beth i'w wneud nesaf`,
+  hearingScheduledList: `Bydd dyddiad gwrandawiad yn cael ei drefnu. Byddwch yn cael hysbysiad yn dweud wrthych pan fydd hyn wedi digwydd. Yn y gwrandawiad, bydd barnwr yn gwrando ar y ddwy ochr ac yn gwneud penderfyniad. Dylech ddod i'r gwrandawiad.`,
+  supportList: `Mae angen cymorth ar rai pobl i ddefnyddio gwasanaethau HMCTS, fel mynediad heb risiau i lys ar gyfer gwrandawiad. Os oes angen cymorth arnoch ac nad ydych wedi gofyn amdano yn eich ymateb eisoes, cysylltwch â ni. Defnyddiwch y ddolen ‘Cysylltu â ni am help’ ar y dudalen hon.`,
+  thoughtsHeader: `Hoffem glywed eich barn`,
+  surveyLink: `Cwblhewch yr arolwg byr hwn i'n helpu i wella'r gwasanaeth hwn (yn agor mewn tab newydd)`,
+  surveyParagraph: `(mae'n cymryd 5 munud fel arfer).`,
+  pageSlug: `response-and-counter-claim-submitted`,
+  closeAndReturnToCaseOverviewButton: `Cau a dychwelyd i drosolwg yr achos`,
+};

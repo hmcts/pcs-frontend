@@ -1,0 +1,98 @@
+import { isoTime, parseDate } from '@utils/makeOrderFormat';
+import type { FormData } from '@utils/orderCase';
+
+/*
+ * What an order decides, as pcs-api records it: the same for an order its form generated and one the judge wrote.
+ * This is the only place that reads the make order form's field names to say so; pcs-api never reads them.
+ */
+
+/** Whether an order disposes of an application, which closes it, or lists it for a hearing, which leaves it open. */
+export type GenAppDecision = 'DISPOSED' | 'LISTED';
+
+export interface ApplicationDecision {
+  genAppId: string;
+  decision: GenAppDecision;
+}
+
+export type ClaimOutcomeKind =
+  'OUTRIGHT_POSSESSION' | 'SUSPENDED_POSSESSION' | 'STRUCK_OUT' | 'DISMISSED' | 'NO_ORDER' | 'OTHER';
+
+export interface ClaimOutcome {
+  kind: ClaimOutcomeKind;
+  possessionForthwith?: boolean;
+  possessionDate?: string;
+  /** The time on that day, HH:mm, if the order gives one. */
+  possessionTime?: string;
+  grounds?: 'MANDATORY' | 'DISCRETIONARY';
+  groundsDetails?: string;
+  warrantOnNotice?: boolean;
+}
+
+const DECISION_FIELD = /^app-(.+)-decision$/;
+
+/** A posted field's first value, trimmed. */
+export function first(value: unknown): string {
+  return String((Array.isArray(value) ? value[0] : value) ?? '').trim();
+}
+
+/** A posted field's values, without blanks. */
+export function all(value: unknown): string[] {
+  return (Array.isArray(value) ? value : [value]).filter(v => v !== undefined && v !== '').map(String);
+}
+
+function isoDate(formData: FormData, prefix: string): string | undefined {
+  const parts = ['day', 'month', 'year'].map(part => first(formData[`${prefix}-${part}`]));
+  return /^\d{4}$/.test(parts[2]) ? parseDate(parts[0], parts[1], parts[2])?.toISOString().slice(0, 10) : undefined;
+}
+
+/**
+ * The applications the order disposes of or lists for a hearing. "Not dealt with" leaves one as it is; anything else
+ * but listing disposes of it, whatever the order's wording says was decided.
+ */
+export function applicationDecisions(formData: FormData = {}): ApplicationDecision[] {
+  return Object.entries(formData).flatMap(([field, value]) => {
+    const genAppId = DECISION_FIELD.exec(field)?.[1];
+    const answer = first(value);
+    if (!genAppId || !answer || answer === 'none') {
+      return [];
+    }
+    return [{ genAppId, decision: answer === 'list' ? 'LISTED' : 'DISPOSED' }];
+  });
+}
+
+/** What an order its form generated decides about the claim, from the judge's answers for its type. */
+export function claimOutcome(orderType: string, formData: FormData = {}): ClaimOutcome {
+  switch (orderType) {
+    case 'OUTRIGHT_POSSESSION': {
+      const grounds = first(formData['outright-grounds-type']);
+      const by = first(formData['outright-possession']) === 'by';
+      return {
+        kind: 'OUTRIGHT_POSSESSION',
+        possessionForthwith: first(formData['outright-possession']) === 'forthwith',
+        possessionDate: by ? isoDate(formData, 'outright-by-date') : undefined,
+        possessionTime: by ? isoTime(first(formData['outright-by-time'])) : undefined,
+        grounds: grounds === 'mandatory' ? 'MANDATORY' : grounds === 'discretionary' ? 'DISCRETIONARY' : undefined,
+        groundsDetails: first(formData['outright-grounds-details']) || undefined,
+      };
+    }
+    case 'SUSPENDED_POSSESSION': {
+      const options = all(formData['suspended-options']);
+      return {
+        kind: 'SUSPENDED_POSSESSION',
+        possessionDate: isoDate(formData, 'suspended-by-date'),
+        possessionTime: isoTime(first(formData['suspended-by-time'])),
+        warrantOnNotice: options.includes('warrant-on-notice'),
+      };
+    }
+    case 'STRIKE_OUT_DISMISSAL': {
+      const outcome = all(formData['strike-subjects']).includes('claim') ? first(formData['strike-claim-outcome']) : '';
+      return { kind: outcome === 'struck-out' ? 'STRUCK_OUT' : outcome === 'dismissed' ? 'DISMISSED' : 'NO_ORDER' };
+    }
+    // An adjournment manages the case without deciding the claim.
+    case 'ADJOURNMENT':
+    case 'NO_ORDER_ON_CLAIM':
+      return { kind: 'NO_ORDER' };
+    default:
+      return { kind: 'OTHER' };
+  }
+}

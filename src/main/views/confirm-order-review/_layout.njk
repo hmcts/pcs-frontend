@@ -1,0 +1,25 @@
+{% extends "xui-layout.njk" %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{#
+  Every page of the review: the case it is on in a line, then the page, which shows the order above its questions
+  with the order panel in _order-panel.njk.
+#}
+{% block content %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  <div id="confirm-order-review-form" class="pcs-review-header">
+    <span class="govuk-caption-m">Confirm order review</span>
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-1">{{ pageHeading }}</h1>
+    <p class="govuk-body-s pcs-review-header__case">
+      <span><span class="govuk-!-font-weight-bold">Case reference:</span> {{ caseReferenceDisplay }}</span>
+      <span>{{ propertyAddressDisplay }}</span>
+      <span class="govuk-!-font-weight-bold">{{ claimantNames }} vs {{ defendantNames }}</span>
+    </p>
+  </div>
+
+  {% block page %}{% endblock %}
+{% endblock %}

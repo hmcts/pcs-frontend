@@ -1,81 +1,13 @@
 import type { Request } from 'express';
 
-import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
-import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
+import { validateAmount } from '../../../constants/validation';
+import { fromYesNoEnum, isLegalRepresentativeUser, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { FrequencyValue, HouseholdCircumstances, IncomeExpenseDetails } from '@services/ccdCase.interface';
-
-const createAmountValidator =
-  (largeAmountErrorKey: string, negativeErrorKey: string) =>
-  (value: unknown): boolean | string => {
-    if (typeof value !== 'string') {
-      return true;
-    }
-
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return true;
-    }
-
-    const normalized = trimmed.replace(/,/g, '');
-    const numericValue = parseFloat(normalized);
-
-    if (!Number.isNaN(numericValue)) {
-      if (numericValue < 0) {
-        return negativeErrorKey;
-      }
-      // AC: £1bn or more should throw error
-      if (numericValue >= MAX_INCOME_AMOUNT) {
-        return largeAmountErrorKey;
-      }
-    }
-
-    if (!AMOUNT_FORMAT_REGEX.test(normalized)) {
-      return 'errors.amount.invalidFormat';
-    }
-
-    return true;
-  };
-
-const validateHouseholdBillsAmount = createAmountValidator(
-  'errors.householdBillsAmount.largeAmount',
-  'errors.householdBillsAmount.negative'
-);
-const validateLoanPaymentsAmount = createAmountValidator(
-  'errors.loanPaymentsAmount.largeAmount',
-  'errors.loanPaymentsAmount.negative'
-);
-const validateChildSpousalMaintenanceAmount = createAmountValidator(
-  'errors.childSpousalMaintenanceAmount.largeAmount',
-  'errors.childSpousalMaintenanceAmount.negative'
-);
-const validateMobilePhoneAmount = createAmountValidator(
-  'errors.mobilePhoneAmount.largeAmount',
-  'errors.mobilePhoneAmount.negative'
-);
-const validateGroceryShoppingAmount = createAmountValidator(
-  'errors.groceryShoppingAmount.largeAmount',
-  'errors.groceryShoppingAmount.negative'
-);
-const validateFuelParkingTransportAmount = createAmountValidator(
-  'errors.fuelParkingTransportAmount.largeAmount',
-  'errors.fuelParkingTransportAmount.negative'
-);
-const validateSchoolCostsAmount = createAmountValidator(
-  'errors.schoolCostsAmount.largeAmount',
-  'errors.schoolCostsAmount.negative'
-);
-const validateClothingAmount = createAmountValidator(
-  'errors.clothingAmount.largeAmount',
-  'errors.clothingAmount.negative'
-);
-const validateOtherExpensesAmount = createAmountValidator(
-  'errors.otherExpensesAmount.largeAmount',
-  'errors.otherExpensesAmount.negative'
-);
+import { release14RadioWording } from '@utils/featureFlags';
 
 const regularExpenseKeys = [
   'householdBills',
@@ -116,6 +48,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'householdBills',
           translationKey: 'options.householdBills',
+          subFieldsLegendKey: 'subFieldsLegend.householdBills',
           subFields: {
             householdBillsAmount: {
               name: 'householdBillsAmount',
@@ -133,15 +66,21 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateHouseholdBillsAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.householdBillsAmount.negative',
+                  maxAmountError: 'errors.householdBillsAmount.largeAmount',
+                }),
             },
             householdBillsFrequency: {
               name: 'householdBillsFrequency',
               type: 'radio',
               required: true,
               errorMessage: 'errors.householdBillsFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.householdBills',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -153,6 +92,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'loanPayments',
           translationKey: 'options.loanPayments',
+          subFieldsLegendKey: 'subFieldsLegend.loanPayments',
           subFields: {
             loanPaymentsAmount: {
               name: 'loanPaymentsAmount',
@@ -170,15 +110,21 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateLoanPaymentsAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.loanPaymentsAmount.negative',
+                  maxAmountError: 'errors.loanPaymentsAmount.largeAmount',
+                }),
             },
             loanPaymentsFrequency: {
               name: 'loanPaymentsFrequency',
               type: 'radio',
               required: true,
               errorMessage: 'errors.loanPaymentsFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.loanPayments',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -190,6 +136,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'childSpousalMaintenance',
           translationKey: 'options.childSpousalMaintenance',
+          subFieldsLegendKey: 'subFieldsLegend.childSpousalMaintenance',
           subFields: {
             childSpousalMaintenanceAmount: {
               name: 'childSpousalMaintenanceAmount',
@@ -207,15 +154,21 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateChildSpousalMaintenanceAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.childSpousalMaintenanceAmount.negative',
+                  maxAmountError: 'errors.childSpousalMaintenanceAmount.largeAmount',
+                }),
             },
             childSpousalMaintenanceFrequency: {
               name: 'childSpousalMaintenanceFrequency',
               type: 'radio',
               required: true,
               errorMessage: 'errors.childSpousalMaintenanceFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.childSpousalMaintenance',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -227,6 +180,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'mobilePhone',
           translationKey: 'options.mobilePhone',
+          subFieldsLegendKey: 'subFieldsLegend.mobilePhone',
           subFields: {
             mobilePhoneAmount: {
               name: 'mobilePhoneAmount',
@@ -244,15 +198,21 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateMobilePhoneAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.mobilePhoneAmount.negative',
+                  maxAmountError: 'errors.mobilePhoneAmount.largeAmount',
+                }),
             },
             mobilePhoneFrequency: {
               name: 'mobilePhoneFrequency',
               type: 'radio',
               required: true,
               errorMessage: 'errors.mobilePhoneFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.mobilePhone',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -264,6 +224,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'groceryShopping',
           translationKey: 'options.groceryShopping',
+          subFieldsLegendKey: 'subFieldsLegend.groceryShopping',
           subFields: {
             groceryShoppingAmount: {
               name: 'groceryShoppingAmount',
@@ -281,15 +242,21 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateGroceryShoppingAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.groceryShoppingAmount.negative',
+                  maxAmountError: 'errors.groceryShoppingAmount.largeAmount',
+                }),
             },
             groceryShoppingFrequency: {
               name: 'groceryShoppingFrequency',
               type: 'radio',
               required: true,
               errorMessage: 'errors.groceryShoppingFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.groceryShopping',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -301,6 +268,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'fuelParkingTransport',
           translationKey: 'options.fuelParkingTransport',
+          subFieldsLegendKey: 'subFieldsLegend.fuelParkingTransport',
           subFields: {
             fuelParkingTransportAmount: {
               name: 'fuelParkingTransportAmount',
@@ -318,15 +286,21 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateFuelParkingTransportAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.fuelParkingTransportAmount.negative',
+                  maxAmountError: 'errors.fuelParkingTransportAmount.largeAmount',
+                }),
             },
             fuelParkingTransportFrequency: {
               name: 'fuelParkingTransportFrequency',
               type: 'radio',
               required: true,
               errorMessage: 'errors.fuelParkingTransportFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.fuelParkingTransport',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -338,6 +312,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'schoolCosts',
           translationKey: 'options.schoolCosts',
+          subFieldsLegendKey: 'subFieldsLegend.schoolCosts',
           subFields: {
             schoolCostsAmount: {
               name: 'schoolCostsAmount',
@@ -355,15 +330,21 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateSchoolCostsAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.schoolCostsAmount.negative',
+                  maxAmountError: 'errors.schoolCostsAmount.largeAmount',
+                }),
             },
             schoolCostsFrequency: {
               name: 'schoolCostsFrequency',
               type: 'radio',
               required: true,
               errorMessage: 'errors.schoolCostsFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.schoolCosts',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -375,6 +356,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'clothing',
           translationKey: 'options.clothing',
+          subFieldsLegendKey: 'subFieldsLegend.clothing',
           subFields: {
             clothingAmount: {
               name: 'clothingAmount',
@@ -392,15 +374,21 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateClothingAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.clothingAmount.negative',
+                  maxAmountError: 'errors.clothingAmount.largeAmount',
+                }),
             },
             clothingFrequency: {
               name: 'clothingFrequency',
               type: 'radio',
               required: true,
               errorMessage: 'errors.clothingFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.clothing',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -412,6 +400,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'otherExpenses',
           translationKey: 'options.otherExpenses',
+          subFieldsLegendKey: 'subFieldsLegend.otherExpenses',
           subFields: {
             otherExpensesAmount: {
               name: 'otherExpensesAmount',
@@ -429,15 +418,21 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateOtherExpensesAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.otherExpensesAmount.negative',
+                  maxAmountError: 'errors.otherExpensesAmount.largeAmount',
+                }),
             },
             otherExpensesFrequency: {
               name: 'otherExpensesFrequency',
               type: 'radio',
               required: true,
               errorMessage: 'errors.otherExpensesFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.otherExpenses',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -449,6 +444,23 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ],
     },
   ],
+  // Show the question as the legend heading for citizens so screen readers read it with the checkboxes.
+  // No change for legal reps
+  extendGetContent: (req, formContent) => {
+    const wording = release14RadioWording(req);
+    const checkboxField = formContent.fields.find(f => f.componentType === 'checkboxes');
+    if (isLegalRepresentativeUser(req) || !checkboxField?.component) {
+      return wording;
+    }
+    checkboxField.component.fieldset = {
+      legend: {
+        text: formContent.heading,
+        isPageHeading: true,
+        classes: 'govuk-fieldset__legend--l govuk-!-margin-bottom-6',
+      },
+    };
+    return { ...wording, heading: '' };
+  },
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
     const draftHc = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances as

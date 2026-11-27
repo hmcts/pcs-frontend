@@ -59,6 +59,7 @@ const fieldsConfig: FormFieldConfig[] = [
 
 const STEP_NAME = 'tenancy-type-details';
 
+// English fallback; the page text comes from tenancyTypeAgreementTypes.* in the step's locale file.
 const TENANCY_TYPE_TO_TEXT: Record<string, string> = {
   ASSURED_TENANCY: 'an assured',
   SECURE_TENANCY: 'a secure',
@@ -153,11 +154,14 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ? caseData?.otherLicenceTypeDetails
       : caseData?.tenancy_DetailsOfOtherTypeOfTenancyLicence;
     // England: tenancy_* (TenancyLicenceDetails).
-    const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
+    const t = getTranslationFunction(req);
+    const englishAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
+    const tenancyTypeAgreementType = englishAgreementType
+      ? t(`tenancyTypeAgreementTypes.${tenancyTypeOfTenancyLicence}`, { defaultValue: englishAgreementType })
+      : undefined;
     const senderName = isLegalRepresentativeUser(req) ? claimantName : orgName;
     const release12Enabled = isRelease12Enabled(req);
 
-    const t = getTranslationFunction(req);
     let tenancyType: unknown;
     if (walesProperty) {
       if (occupationLicenceTypeWales === 'OTHER') {

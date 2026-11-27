@@ -56,5 +56,9 @@ version
 /src/test/java/build/
 /src/test/java/.gradle/
 
+# Fortify scan working files (fortify-client writes these relative to the repo root)
+/Fortify Scan/
+/lib/
+
 # Local Welsh-translation helper scripts (not part of the app)
 scripts/

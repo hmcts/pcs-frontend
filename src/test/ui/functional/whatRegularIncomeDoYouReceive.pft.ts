@@ -23,21 +23,6 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     regularIncomeOptions: [
       [
         whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
-        whatRegularIncomeDoYouReceive.incorrectFormatTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
-    ],
-  });
-
-  await performValidation('errorMessage', {
-    header: whatRegularIncomeDoYouReceive.errorValidationHeader,
-    message: whatRegularIncomeDoYouReceive.incorrectFormatErrorMessage,
-  });
-
-  await performAction('selectWhatRegularIncomeDoYouReceive', {
-    regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
         whatRegularIncomeDoYouReceive.negativeTextInput,
         whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
       ],
@@ -91,7 +76,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     regularIncomeOptions: [
       [
         whatRegularIncomeDoYouReceive.universalCreditParagraph,
-        whatRegularIncomeDoYouReceive.incorrectFormatTextInput,
+        whatRegularIncomeDoYouReceive.threeDecimalIncorrectFormatTextInput,
         whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
       ],
     ],
@@ -149,16 +134,11 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     message: whatRegularIncomeDoYouReceive.stateOrPrivatePensionAmountErrorMessage,
   });
 
-  await performValidation('errorMessage', {
-    header: whatRegularIncomeDoYouReceive.errorValidationHeader,
-    message: whatRegularIncomeDoYouReceive.stateOrPrivatePensionFrequencyErrorMessage,
-  });
-
   await performAction('selectWhatRegularIncomeDoYouReceive', {
     regularIncomeOptions: [
       [
         whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
-        whatRegularIncomeDoYouReceive.incorrectFormatTextInput,
+        whatRegularIncomeDoYouReceive.threeDecimalIncorrectFormatTextInput,
         whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
       ],
     ],
@@ -216,16 +196,12 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     message: whatRegularIncomeDoYouReceive.incomeFromAllJobsAmountErrorMessage,
   });
 
-  await performValidation('errorMessage', {
-    header: whatRegularIncomeDoYouReceive.errorValidationHeader,
-    message: whatRegularIncomeDoYouReceive.incomeFromAllJobsFrequencyErrorMessage,
-  });
-
+  //three decimal validation
   await performAction('selectWhatRegularIncomeDoYouReceive', {
     regularIncomeOptions: [
       [
         whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
-        whatRegularIncomeDoYouReceive.incorrectFormatTextInput,
+        whatRegularIncomeDoYouReceive.threeDecimalIncorrectFormatTextInput,
         whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
       ],
     ],
@@ -235,7 +211,6 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
     message: whatRegularIncomeDoYouReceive.incorrectFormatErrorMessage,
   });
-
   await performAction('selectWhatRegularIncomeDoYouReceive', {
     regularIncomeOptions: [
       [

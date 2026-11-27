@@ -1,0 +1,18 @@
+export const counterClaimAbout = {
+  mainHeader: `Ynglŷn â'ch gwrth-hawliad`,
+  youWillBeParagraph: `Byddwch yn gallu uwchlwytho unrhyw dystiolaeth sydd gennych ar y dudalen nesaf.`,
+  theClaimantWillBeParagraph: `Bydd yr hawlydd yn gallu gweld eich atebion.`,
+  whatIsYourCounterClaimLabelText: `Ar gyfer beth mae eich gwrth-hawliad?`,
+  youCanEnterUpToHintText: `Mae gennych 6,797 nod ar ôl`,
+  whatAreYourReasonsLabelText: `Beth yw eich rhesymau dros wneud y gwrth-hawliad?`,
+  saveAndContinueButton: `Cadw a pharhau`,
+  saveForLaterButton: `Cadw at hwyrach ymlaen`,
+  backLink: `Yn ôl`,
+  enterWhatYourCounterClaimErrorMessage: `Nodwch ar gyfer beth mae eich gwrth-hawliad`,
+  enterWhatYourReasonsAreForErrorMessage: `Nodwch beth yw eich rhesymau dros wneud y gwrth-hawliad`,
+  thereIsAProblemErrorMessageHeader: `Mae yna broblem`,
+  counterClaimForInput: `services not provided`,
+  reasonsForCounterClaimInput: `electricity and windows not repaired`,
+  feedbackLink: `adborth (yn agor mewn tab newydd)`,
+  pageSlug: `counter-claim-about`,
+};

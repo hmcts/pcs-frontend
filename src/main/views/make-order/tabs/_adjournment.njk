@@ -1,0 +1,61 @@
+{% import "make-order/_compact.njk" as compact with context %}
+{% import "make-order/_listing.njk" as listing with context %}
+
+<h3 class="govuk-heading-m">Adjournment</h3>
+
+{% set furtherHearingHtml %}
+  {{ listing.listing("adj", "Adjourned for further hearing conditions", [
+    "Adjourned to next available possession list after",
+    "Adjourned to next available date (non-possession list) after",
+    "Adjourned to specific date"
+  ]) }}
+{% endset %}
+
+{% macro paymentFields(option, amountLabel, instalments=true) %}
+  {% set prefix = "adj-gen-" + option %}
+  {% call compact.row() %}
+    {{ compact.money({ id: prefix + "-amount", label: amountLabel }) }}
+    {% if instalments %}
+      {{ compact.select(prefix + "-frequency", { label: "How often", items: compact.paymentFrequencies, default: "monthly" }) }}
+    {% endif %}
+    {{ compact.date({ id: prefix + "-date", legend: "First payment by" if instalments else "Payment by" }) }}
+  {% endcall %}
+{% endmacro %}
+
+{% set generallyHtml %}
+  {{ compact.checkboxes("adj-gen", {
+    legend: "Conditions (optional)",
+    classes: "pcs-divided-options",
+    items: [
+      {
+        value: "current-rent-plus",
+        text: "On payment of current rent plus an additional sum",
+        conditional: { html: paymentFields("current-rent-plus", "Additional sum") }
+      },
+      { value: "payments", text: "On regular payments", conditional: { html: paymentFields("payments", "Payments of") } },
+      { value: "oneoff", text: "On a single payment", conditional: { html: paymentFields("oneoff", "Payment of", false) } },
+      {
+        value: "restore",
+        text: "Automatically struck out unless an application to restore is made",
+        conditional: { html: compact.date({ id: "adj-gen-restore-date", legend: "Application to restore by" }) }
+      }
+    ]
+  }) }}
+{% endset %}
+
+{# Only a case with an open counterclaim has more than its claim to adjourn; applications are decided in their own section. #}
+{% if openCounterclaim %}
+  {{ compact.checkboxes("adj-subjects", { legend: "What is adjourned", items: [
+    { value: "claim", text: "Claim" },
+    { value: "counterclaim", text: "Counterclaim" }
+  ] }) }}
+{% endif %}
+
+{{ compact.radios("adj-type", {
+  legend: "Adjournment type",
+  classes: "govuk-radios--small pcs-inline-radios",
+  items: [
+    { value: "further-hearing", text: "Adjourned for further hearing", conditional: { html: furtherHearingHtml } },
+    { value: "generally", text: "Adjourned generally", conditional: { html: generallyHtml } }
+  ]
+}) }}

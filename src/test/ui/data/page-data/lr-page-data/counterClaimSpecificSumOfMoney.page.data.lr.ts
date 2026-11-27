@@ -19,14 +19,12 @@ export const counterClaimSpecificSumOfMoney = {
   pageSlug: `counter-claim-specific-sum`,
   backLink: `Back`,
   feeHiddenAmount: `35.00`,
-  /*
-enterHowMuchYouAreClaimingErrorMessage: `Enter how much you are claiming for`,
-thereIsAProblemErrorMessageHeader: `There is a problem`,
-specificSumRequiredErrorMessage: `Select if you are claiming for a specific sum of money`,
-enterMaxValueErrorMessage: `Enter the maximum value of your claim`,
-billionClaimErrorMessage: `The amount you are claiming for must be less than £1 billion`,
-negativeClaimInputErrorMessage: `The amount you are claiming for must be £0.00 or above`,
-maximumValueBillionErrorMessage: `The maximum value you are claiming for must be less than £1 billion`,
-negativeMaxValueErrorMessage: `The maximum value you are claiming for must be £0.00 or above`,
- */
+  enterHowMuchYouAreClaimingErrorMessage: `Enter how much the defendant is claiming for`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  specificSumRequiredErrorMessage: `Select if the defendant is claiming for a specific sum of money`,
+  enterMaxValueErrorMessage: `Enter the maximum value of the defendant’s claim`,
+  billionClaimErrorMessage: `The amount the defendant is claiming for must be less than £1 billion`,
+  negativeClaimInputErrorMessage: `The amount the defendant is claiming for must be £0.00 or above`,
+  maximumValueBillionErrorMessage: `The maximum value the defendant is claiming for must be less than £1 billion`,
+  negativeMaxValueErrorMessage: `The maximum value the defendant is claiming for must be £0.00 or above`,
 };

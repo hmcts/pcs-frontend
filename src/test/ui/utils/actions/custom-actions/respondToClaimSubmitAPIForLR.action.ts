@@ -27,11 +27,14 @@ export class SubmitPossessionClaimResponseAPIAction implements IAction {
       submitPossessionClaimResponseApiDataForLR.submitPossessionClaimResponseApiInstance()
     );
 
-    const RESPONDCLAIM_EVENT_TOKEN = (
+    const startEvent = (
       await submitPossessionClaimResponseApi.get(
         respondPossessionClaimSolicitorEventTokenApiData.respondPossessionClaimSolicitorApiEndPoint()
       )
-    ).data.token;
+    ).data;
+    const RESPONDCLAIM_EVENT_TOKEN = startEvent.token;
+    // pcs-api rejects a submit whose draftVersion isn't the stored one.
+    const draftVersion = startEvent.case_details?.case_data?.possessionClaimResponse?.draftVersion;
 
     const maxRetries = actionRetries;
 
@@ -39,7 +42,10 @@ export class SubmitPossessionClaimResponseAPIAction implements IAction {
       try {
         const submitResponseLR = await submitPossessionClaimResponseApi.post(
           submitPossessionClaimResponseApiDataForLR.submitPossessionClaimResponseApiEndPoint(),
-          submitPossessionClaimResponseApiDataForLR.submitPossessionClaimResponsePayload(RESPONDCLAIM_EVENT_TOKEN)
+          submitPossessionClaimResponseApiDataForLR.submitPossessionClaimResponsePayload(
+            RESPONDCLAIM_EVENT_TOKEN,
+            draftVersion
+          )
         );
 
         console.log('\n✅ SUBMIT LEGAL REPRESENTATIVE RESPONSE SUCCESSFUL:');
@@ -59,6 +65,8 @@ export class SubmitPossessionClaimResponseAPIAction implements IAction {
           console.error('Message:', responseBody?.message);
           console.error('Path:', responseBody?.path);
           console.error('Timestamp:', responseBody?.timestamp);
+          console.error('Callback errors:', responseBody?.callbackErrors);
+          console.error('Draft version sent:', draftVersion);
 
           if (status === 404) {
             throw error;

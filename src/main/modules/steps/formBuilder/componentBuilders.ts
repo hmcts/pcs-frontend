@@ -41,7 +41,7 @@ export function buildConditionalItemContent(option: FormFieldOption, nunjucksEnv
   }
 
   if (option.subFields) {
-    const subFieldsHTML = buildSubFieldsHTML(option.subFields, nunjucksEnv);
+    const subFieldsHTML = buildSubFieldsHTML(option.subFields, nunjucksEnv, option.subFieldsLegend);
     if (subFieldsHTML) {
       conditionalParts.push(subFieldsHTML);
     }
@@ -114,7 +114,7 @@ export function buildComponentConfig({
           ...(field.hintClasses ? { classes: field.hintClasses } : {}),
         }
       : null,
-    errorMessage: hasError && errorText ? { text: errorText } : null,
+    errorMessage: hasError && errorText ? { text: errorText, visuallyHiddenText: t('common:errorPrefix') } : null,
     classes: field.classes || (field.type === 'text' ? 'govuk-!-width-three-quarters' : undefined),
     attributes: field.attributes || {},
   };
@@ -244,6 +244,10 @@ export function buildComponentConfig({
       component.uploadButtonText = t('uploadButton');
       component.filesAddedHeading = t('filesAddedHeading');
       component.deleteButtonText = t('deleteButton');
+      component.errorPrefix = t('common:errorPrefix');
+      component.dropzoneHintText = t('common:fileUpload.dropzoneHint');
+      component.dropzoneButtonText = t('common:fileUpload.dropzoneButton');
+      component.uploadStatusText = t('common:fileUpload.uploadStatus');
       componentType = 'fileUpload';
       break;
     }

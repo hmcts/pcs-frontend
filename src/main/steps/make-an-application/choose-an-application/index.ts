@@ -1,10 +1,25 @@
 import { Request } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 
-import { createFormStep } from '../../../modules/steps';
+import { createFormStep, getFormData } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
+import { getApplicationId, setApplicationId } from '../session';
 
+import { BuiltFormContent } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { ENABLE_DEFENDANT_GENERAL_APPLICATIONS_R2 } from '@utils/featureFlags';
+import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
+
+const isDefendantGeneralApplicationsR2Enabled = (req: Request): Promise<boolean> =>
+  getLaunchDarklyFlag(req, ENABLE_DEFENDANT_GENERAL_APPLICATIONS_R2, false);
+
+function removeSuspendOption(formContent: BuiltFormContent): void {
+  const typeOfApplicationField = formContent.fields.find(field => field.name === 'typeOfApplication');
+  const radioComponent = typeOfApplicationField?.component as { items?: { value?: string }[] } | undefined;
+  if (radioComponent?.items) {
+    radioComponent.items = radioComponent.items.filter(item => item.value !== 'SUSPEND');
+  }
+}
 
 export const step: StepDefinition = createFormStep({
   stepName: 'choose-an-application',
@@ -20,6 +35,11 @@ export const step: StepDefinition = createFormStep({
       translationKey: { label: 'question' },
       legendClasses: 'govuk-fieldset__legend--m',
       options: [
+        {
+          value: 'SUSPEND',
+          translationKey: 'options.suspend.label',
+          hint: 'options.suspend.hint',
+        },
         {
           value: 'ADJOURN',
           translationKey: 'options.adjourn.label',
@@ -46,10 +66,24 @@ export const step: StepDefinition = createFormStep({
     sendTheFormToTheCourt: 'noticeTextList.sendTheFormToTheCourt',
   },
   beforeGet: async (req: Request) => {
-    if (!req.session.genApp?.applicationId) {
-      req.session.genApp = {
-        applicationId: uuidv4(),
-      };
+    if (!getApplicationId(req)) {
+      setApplicationId(req, uuidv4());
+    }
+  },
+  extendGetContent: async (req: Request, formContent: BuiltFormContent) => {
+    if (await isDefendantGeneralApplicationsR2Enabled(req)) {
+      return { context: 'r2', showPostOnlyNotice: false };
+    }
+
+    removeSuspendOption(formContent);
+    return { showPostOnlyNotice: true };
+  },
+  beforeRedirect: async (req: Request) => {
+    if (
+      getFormData(req, 'choose-an-application').typeOfApplication === 'SUSPEND' &&
+      !(await isDefendantGeneralApplicationsR2Enabled(req))
+    ) {
+      throw new Error('Suspend general applications are not enabled');
     }
   },
 });

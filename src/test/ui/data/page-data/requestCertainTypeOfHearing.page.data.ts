@@ -6,5 +6,5 @@ export const requestCertainTypeOfHearing = {
   inPersonHearingCheckbox: `In-person hearing`,
   phoneHearingCheckbox: `Phone hearing`,
   videoHearingCheckbox: `Video hearing`,
-  noCertainTypeOfHearingCheckbox: `I do not need any support at this time`,
+  noCertainTypeOfHearingCheckbox: `I do not need to request for a certain type of hearing at this time`,
 };

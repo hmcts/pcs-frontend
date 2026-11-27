@@ -1,0 +1,123 @@
+{#
+  The make order form and the order it generates, which a judge fills in to make an order and a
+  caseworker may change before issuing it. The page's form wraps it, as #make-order-form.
+#}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% import "make-order/_compact.njk" as compact with context %}
+
+<input type="hidden" id="order-type" name="orderType" value="{{ draftOrderType }}">
+
+{% import "make-order/_application.njk" as applicationRow with context %}
+{% import "make-order/_case-facts.njk" as caseFacts with context %}
+
+{#
+  One screen, whatever the order is for: the hearing's facts and who attended for an order made at a hearing, then
+  each open application the order may decide, then every order type for the claim. With an application open, the
+  claim's order types wait behind a tick box: an application is nearly always decided without the claim being, so
+  the judge chooses to order on it.
+#}
+{#
+  Only the judge making an order for a hearing records its facts and note, and the page has those of each hearing
+  they can choose. A part of the form marked data-made-at is shown, and sent, only for the choice it names
+  (showMadeAt in make-order.ts).
+#}
+{% for record in hearingRecords %}
+  {{ caseFacts.panel(record) }}
+{% endfor %}
+<fieldset class="govuk-fieldset" data-made-at="hearing" {%- if withoutHearing %} hidden disabled{% endif %}>
+  {% include "make-order/_attendance.njk" %}
+</fieldset>
+
+<h2 class="govuk-heading-l govuk-!-margin-top-6">Recitals</h2>
+
+{{ compact.reveal("recitals", "Recitals", compact.textarea("recitals-text", { label: "Recital paragraphs", optional: true })) }}
+
+{#
+  Every open application, each decided on its own, so one order can decide any of them and the claim. Shown only
+  while the case has one. First: with an application open, the claim is the exception.
+#}
+{% if applications | length %}
+  <section class="pcs-applications" aria-labelledby="applications-heading" data-applications>
+    <h2 class="govuk-heading-l govuk-!-margin-top-6" id="applications-heading">Applications</h2>
+    {% for item in applications %}
+      {{ applicationRow.row(item) }}
+    {% endfor %}
+  </section>
+{% endif %}
+
+<h2 class="govuk-heading-l govuk-!-margin-top-6">Claim</h2>
+
+{#
+  With an application open the claim's order types wait behind a tick box, unticked until the judge decides to
+  order on the claim (order type NO_ORDER_ON_CLAIM meanwhile). Without one, the hearing is the claim's, so they show.
+#}
+{% if applications | length %}
+  {{ govukCheckboxes({
+    idPrefix: "claim-order",
+    name: "claim-order",
+    classes: "govuk-checkboxes--small",
+    fieldset: { legend: { text: "Do you wish to make an order on the main claim?", classes: "govuk-fieldset__legend--s" } },
+    hint: { text: "Leave this unticked to decide only the applications." },
+    items: [{ value: "yes", text: "Yes, make an order on the claim", checked: draftOrderType != "NO_ORDER_ON_CLAIM" }]
+  }) }}
+{% endif %}
+
+<div data-claim-order {%- if applications | length and draftOrderType == "NO_ORDER_ON_CLAIM" %} hidden{% endif %}>
+{#
+  One list drives both the tabs and their panels: what the order does about the claim, which the order types
+  exclude one another over, with or without a hearing. The tab marked open is the order's, or the first it is offered.
+#}
+{% set orderTypeTabs = [
+  { id: "tab-outright", type: "OUTRIGHT_POSSESSION", label: "Outright possession", template: "make-order/tabs/_outright.njk" },
+  { id: "tab-suspended", type: "SUSPENDED_POSSESSION", label: "Suspended possession", template: "make-order/tabs/_suspended.njk" },
+  { id: "tab-adjournment", type: "ADJOURNMENT", label: "Adjournment", template: "make-order/tabs/_adjournment.njk" },
+  { id: "tab-strike-out", type: "STRIKE_OUT_DISMISSAL", label: "Strike out/dismiss", template: "make-order/tabs/_strike-out.njk" },
+  { id: "tab-free-form", type: "FREE_FORM", label: "Free form", template: "make-order/tabs/_free-form.njk" }
+] %}
+{% set openOrderType = draftOrderType if draftOrderType != "NO_ORDER_ON_CLAIM" else ("ADJOURNMENT" if withoutHearing else "OUTRIGHT_POSSESSION") %}
+
+{# The macro hardcodes an h2 tab-list heading, so use its markup directly to preserve heading order. #}
+<div class="govuk-tabs" data-module="govuk-tabs">
+  <h3 class="govuk-tabs__title">Contents</h3>
+
+  <ul class="govuk-tabs__list">
+    {% for tab in orderTypeTabs %}
+      <li class="govuk-tabs__list-item {%- if tab.type == openOrderType %} govuk-tabs__list-item--selected{% endif %}">
+        <a class="govuk-tabs__tab" href="#{{ tab.id }}" data-order-type="{{ tab.type }}">{{ tab.label }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  {# govuk-frontend expects every panel after the first to start hidden. #}
+  {% for tab in orderTypeTabs %}
+    <div class="govuk-tabs__panel {%- if tab.type != openOrderType %} govuk-tabs__panel--hidden{% endif %}" id="{{ tab.id }}">
+      {% include tab.template %}
+    </div>
+  {% endfor %}
+</div>
+</div>
+
+{% include "make-order/_costs.njk" %}
+
+{% include "make-order/_notice.njk" %}
+
+{#
+  Any order can transfer enforcement of the case's possession order to the High Court, whatever else it orders and
+  whether or not it is made at a hearing. Last on the form, as the judges seldom need it.
+#}
+<div>
+  <h2 class="govuk-heading-l govuk-!-margin-top-6">Enforcement</h2>
+
+  {% set transferHtml %}
+    {{ compact.checkboxes("transfer-enforcement-costs", {
+      items: [{ value: "bailiff", text: "Limit recoverable costs to bailiffs’ fees" }]
+    }) }}
+  {% endset %}
+  {{ compact.reveal("transfer-enforcement", "Transfer to the High Court", transferHtml) }}
+</div>
+
+<section class="govuk-!-margin-top-6" aria-labelledby="order-preview-heading">
+  <h2 class="govuk-heading-l" id="order-preview-heading">{{ orderPreviewHeading | default("Order preview") }}</h2>
+  <div id="order-editor" tabindex="-1"></div>
+  <textarea hidden id="order-document" name="orderDocument">{{ orderDocumentJson }}</textarea>
+</section>

@@ -1,0 +1,108 @@
+{% extends "confirm-order-review/_layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% import "confirm-order-review/_order-panel.njk" as orderPanel %}
+
+{# The make order form's layout, for the Judge's form the caseworker may change. #}
+{% set htmlClasses = "pcs-make-order" %}
+
+{% set pageHeading = "Review the order" %}
+{% set orderPreviewHeading = "Order to issue" %}
+
+{% block page %}
+  <div class="pcs-review-page">
+    {# What the Judge submitted stays above the page, read only, whatever the caseworker changes in the form. #}
+    {% call orderPanel.panel("Order the Judge submitted", staffMessage) %}
+      {% if edits.added or edits.changed %}
+        <p class="govuk-body-s" id="judge-changes-key">
+          Clauses the Judge added are highlighted in green. Generated clauses they changed are highlighted in blue.
+        </p>
+      {% endif %}
+      {% include "confirm-order-review/_order-preview.njk" %}
+    {% endcall %}
+
+    {# The make order page's script runs the Judge's form and its order editor, which it finds by this id. #}
+    <form method="post" action="{{ formAction }}" novalidate id="make-order-form">
+      <script type="application/json" id="order-context">{{ orderContext | jsonScript | safe }}</script>
+      {{ csrfProtection(csrfToken) }}
+      <input type="hidden" name="reviewOrderId" value="{{ reviewOrderId }}">
+
+      {% include "make-order/_whole-file.njk" %}
+
+      {% if freeForm %}
+        {{ govukWarningText({
+          text: "The Judge has created a custom order. Review the full order before issuing",
+          attributes: { id: "free-form-warning" }
+        }) }}
+      {% endif %}
+
+      {% if edits.added or edits.changed %}
+        {% set editsHtml %}
+          <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-0">
+            {% if edits.added %}
+              <li>The Judge added wording to the order. Check the wording and any follow-up before issue</li>
+            {% endif %}
+            {% if edits.changed %}
+              <li>The Judge changed generated wording. Check the fields below still reflect the order</li>
+            {% endif %}
+          </ul>
+        {% endset %}
+        {{ govukNotificationBanner({
+          titleText: "The Judge edited this order",
+          html: editsHtml,
+          attributes: { id: "judge-edits" }
+        }) }}
+      {% endif %}
+
+      <p class="govuk-body" id="order-changes-guidance">
+        Check the Judge's order. These are their answers and the order they generate: you can change the answers
+        and the wording before you issue it, or return the order to the Judge with a query. The order the Judge
+        submitted stays as it is.
+      </p>
+
+      {% include "make-order/_form.njk" %}
+
+      {% set queryHtml %}
+        {{ govukCharacterCount({
+          name: "query-to-judge",
+          id: "query-to-judge",
+          maxlength: maxQueryLength,
+          label: { text: "Your query for the Judge" },
+          value: answers.queryToJudge,
+          errorMessage: validationErrors["query-to-judge"]
+        }) }}
+      {% endset %}
+      {{ govukCheckboxes({
+        name: "send-query",
+        idPrefix: "send-query",
+        classes: "govuk-checkboxes--small",
+        fieldset: { legend: { text: "Do you have a query for the Judge?", classes: "govuk-fieldset__legend--m" } },
+        hint: { text: "The order will be returned to the Judge with your query" },
+        errorMessage: validationErrors["send-query"],
+        items: [{
+          value: "yes",
+          text: "Send query to Judge",
+          checked: answers.sendQuery,
+          conditional: { html: queryHtml }
+        }]
+      }) }}
+
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Continue", name: "action", value: "ISSUE" }) }}
+        {{ govukButton({
+          text: "Return to Judge",
+          classes: "govuk-button--secondary",
+          name: "action",
+          value: "RETURN_TO_JUDGE",
+          preventDoubleClick: true
+        }) }}
+        <a class="govuk-link" href="{{ cancelUrl }}">Cancel</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

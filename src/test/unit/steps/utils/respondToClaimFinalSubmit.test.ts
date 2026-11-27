@@ -31,8 +31,12 @@ jest.mock('@utils/clientContextSessionClearer', () => ({
 import type { Request } from 'express';
 
 import {
+  RespondToClaimSubmitRejectedError,
+  getEndOfJourneyCyaDraftChangedPath,
   getEndOfJourneyCyaSubmitErrorPath,
+  isDraftChangedError,
   parseSubmitPaymentPayload,
+  submitRejectionReason,
   submitRespondToClaimResponse,
 } from '../../../../main/steps/utils/respondToClaimFinalSubmit';
 
@@ -192,5 +196,115 @@ describe('respondToClaimFinalSubmit', () => {
         })
       );
     });
+  });
+});
+
+// HDPI-8866 W05 — the submit carries the reviewed draft version and surfaces a DRAFT_CHANGED refusal distinctly.
+describe('submitRespondToClaimResponse — reviewed draft version', () => {
+  const reqWithDraftVersion = (draftVersion?: number): Request =>
+    ({
+      session: { user: { accessToken: 'mock-token' } },
+      res: {
+        locals: {
+          validatedCase: {
+            id: '1234567890123456',
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: { makeCounterClaim: 'NO' },
+                ...(draftVersion !== undefined && { draftVersion }),
+              },
+            },
+          },
+        },
+      },
+    }) as unknown as Request;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockHttpGet.mockResolvedValue({ data: { token: 'event-token' } });
+  });
+
+  it('sends the draft version the review page was rendered from', async () => {
+    mockHttpPost.mockResolvedValue({ data: {} });
+
+    await submitRespondToClaimResponse(reqWithDraftVersion(5));
+
+    const [, payload] = mockHttpPost.mock.calls[0];
+    expect(payload.data.possessionClaimResponse).toEqual({ draftVersion: 5 });
+  });
+
+  it('sends no draft version when the case carries none', async () => {
+    mockHttpPost.mockResolvedValue({ data: {} });
+
+    await submitRespondToClaimResponse(reqWithDraftVersion());
+
+    const [, payload] = mockHttpPost.mock.calls[0];
+    expect(payload.data.possessionClaimResponse).toEqual({});
+  });
+
+  it('rethrows a DRAFT_CHANGED refusal from CCD unchanged so the caller can detect it', async () => {
+    const refusal = {
+      response: { status: 422, data: { callbackErrors: ['DRAFT_CHANGED'] } },
+    };
+    mockHttpPost.mockRejectedValue(refusal);
+
+    const rejection = await submitRespondToClaimResponse(reqWithDraftVersion(5)).catch(error => error);
+
+    expect(rejection).toBe(refusal);
+    expect(isDraftChangedError(rejection)).toBe(true);
+  });
+
+  it('maps a validation refusal from pcs-api to RespondToClaimSubmitRejectedError carrying the messages', async () => {
+    mockHttpPost.mockRejectedValue({
+      response: { status: 422, data: { callbackErrors: ['Enter a valid postcode for correspondence address'] } },
+    });
+
+    const rejection = await submitRespondToClaimResponse(reqWithDraftVersion(5)).catch(error => error);
+
+    expect(rejection).toBeInstanceOf(RespondToClaimSubmitRejectedError);
+    expect(rejection.messages).toEqual(['Enter a valid postcode for correspondence address']);
+  });
+
+  it('rethrows any other CCD error unchanged', async () => {
+    const boom = new Error('boom');
+    mockHttpPost.mockRejectedValue(boom);
+
+    await expect(submitRespondToClaimResponse(reqWithDraftVersion(5))).rejects.toBe(boom);
+  });
+});
+
+describe('isDraftChangedError', () => {
+  it.each([
+    ['an HTTPError built from mid-event callback errors', new Error('CCD callback rejected request: DRAFT_CHANGED')],
+    ['an axios error carrying callbackErrors', { response: { data: { callbackErrors: ['DRAFT_CHANGED'] } } }],
+  ])('recognises %s', (_label, error) => {
+    expect(isDraftChangedError(error)).toBe(true);
+  });
+
+  it.each([
+    ['a plain error', new Error('boom')],
+    ['an axios error with unrelated callback errors', { response: { data: { callbackErrors: ['Other'] } } }],
+    ['undefined', undefined],
+  ])('rejects %s', (_label, error) => {
+    expect(isDraftChangedError(error)).toBe(false);
+  });
+});
+
+describe('getEndOfJourneyCyaDraftChangedPath', () => {
+  it('returns the review page with the draftChanged marker', () => {
+    expect(getEndOfJourneyCyaDraftChangedPath('123')).toBe(
+      '/case/123/respond-to-claim/end-of-journey-cya?draftChanged=1'
+    );
+  });
+});
+
+describe('submitRejectionReason', () => {
+  it('maps a correspondence-address refusal to the address reason', () => {
+    expect(submitRejectionReason(['Enter a valid postcode for correspondence address'])).toBe('correspondenceAddress');
+  });
+
+  it('maps anything else to other', () => {
+    expect(submitRejectionReason(['Invalid submission: missing response data'])).toBe('other');
+    expect(submitRejectionReason([])).toBe('other');
   });
 });

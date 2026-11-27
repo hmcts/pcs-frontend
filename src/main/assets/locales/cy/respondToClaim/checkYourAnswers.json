@@ -1,6 +1,8 @@
 {
   "pageTitle": "Gwirio eich atebion",
   "errors": {
-    "submitResponseFailed": "Wedi  methu cyflwyno ymateb. Rhowch gynnig arall arni."
+    "submitResponseFailed": "Wedi  methu cyflwyno ymateb. Rhowch gynnig arall arni.",
+    "draftChanged": "Mae eich atebion wedi newid ers i chi eu hadolygu. Gwiriwch nhw a chadarnhewch eto.",
+    "correspondenceAddressRejected": "Gwiriwch y cyfeiriad gohebu a roesoch a rhowch gynnig arall arni."
   }
 }

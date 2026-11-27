@@ -17,4 +17,5 @@ export const endOfJourneyCYA = {
   selectIfDefendantBelieveErrorMessage: `Select if the defendant believes that the facts stated in this defence form are true`,
   yourFullNameErrorMessage: `Enter your full name`,
   firmNameErrorMessage: `Enter firm name`,
+  enterPositionErrorMessage: `Enter position held name`,
 };

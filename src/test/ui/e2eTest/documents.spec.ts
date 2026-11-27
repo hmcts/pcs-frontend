@@ -43,7 +43,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Documents - e2e Journey @nightly', async () => {
-  test('Upload documents when GenApps submitted @smoke @regression @crossbrowser @healthCheck', async () => {
+  test('Upload documents when GenApps submitted @regression @crossbrowser @healthCheck', async () => {
     await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
     await performAction(
       'navigateToUrl',
@@ -89,7 +89,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performAction('clickLink', checkYourAnswers.changeLink);
     await performAction('uploadDocuments', { files: ['uploadYourDocuments.docx'] });
     await performAction('verifyCheckYourAnswers', {
-      fileName: 'uploadYourDocuments.docx',
+      fileName: 'uploadYourDocuments.ppt',
     });
     await performAction('clickButton', checkYourAnswers.submitButton);
     await performAction('clickLink', documentsUploaded.closeAndReturnToCaseOverviewLink);

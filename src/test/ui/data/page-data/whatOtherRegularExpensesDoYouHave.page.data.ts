@@ -1,79 +1,72 @@
 export const whatOtherRegularExpensesDoYouHave = {
   mainHeader: `What other regular expenses do you have? (Optional)`,
-  selectAllThatApplyHintText: `Select all that apply. Enter total amount in pounds and pence, for example £148.00 or £148.50. The information you provide must be truthful and accurate.`,
+  selectAllThatApplyHintText: `Select all that apply. Enter total amount in pounds and pence, for example £148 or £148.50. The information you provide must be truthful and accurate.`,
 
   // Household Bills
   householdBillsParagraph: `Household bills (for example, council tax, gas, electricity, water, internet)`,
   householdBillsAmountPaidHiddenLabel: `Amount paid`,
   householdBillsTotalAmountInput: `450.00`,
-  householdBillsPaidEveryHiddenLabel: `Paid every:`,
-  householdBillsWeekHiddenRadioOption: `Week`,
-  householdBillsMonthHiddenRadioOption: `Month`,
+  householdBillsWeekHiddenRadioOption: `Paid every week`,
+  householdBillsMonthHiddenRadioOption: `Paid every month`,
   amountReceivedHiddenTextLabel: 'Amount paid',
 
   // Loan Payments
   loanPaymentsParagraph: `Loan payments`,
   loanPaymentsAmountPaidHiddenLabel: `Amount paid`,
   loanPaymentsTotalAmountInput: `200.00`,
-  loanPaymentsPaidEveryHiddenLabel: `Paid every:`,
-  loanPaymentsWeekHiddenRadioOption: `Week`,
-  loanPaymentsMonthHiddenRadioOption: `Month`,
+  loanPaymentsTotalAmountTextInput: `200`,
+  loanPaymentsWeekHiddenRadioOption: `Paid every week`,
+  loanPaymentsMonthHiddenRadioOption: `Paid every month`,
 
   // Child or Spousal Maintenance
   childSpousalMaintenanceParagraph: `Child or spousal maintenance`,
   childSpousalMaintenanceAmountHiddenPaidLabel: `Amount paid`,
   childSpousalMaintenanceTotalAmountInput: `150.00`,
-  childSpousalMaintenancePaidHiddenEveryLabel: `Paid every:`,
-  childSpousalMaintenanceWeekHiddenRadioOption: `Week`,
-  childSpousalMaintenanceMonthHiddenRadioOption: `Month`,
+  childSpousalMaintenanceWeekHiddenRadioOption: `Paid every week`,
+  childSpousalMaintenanceMonthHiddenRadioOption: `Paid every month`,
 
   // Mobile Phone
   mobilePhoneParagraph: `Mobile phone`,
   mobilePhoneAmountPaidHiddenLabel: `Amount paid`,
   mobilePhoneTotalAmountInput: `50.00`,
-  mobilePhonePaidEveryHiddenLabel: `Paid every:`,
-  mobilePhoneWeekHiddenRadioOption: `Week`,
-  mobilePhoneMonthHiddenRadioOption: `Month`,
+  mobilePhoneWeekHiddenRadioOption: `Paid every week`,
+  mobilePhoneMonthHiddenRadioOption: `Paid every month`,
 
   // Grocery Shopping
   groceryShoppingParagraph: `Grocery shopping`,
   groceryShoppingAmountPaidHiddenLabel: `Amount paid`,
   groceryShoppingTotalAmountInput: `300.00`,
-  groceryShoppingPaidEveryHiddenLabel: `Paid every:`,
-  groceryShoppingWeekHiddenRadioOption: `Week`,
-  groceryShoppingMonthHiddenRadioOption: `Month`,
+  groceryShoppingTotalAmountTextInput: `300`,
+  groceryShoppingWeekHiddenRadioOption: `Paid every week`,
+  groceryShoppingMonthHiddenRadioOption: `Paid every month`,
 
   // Fuel, Parking and Transport
   fuelParkingTransportParagraph: `Fuel, parking and transport`,
   fuelParkingTransportAmountPaidHiddenLabel: `Amount paid`,
   fuelParkingTransportTotalAmountInput: `250.00`,
-  fuelParkingTransportPaidEveryHiddenLabel: `Paid every:`,
-  fuelParkingTransportWeekHiddenRadioOption: `Week`,
-  fuelParkingTransportMonthHiddenRadioOption: `Month`,
+  fuelParkingTransportWeekHiddenRadioOption: `Paid every week`,
+  fuelParkingTransportMonthHiddenRadioOption: `Paid every month`,
 
   // School Costs
   schoolCostsParagraph: `School costs (for example, uniform and school dinners)`,
   schoolCostsAmountPaidHiddenLabel: `Amount paid`,
   schoolCostsTotalAmountInput: `180.00`,
-  schoolCostsPaidEveryHiddenLabel: `Paid every:`,
-  schoolCostsWeekHiddenRadioOption: `Week`,
-  schoolCostsMonthHiddenRadioOption: `Month`,
+  schoolCostsWeekHiddenRadioOption: `Paid every week`,
+  schoolCostsMonthHiddenRadioOption: `Paid every month`,
 
   // Clothing
   clothingParagraph: `Clothing`,
   clothingAmountPaidHiddenLabel: `Amount paid`,
   clothingTotalAmountInput: `100.00`,
-  clothingPaidEveryHiddenLabel: `Paid every:`,
-  clothingWeekHiddenRadioOption: `Week`,
-  clothingMonthHiddenRadioOption: `Month`,
+  clothingWeekHiddenRadioOption: `Paid every week`,
+  clothingMonthHiddenRadioOption: `Paid every month`,
 
   // Other
   otherExpensesParagraph: `Other`,
   otherExpensesAmountPaidHiddenLabel: `Amount paid`,
   otherExpensesTotalAmountInput: `75.00`,
-  otherExpensesPaidEveryHiddenLabel: `Paid every:`,
-  otherExpensesWeekHiddenRadioOption: `Week`,
-  otherExpensesMonthHiddenRadioOption: `Month`,
+  otherExpensesWeekHiddenRadioOption: `Paid every week`,
+  otherExpensesMonthHiddenRadioOption: `Paid every month`,
 
   errorValidationHeader: `There is a problem`,
   // Mandatory Field Errors - Amount Missing
@@ -98,7 +91,7 @@ export const whatOtherRegularExpensesDoYouHave = {
   clothingFrequencyErrorMessage: `Select how frequently you pay for clothing`,
   otherExpensesFrequencyErrorMessage: `Select how frequently you pay for other expenses`,
 
-  invalidFormatErrorMessage: `Enter an amount in the correct format, for example 148.00 or 148.50`,
+  invalidFormatErrorMessage: `Enter an amount in the correct format, for example 148 or 148.50`,
 
   // Minimum Limit Errors
   householdBillsMinErrorMessage: `The amount you pay for household bills each week or month must be £0.00 or above`,
@@ -122,7 +115,7 @@ export const whatOtherRegularExpensesDoYouHave = {
   clothingMaxErrorMessage: `The amount you pay for clothing each week or month must be less than £1 billion`,
   otherExpensesMaxErrorMessage: `The amount you pay for other expenses each week or month must be less than £1 billion`,
 
-  incorrectFormatTextInput: `1000`,
+  incorrectFormatTextInput: `1000.000`,
   negativeTextInput: `-100.00`,
   billionTextInput: `1000000001.00`,
   testInputZero: `0.00`,

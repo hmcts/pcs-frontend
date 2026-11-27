@@ -8,12 +8,14 @@ import { getClaimantName } from '../../utils/getClaimantName';
 import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { createRespondToClaimFormStep } from '../formStep';
 
+import { getRequestLanguage } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData } from '@services/ccdCase.interface';
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
 import { extractCaseDocuments } from '@utils/documentUtils';
+import { formatLocalisedDate } from '@utils/formatLocalisedDate';
 import { formatDateOrdinal } from '@utils/viewTheClaim/viewTheClaimUtils';
 
 const logger = Logger.getLogger('confirmation-of-notice-date-when-provided');
@@ -24,15 +26,13 @@ const textOrUndefined = (value?: string): string | undefined => {
 };
 
 // Flag cleanup (`release-1.2-enabled`): once the flag is permanently on, inline `formatDateOrdinal` at the
-// call site and delete this helper, along with the pre-release-1.2 `d LLLL y` branch + the luxon import.
-const formatNoticeDate = (noticeDate: string, release12Enabled: boolean): string => {
+// call site and delete this helper, along with the pre-release-1.2 plain-date branch.
+const formatNoticeDate = (noticeDate: string, release12Enabled: boolean, lang: string): string => {
   if (release12Enabled) {
-    return formatDateOrdinal(noticeDate) ?? '';
+    return formatDateOrdinal(noticeDate, lang) ?? '';
   }
 
-  return noticeDate
-    ? DateTime.fromISO(noticeDate).setZone('Europe/London').setLocale('en-gb').toFormat('d LLLL y')
-    : '';
+  return formatLocalisedDate(noticeDate, lang) ?? '';
 };
 
 const getNoticeDocumentId = (validatedCase?: CcdCaseModel): string | undefined => {
@@ -45,7 +45,11 @@ const getNoticeDocumentId = (validatedCase?: CcdCaseModel): string | undefined =
   return noticeDoc?.id;
 };
 
-const getNoticeMethodText = (validatedCase: CcdCaseModel | undefined, t: TFunction): string | undefined => {
+const getNoticeMethodText = (
+  validatedCase: CcdCaseModel | undefined,
+  t: TFunction,
+  lang: string
+): string | undefined => {
   switch (validatedCase?.notice_ServiceMethod) {
     case 'PERSONALLY_HANDED': {
       const name = textOrUndefined(validatedCase.notice_PersonName);
@@ -56,7 +60,7 @@ const getNoticeMethodText = (validatedCase: CcdCaseModel | undefined, t: TFuncti
       return emailAddress ? t('methodOfService.EMAIL', { emailAddress }) : t('methodOfService.EMAIL_ALT');
     }
     case 'DELIVERED_PERMITTED_PLACE': {
-      const date = formatDateOrdinal(validatedCase.notice_DeliveredDate);
+      const date = formatDateOrdinal(validatedCase.notice_DeliveredDate, lang);
       return date
         ? t('methodOfService.DELIVERED_PERMITTED_PLACE', { date })
         : t('methodOfService.DELIVERED_PERMITTED_PLACE_ALT');
@@ -160,9 +164,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const validatedCase = req.res?.locals.validatedCase;
     const claimantName = getClaimantName(req);
     const release12Enabled = isRelease12Enabled(req);
+    const lang = getRequestLanguage(req);
 
     const noticeDateRaw = validatedCase?.noticeDate || '';
-    const noticeDate = formatNoticeDate(noticeDateRaw, release12Enabled);
+    const noticeDate = formatNoticeDate(noticeDateRaw, release12Enabled, lang);
 
     const t = getTranslationFunction(req);
 
@@ -182,7 +187,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     // Flag cleanup (`release-1.2-enabled`): once the flag is permanently on, drop these guards and
     // `release12Enabled` above so the notice link and service method are always resolved.
     const noticeDocumentId = release12Enabled ? getNoticeDocumentId(validatedCase) : undefined;
-    const noticeMethodText = release12Enabled ? getNoticeMethodText(validatedCase, t) : undefined;
+    const noticeMethodText = release12Enabled ? getNoticeMethodText(validatedCase, t, lang) : undefined;
 
     return {
       claimantName,

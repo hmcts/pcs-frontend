@@ -17,11 +17,10 @@ export interface DraftDefendantResponse extends PossessionClaimResponse {
   };
 }
 
-// Get a deep clone of defendant-only fields from the existing draft/case data.
-// All nested objects are pre-initialised so callers can set/delete fields directly.
-export const buildDraftDefendantResponse = (req: Request): DraftDefendantResponse => {
-  const existing = req.res?.locals.validatedCase?.data?.possessionClaimResponse;
-
+// The defendant-only slice of the response that every draft save sends. The draft save REPLACES the
+// stored response, so a writer that omits a field wipes it: build the slice here and nowhere else.
+// Nested objects are deep-cloned and pre-initialised so callers can set/delete fields directly.
+export const toDefendantDraftSlice = (existing?: PossessionClaimResponse): DraftDefendantResponse => {
   const defendantOnly: PossessionClaimResponse = {
     defendantResponses: existing?.defendantResponses ? cloneDeep(existing.defendantResponses) : {},
     defendantContactDetails: existing?.defendantContactDetails
@@ -35,9 +34,15 @@ export const buildDraftDefendantResponse = (req: Request): DraftDefendantRespons
     defendantOnly.defendantContactDetails = { party: {} };
   }
 
-  clearSectionCompletionOnEdit(req, defendantOnly);
-
   return defendantOnly as DraftDefendantResponse;
+};
+
+// The defendant slice from the existing draft/case data on the request, with the current step's section
+// confirmation cleared (editing a step revokes that section's "done").
+export const buildDraftDefendantResponse = (req: Request): DraftDefendantResponse => {
+  const defendantOnly = toDefendantDraftSlice(req.res?.locals.validatedCase?.data?.possessionClaimResponse);
+  clearSectionCompletionOnEdit(req, defendantOnly);
+  return defendantOnly;
 };
 
 function clearSectionCompletionOnEdit(req: Request, draft: PossessionClaimResponse): void {
@@ -55,6 +60,16 @@ function clearSectionCompletionOnEdit(req: Request, draft: PossessionClaimRespon
   );
 }
 
+export function parseDraftVersion(value: unknown): number | undefined {
+  if (typeof value === 'number' && Number.isInteger(value)) {
+    return value;
+  }
+  if (typeof value === 'string' && /^\d+$/.test(value.trim())) {
+    return Number(value.trim());
+  }
+  return undefined;
+}
+
 // Convenience wrapper: normalises orphaned cross-page fields, saves the draft defendant response,
 // and refreshes validatedCase on the request.
 export const saveDraftDefendantResponse = async (req: Request, response: PossessionClaimResponse): Promise<void> => {
@@ -63,12 +78,17 @@ export const saveDraftDefendantResponse = async (req: Request, response: Possess
   const accessToken = req.session?.user?.accessToken || '';
   const caseId = req.res?.locals.validatedCase?.id || '';
 
+  const reviewedDraftVersion = parseDraftVersion(req.body?.draftVersion);
+
   const updatedCase = await ccdCaseService.updateDraft(
     RESPOND_TO_CLAIM_DRAFT_EVENT,
     accessToken,
     caseId,
     {
-      possessionClaimResponse: normalised,
+      possessionClaimResponse: {
+        ...normalised,
+        ...(reviewedDraftVersion !== undefined && { draftVersion: reviewedDraftVersion }),
+      },
     },
     req.session?.clientContext
   );
