@@ -35,7 +35,7 @@ describe('make an order: limits', () => {
     const tooLong = 'a'.repeat(30001);
     expect(
       await errors('tab-free-form', {
-        'hearing-notes': tooLong,
+        'hearing-1-notes': tooLong,
         recitals: 'yes',
         'recitals-text': tooLong,
         'staff-message': 'yes',
@@ -62,7 +62,7 @@ describe('make an order: limits', () => {
     const atTheLimit = `${'a'.repeat(29998)}\r\na`;
     expect(
       await errors('tab-free-form', {
-        'hearing-notes': atTheLimit,
+        'hearing-1-notes': atTheLimit,
         'recitals-text': 'a'.repeat(30001),
         'staff-message-text': 'a'.repeat(30001),
       })
@@ -89,7 +89,7 @@ describe('make an order: limits', () => {
     expect(
       await errors('tab-outright', {
         ...judgment,
-        'current-rent': '1,000,000,000',
+        'hearing-1-current-rent': '1,000,000,000',
         'outright-mj-arrears': '1000000000.00',
         'outright-mj-interest': '0.5',
         'costs-def-pay-cl-fixed-amount': '355',
@@ -98,9 +98,9 @@ describe('make an order: limits', () => {
     expect(
       await errors('tab-outright', {
         ...judgment,
-        'arrears-notice': '-5',
-        'current-rent': '750.001',
-        'arrears-today': '1000000000.01',
+        'hearing-1-arrears-notice': '-5',
+        'hearing-1-current-rent': '750.001',
+        'hearing-1-arrears-today': '1000000000.01',
         'outright-mj-arrears': '2,000,000,000',
         'outright-mj-interest': 'ten pounds',
         'costs-def-pay-cl-fixed-amount': '1000000001',
@@ -137,7 +137,7 @@ describe('make an order: limits', () => {
       'adj-hearing-date-specific-day': '1',
       'adj-hearing-date-specific-month': '10',
       'adj-hearing-date-specific-year': '2026',
-      'adj-time-estimate': '30',
+      'adj-time-estimate-minutes': '30',
     };
     // The times parseTime reads are its unit test's; here, that the page asks for one it can read.
     expect(await errors('tab-adjournment', { ...hearing, 'adj-specific-time': '2 p.m.' })).toEqual([]);

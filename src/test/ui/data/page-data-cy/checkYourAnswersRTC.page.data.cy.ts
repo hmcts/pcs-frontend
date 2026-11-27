@@ -1,0 +1,17 @@
+export const checkYourAnswersRTC = {
+  mainHeader: `Gwirio eich atebion`,
+  statementOfTruthHeader: `Datganiad gwirionedd`,
+  statementOfTruthParagraph: `Gwiriwch fod yr holl fanylion rydych wedi'u nodi yn gywir.`,
+  contemptOfCourtCheckboxLabel: `Rwy'n deall y gellir dwyn achos dirmyg llys yn erbyn unrhyw un sy'n gwneud, neu'n achosi i rywun wneud, datganiad ffug mewn dogfen a ddilysir gan ddatganiad gwirionedd heb gredu'n onest ei fod yn wir.`,
+  factsTrueCheckboxLabel: `Rwy'n credu bod y ffeithiau a nodir yn y ffurflen amddiffyn hon yn wir.`,
+  yourFullNameTextLabel: `Eich enw llawn`,
+  yourFullNameTextInput: `James Anderson`,
+  submitButton: `Cyflwyno`,
+  backLink: `Yn ôl`,
+  saveAndContinueButton: `Cadw a pharhau`,
+  saveForLaterButton: `Cadw am nes ymlaen`,
+  thereIsAProblemErrorMessageHeader: `Mae problem`,
+  ifYouUnderstandErrorMessage: `Dewiswch os ydych yn deall y gellir dwyn achos dirmyg llys yn erbyn unrhyw un sy'n gwneud, neu'n achosi i rywun wneud, datganiad ffug mewn dogfen a ddilysir gan ddatganiad gwirionedd heb gredu'n onest ei fod yn wir`,
+  ifYouBelieveErrorMessage: `Dewiswch os ydych yn credu bod y ffeithiau a nodir yn y ffurflen amddiffyn hon yn wir`,
+  yourFullNameErrorMessage: `Rhowch eich enw llawn`,
+};

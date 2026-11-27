@@ -5,8 +5,8 @@ import { flowConfig } from '../flow.config';
 import { getSuspendApplicationFee } from '../suspendFee';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { ENABLE_DEFENDANT_GENERAL_APPLICATIONS_R2 } from '@utils/featureFlags';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
-import { ENABLE_DEFENDANT_GENERAL_APPLICATIONS_R2 } from '@utils/respondToClaimFlags';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'apply-to-stop-or-delay-the-eviction',
