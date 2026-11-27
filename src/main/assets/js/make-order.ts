@@ -409,15 +409,6 @@ export function initMakeOrder(): void {
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   form.addEventListener('submit', followTab);
-  // A party's filed draft makes the order a free form one on the claim, chosen before the draft goes in, so the order
-  // is regenerated for free form first. Naming the free form tab in the fragment opens it, as for a saved tab.
-  const useFreeForm = (): void => {
-    if (claimOrder && !claimOrder.checked) {
-      claimOrder.click();
-    }
-    window.history.replaceState(window.history.state, '', '#tab-free-form');
-    window.dispatchEvent(new HashChangeEvent('hashchange'));
-  };
   // A draft order goes in as the judge's own clauses, after "IT IS ORDERED THAT:", which no decision or order type
   // takes away.
   form.addEventListener('click', ({ target }) => {
@@ -426,8 +417,11 @@ export function initMakeOrder(): void {
       return;
     }
     const filed = button.closest<HTMLElement>('[data-filed-draft]');
+    // A party's filed draft makes the order a free form one, chosen before the draft goes in, so the order is
+    // regenerated for free form first. Naming the free form tab in the fragment opens it, as for a saved tab.
     if (filed) {
-      useFreeForm();
+      window.history.replaceState(window.history.state, '', '#tab-free-form');
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
     }
     if (editor.insertHtml(button.dataset.draftOrder!, { at: { after: 'paragraph:ordered-that' } })) {
       const reference = button.closest<HTMLElement>('[data-application]')?.dataset.applicationReference;

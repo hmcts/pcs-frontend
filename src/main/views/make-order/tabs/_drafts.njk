@@ -2,7 +2,7 @@
 
 <h3 class="govuk-heading-m">Drafts</h3>
 
-<p class="govuk-body">Draft orders the parties have filed, newest first. Using one makes this a free form order.</p>
+<p class="govuk-body">Draft orders the parties have filed, newest first. Adding one to the order makes it a free form order.</p>
 
 {% for draft in drafts %}
   <section class="govuk-!-margin-bottom-6" aria-labelledby="draft-{{ draft.id }}-heading" data-filed-draft data-party="{{ draft.party }}">
@@ -11,7 +11,7 @@
     {# Cleaned by pcs-api when filed. #}
     <div class="govuk-inset-text govuk-!-margin-top-0" data-draft-wording>{{ draft.wording | safe }}</div>
     {{ govukButton({
-      html: "Use this draft<span class=\"govuk-visually-hidden\"> from " + (draft.party | escape) + ", filed on " + draft.submittedAtDisplay + "</span>",
+      html: "Add this draft to the order<span class=\"govuk-visually-hidden\"> from " + (draft.party | escape) + ", filed on " + draft.submittedAtDisplay + "</span>",
       type: "button",
       classes: "govuk-button--secondary",
       attributes: { "data-draft-order": draft.wording }
