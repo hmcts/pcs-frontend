@@ -17,7 +17,7 @@ import {
   postedAnswers,
   requestDateTime,
 } from '@utils/scheduleEviction';
-import { errorSummary, manageCaseDetailsUrl, refusedXuiEvent, xuiHeaderModel } from '@utils/xuiUtils';
+import { errorSummary, formatDateTime, manageCaseDetailsUrl, refusedXuiEvent, xuiHeaderModel } from '@utils/xuiUtils';
 
 /*
  * The Schedule eviction event, reached from XUI. The start page starts the event and keeps it on the session;
@@ -66,7 +66,7 @@ function checkYourAnswersModel(req: Request, eviction: ScheduleEvictionSession) 
   return {
     ...pageModel(req, eviction),
     dispenseWithService: eviction.answers.dispenseWithService === 'YES' ? 'Yes' : 'No',
-    scheduledEviction: displayDateTime(evictionDateTime(eviction.answers)!),
+    scheduledEviction: formatDateTime(requestDateTime(evictionDateTime(eviction.answers)!)),
     changeUrl: pageUrl(req, 'evictionDetails'),
   };
 }
@@ -77,7 +77,6 @@ export default function scheduleEvictionRoutes(app: Application): void {
     try {
       const started = await ccdCaseService.startCaseEvent(req.session.user!.accessToken, caseReference, EVENT_ID);
       if (!started.data.sdkEventPayload) {
-        // CCD only gives the payload to users allowed to use the event.
         throw new HTTPError('Not permitted to schedule an eviction on this case', 403);
       }
       req.session.scheduleEvictions = {

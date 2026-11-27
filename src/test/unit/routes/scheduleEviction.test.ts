@@ -124,6 +124,15 @@ describe('scheduleEvictionRoutes', () => {
     expect(res.redirect).toHaveBeenCalledWith(`${CASE_URL}/check-your-answers`);
   });
 
+  it('shows the eviction date on check your answers as ExUI shows dates', () => {
+    handler('get', '/check-your-answers')(request(inProgress(validAnswers)), res);
+
+    expect(res.render).toHaveBeenCalledWith(
+      'schedule-eviction/check-your-answers',
+      expect.objectContaining({ scheduledEviction: '1 Jan 2099, 10:00:00 AM' })
+    );
+  });
+
   it('goes back to the question on Previous', async () => {
     await handler('post', '/check-your-answers')(request(inProgress(validAnswers), { action: 'previous' }), res);
 
