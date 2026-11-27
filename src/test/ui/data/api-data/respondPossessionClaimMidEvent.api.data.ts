@@ -10,6 +10,7 @@ export const respondPossessionClaimMidEventApiData = {
             //'emailAddress: '{{Citizen_EmailID}}',
             phoneNumber: '07700900000',
             phoneNumberProvided: 'YES',
+            textMessageNumber: '07700900980',
             address: {
               AddressLine1: '10 Second Avenue',
               AddressLine2: '',
@@ -26,7 +27,7 @@ export const respondPossessionClaimMidEventApiData = {
           correspondenceAddressConfirmation: 'YES',
           dateOfBirth: '1990-05-20',
           contactByPhone: 'YES',
-          contactByText: 'NO',
+          contactByText: 'YES',
           contactByEmail: 'YES',
           contactByPost: 'NO',
           freeLegalAdvice: 'NO',
