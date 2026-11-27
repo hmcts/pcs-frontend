@@ -221,5 +221,21 @@
     "oneFound": "1 address found",
     "manyFound": "{count} addresses found",
     "noneFound": "Heb ganfod cyfeiriad"
+  },
+  "cookieBanner": {
+    "serviceName": "Gwasanaeth Hawliadau Meddiant",
+    "title": "Cwcis ar {{serviceName}}",
+    "message": {
+      "base": "Rydym yn defnyddio cwcis hanfodol i wneud i’r gwasanaeth hwn weithio. Rydym hefyd yn defnyddio cwcis dadansoddol fel y gallwn ddeall sut rydych yn defnyddio’r gwasanaeth a pha welliannau y gallwn eu gwneud.",
+      "accept": "Rydych wedi derbyn cwcis ychwanegol.",
+      "reject": "Rydych chi wedi gwrthod cwcis ychwanegol.",
+      "changeSettings": "Gallwch <a class=\"govuk-link\" href=\"/cookies\">newid gosodiadau eich cwcis</a> ar unrhyw adeg."
+    },
+    "buttons": {
+      "accept": "Derbyn cwcis ychwanegol",
+      "reject": "Gwrthod cwcis ychwanegol",
+      "viewCookies": "Gweld cwcis",
+      "hide": "Cuddio’r neges cwcihon"
+    }
   }
 }

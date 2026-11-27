@@ -33,6 +33,15 @@ jest.mock('../../../../main/assets/js/redirect-on-back', () => ({
   initRedirectOnBack: jest.fn(),
 }));
 
+jest.mock('@hmcts/cookie-manager', () => ({
+  __esModule: true,
+  default: { on: jest.fn(), init: jest.fn() },
+}));
+
+jest.mock('../../../../main/assets/js/analytics', () => ({
+  trackCookiePreferences: jest.fn(),
+}));
+
 describe('index.ts', () => {
   beforeEach(() => {
     jest.resetModules();
@@ -49,8 +58,10 @@ describe('index.ts', () => {
     const { initPostcodeSelection } = require('../../../../main/assets/js/postcode-select');
     const { initSessionTimeout } = require('../../../../main/assets/js/session-timeout');
     const { initRedirectOnBack } = require('../../../../main/assets/js/redirect-on-back');
+    const cookieManager = require('@hmcts/cookie-manager').default;
 
     expect(initAll).toHaveBeenCalled();
+    expect(cookieManager.init).not.toHaveBeenCalled();
     expect(initMakeOrder).not.toHaveBeenCalled();
     expect(initMultiFileUpload).toHaveBeenCalled();
     expect(initPostcodeLookup).toHaveBeenCalled();
@@ -71,5 +82,38 @@ describe('index.ts', () => {
     expect(startWithSavedOrderTab).toHaveBeenCalledWith(initAll);
     expect(initAll).toHaveBeenCalled();
     expect(initMakeOrder).toHaveBeenCalled();
+  });
+
+  it('starts the cookie manager after tracking cookie preferences when the cookie banner is on the page', () => {
+    document.body.innerHTML = '<div class="cookie-banner" hidden></div>';
+
+    require('../../../../main/assets/js/index');
+
+    const cookieManager = require('@hmcts/cookie-manager').default;
+    const { trackCookiePreferences } = require('../../../../main/assets/js/analytics');
+
+    expect(trackCookiePreferences).toHaveBeenCalledWith(cookieManager);
+    expect(cookieManager.init).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userPreferences: { cookieName: 'pcs-cookie-preferences' },
+        preferencesForm: { class: 'cookie-preferences-form' },
+        cookieManifest: [
+          expect.objectContaining({ categoryName: 'essential', optional: false }),
+          expect.objectContaining({ categoryName: 'apm', optional: true }),
+          expect.objectContaining({ categoryName: 'analytics', optional: true }),
+        ],
+      })
+    );
+    expect((trackCookiePreferences as jest.Mock).mock.invocationCallOrder[0]).toBeLessThan(
+      cookieManager.init.mock.invocationCallOrder[0]
+    );
+  });
+
+  it('starts the cookie manager on the cookies page form', () => {
+    document.body.innerHTML = '<form class="cookie-preferences-form"></form>';
+
+    require('../../../../main/assets/js/index');
+
+    expect(require('@hmcts/cookie-manager').default.init).toHaveBeenCalled();
   });
 });

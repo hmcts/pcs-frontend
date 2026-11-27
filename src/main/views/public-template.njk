@@ -9,8 +9,14 @@
 
 {% block head %}
   {{ super() }}
+  {% include "tagmanager/head.njk" %}
   <meta name="robots" content="noindex">
   {% include "webpack/css.njk" %}
+{% endblock %}
+
+{% block bodyStart %}
+  {% include "tagmanager/body.njk" %}
+  {% include "cookies-banner.njk" %}
 {% endblock %}
 
 {% block header %}

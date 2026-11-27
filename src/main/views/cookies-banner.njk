@@ -1,0 +1,70 @@
+{% from "govuk/components/cookie-banner/macro.njk" import govukCookieBanner %}
+
+{% if tracking and tracking.enabled %}
+{% set cookieBannerTitle = t('cookieBanner.title', { serviceName: t('cookieBanner.serviceName') }) %}
+
+{% set html %}
+  <p class="govuk-body">{{ t('cookieBanner.message.base') | safe }}</p>
+{% endset %}
+
+{% set acceptHtml %}
+  <p class="govuk-body">{{ t('cookieBanner.message.accept') }} {{ t('cookieBanner.message.changeSettings') | safe }}</p>
+{% endset %}
+
+{% set rejectHtml %}
+  <p class="govuk-body">{{ t('cookieBanner.message.reject') }} {{ t('cookieBanner.message.changeSettings') | safe }}</p>
+{% endset %}
+
+{{ govukCookieBanner({
+  classes: 'cookie-banner',
+  ariaLabel: cookieBannerTitle,
+  hidden: true,
+  messages: [
+    {
+      classes: 'cookie-banner-message',
+      headingText: cookieBannerTitle,
+      html: html,
+      actions: [
+        {
+          classes: 'cookie-banner-accept-button',
+          text: t('cookieBanner.buttons.accept'),
+          type: "button"
+        },
+        {
+          classes: 'cookie-banner-reject-button',
+          text: t('cookieBanner.buttons.reject'),
+          type: "button"
+        },
+        {
+          text: t('cookieBanner.buttons.viewCookies'),
+          href: "/cookies"
+        }
+      ]
+    },
+    {
+      classes: 'cookie-banner-accept-message',
+      html: acceptHtml,
+      role: "alert",
+      hidden: true,
+      actions: [
+        {
+          classes: 'cookie-banner-hide-button',
+          text: t('cookieBanner.buttons.hide')
+        }
+      ]
+    },
+    {
+      classes: 'cookie-banner-reject-message',
+      html: rejectHtml,
+      role: "alert",
+      hidden: true,
+      actions: [
+        {
+          classes: 'cookie-banner-hide-button',
+          text: t('cookieBanner.buttons.hide')
+        }
+      ]
+    }
+  ]
+}) }}
+{% endif %}

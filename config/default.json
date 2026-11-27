@@ -4,6 +4,10 @@
     "insightname": "pcs-frontend",
     "enabled": false
   },
+  "tracking": {
+    "enabled": false,
+    "gtmContainerId": "GTM-T2DH9CD5"
+  },
   "node-env": "development",
   "use-ssl": false,
   "session": {

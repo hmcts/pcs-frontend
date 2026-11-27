@@ -15,6 +15,7 @@
 
 {% block head %}
   {{ super() }}
+  {% include "tagmanager/head.njk" %}
   {% include "webpack/css.njk" %}
   {% if isLegalRepresentative %}
     <link rel="stylesheet" href="/assets/ui-component-lib/ui-component-lib.css">
@@ -23,6 +24,8 @@
 
 
 {% block bodyStart %}
+  {% include "tagmanager/body.njk" %}
+  {% include "cookies-banner.njk" %}
 {% endblock %}
 
 {% block header %}

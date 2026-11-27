@@ -1,6 +1,7 @@
 import * as path from 'path';
 
 import * as bodyParser from 'body-parser';
+import config from 'config';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import { glob } from 'glob';
@@ -9,6 +10,7 @@ import favicon from 'serve-favicon';
 import { setupDev } from './development';
 import { publicRouter } from './guidance';
 import {
+  analyticsConsentMiddleware,
   caseReferenceParamMiddleware,
   formBodyMiddleware,
   judgeXuiRedirectMiddleware,
@@ -26,10 +28,16 @@ const developmentMode = env === 'development';
 export const app = express();
 
 app.locals.ENV = env;
+// Google Tag Manager and the cookie banner, on every page when tracking is enabled.
+app.locals.tracking = {
+  enabled: config.get<boolean>('tracking.enabled'),
+  gtmContainerId: config.get<string>('tracking.gtmContainerId'),
+};
 
 setupDev(app, developmentMode);
 
 app.use(cookieParser());
+app.use(analyticsConsentMiddleware);
 app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
 app.use(bodyParser.json());
 app.use(formBodyMiddleware);

@@ -6,7 +6,13 @@
 
 {% block head %}
   {{super()}}
+  {% include "tagmanager/head.njk" %}
   {% include "webpack/css.njk" %}
+{% endblock %}
+
+{% block bodyStart %}
+  {% include "tagmanager/body.njk" %}
+  {% include "cookies-banner.njk" %}
 {% endblock %}
 
 {% block header %}
