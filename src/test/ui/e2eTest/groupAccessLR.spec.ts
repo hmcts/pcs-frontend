@@ -14,6 +14,7 @@ import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { resolveIdamPassword } from '../utils/idamPassword';
+import { loginWithIdam } from '../utils/login';
 
 const home_url = process.env.TEST_URL;
 
@@ -40,9 +41,7 @@ async function validateSolicitorCannotAccessCase(page: Page, solicitorEmail: str
 
   try {
     await isolatedPage.goto(home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-    await isolatedPage.getByLabel('Email address').fill(solicitorEmail);
-    await isolatedPage.getByLabel('Password').fill(resolveIdamPassword());
-    await isolatedPage.getByRole('button', { name: 'Sign in' }).click();
+    await loginWithIdam(isolatedPage, solicitorEmail, resolveIdamPassword());
     await expect(isolatedPage.getByRole('heading', { name: 'You do not have access to this page' })).toBeVisible();
   } finally {
     await isolatedContext.close();
@@ -52,9 +51,7 @@ async function validateSolicitorCannotAccessCase(page: Page, solicitorEmail: str
 async function validateCitizenCannotAccessCase(page: Page, context: BrowserContext): Promise<void> {
   await clearBrowserSession(page, context);
   await page.goto(home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-  await page.getByLabel('Email address').fill(process.env.IDAM_PCS_USER_EMAIL as string);
-  await page.getByLabel('Password').fill(resolveIdamPassword());
-  await page.getByRole('button', { name: 'Sign in' }).click();
+  await loginWithIdam(page, process.env.IDAM_PCS_USER_EMAIL as string, resolveIdamPassword());
   await page.waitForLoadState();
   await performValidation('mainHeader', 'You do not have access to this page');
 }

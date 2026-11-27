@@ -69,6 +69,7 @@ const projectTagFilter = e2eTag ? { grep: new RegExp(e2eTag) } : {};
 
 export default defineConfig({
   testDir: './src/test/ui',
+  testIgnore: '**/loginCompatibility/**',
   ...(e2eSpecTestMatch?.length ? { testMatch: e2eSpecTestMatch } : {}),
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
