@@ -4,6 +4,8 @@ import { isLegalRepresentativeUser } from '../steps/utils';
 
 import { handleRespondToClaimDisabled } from './handleRespondToClaimDisabled';
 
+import { RELEASE_1_4_ENABLED } from '@utils/featureFlags';
+import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import {
   isRespondToClaimEnabledForRelease,
   isRespondToClaimEnabledForUser,
@@ -16,6 +18,7 @@ export const respondToClaimFeatureMiddleware: RequestHandler = async (
 ): Promise<void> => {
   const isReleaseEnabled = await isRespondToClaimEnabledForRelease(req);
   res.locals.release12Enabled = isReleaseEnabled;
+  res.locals.release14Enabled = await getLaunchDarklyFlag(req, RELEASE_1_4_ENABLED, false);
 
   if (isLegalRepresentativeUser(req) && !isReleaseEnabled) {
     return handleRespondToClaimDisabled(req, res);
