@@ -19,8 +19,8 @@ import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 import { type UploadValidationOptions, bytesToMb } from '@utils/documentUploadValidation';
+import { RELEASE_1_4_ENABLED } from '@utils/featureFlags';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
-import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 
 export function applyUploadValidationToComponent(
   component: Record<string, unknown>,
