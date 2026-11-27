@@ -97,13 +97,13 @@ describe('securityHeaders', () => {
     expect(directives.styleSrc).toEqual(["'self'", '*.googletagmanager.com']);
   });
 
-  it.each([false, undefined])('leaves the Google Tag Manager sources out when tracking.enabled is %s', enabled => {
+  it.each([false, undefined])('leaves all Google sources out when tracking.enabled is %s', enabled => {
     useConfig({ ...validConfig, 'tracking.enabled': enabled });
     securityHeaders(false);
     const directives = helmetDirectives();
 
-    expect(stringSources(directives.scriptSrc)).toEqual(["'self'", '*.google-analytics.com']);
-    expect(directives.imgSrc).toEqual(["'self'", '*.google-analytics.com']);
+    expect(stringSources(directives.scriptSrc)).toEqual(["'self'"]);
+    expect(directives.imgSrc).toEqual(["'self'"]);
     expect(directives.connectSrc).toEqual(["'self'"]);
     expect(directives.styleSrc).toEqual(["'self'"]);
   });

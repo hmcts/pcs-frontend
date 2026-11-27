@@ -28,9 +28,10 @@ export function securityHeaders(developmentMode: boolean): express.RequestHandle
   // Google Tag Manager and the Google Analytics tags it loads, only when tracking is on (HDPI-8934).
   const trackingEnabled = config.get<boolean>('tracking.enabled');
   const tagManagerSources = trackingEnabled ? [googleTagManagerDomain] : [];
+  const trackingSources = trackingEnabled ? [googleAnalyticsDomain, googleTagManagerDomain] : [];
 
   // include default helmet functions
-  const scriptSrc: (string | typeof nonceSource)[] = [self, googleAnalyticsDomain, ...tagManagerSources, nonceSource];
+  const scriptSrc: (string | typeof nonceSource)[] = [self, ...trackingSources, nonceSource];
 
   if (developmentMode) {
     // webpack's development build evaluates strings as JavaScript. Browsers ignore 'unsafe-inline' when the
@@ -74,7 +75,7 @@ export function securityHeaders(developmentMode: boolean): express.RequestHandle
             : [self],
           defaultSrc: ["'none'"],
           fontSrc: [self, 'data:'],
-          imgSrc: [self, googleAnalyticsDomain, ...tagManagerSources],
+          imgSrc: [self, ...trackingSources],
           objectSrc: [self],
           scriptSrc,
           styleSrc: [self, ...tagManagerSources],

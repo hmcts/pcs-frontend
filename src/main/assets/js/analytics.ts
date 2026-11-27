@@ -3,6 +3,8 @@ declare global {
     dataLayer: Record<string, unknown>[];
     // Defined by views/tagmanager/head.njk when tracking is enabled.
     loadGoogleTagManager?: () => void;
+    // Set by the loader once it has added GTM to the page.
+    googleTagManagerLoaded?: boolean;
   }
 }
 
@@ -27,7 +29,10 @@ const hasAnalyticsConsent = (preferences: unknown): boolean =>
  * Gives Google Tag Manager the user's cookie preferences and loads it as soon as the user accepts
  * analytics cookies. Until then the page doesn't load it at all (see views/tagmanager/head.njk).
  */
-export function trackCookiePreferences(cookieManager: CookiePreferenceManager): void {
+export function trackCookiePreferences(
+  cookieManager: CookiePreferenceManager,
+  reloadPage: () => void = () => window.location.reload()
+): void {
   cookieManager.on('UserPreferencesLoaded', pushCookiePreferences);
 
   cookieManager.on('UserPreferencesSaved', preferences => {
@@ -35,6 +40,10 @@ export function trackCookiePreferences(cookieManager: CookiePreferenceManager): 
     pushCookiePreferences(preferences);
     if (hasAnalyticsConsent(preferences)) {
       window.loadGoogleTagManager?.();
+    } else if (window.googleTagManagerLoaded) {
+      // GTM can't be unloaded, so reload: the server only renders it with consent. Only the cookies page form can
+      // turn analytics off after it has loaded.
+      reloadPage();
     }
   });
 }
