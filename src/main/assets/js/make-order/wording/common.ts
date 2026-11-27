@@ -85,7 +85,7 @@ const ATTENDANCE_ROLES: Record<string, (party: string) => string> = {
 
 /**
  * A recital for each application the order decides:
- * "AND UPON considering the first claimant's application dated ...", the first "UPON" unless a recital came before it.
+ * "AND UPON considering the First Claimant's application dated ...", the first "UPON" unless a recital came before it.
  */
 function addApplicationRecitals(order: DocBuilder, data: OrderData, after: boolean): void {
   let upon = after;
@@ -144,7 +144,10 @@ function addAttendance(order: DocBuilder, data: OrderData): void {
   }
   const spoken = heard.map(({ choice, name, parties }) => {
     const description = ATTENDANCE_ROLES[choice](joinList(parties));
-    return name ? `${name}, ${description}` : description;
+    if (name) {
+      return `${name}, ${description}`;
+    }
+    return choice === 'solicitor' ? `the ${description}` : description;
   });
   if (spoken.length || letters.length) {
     const speakers =
@@ -182,10 +185,10 @@ export function addPreamble(order: DocBuilder, data: OrderData): void {
     content
       .text('This order is made by ')
       .fact('before-judge', judge)
-      .text(' at the ')
-      .fact('before-court', court)
       .text(' on ')
       .fact('before-date', madeOn)
+      .text(' at the ')
+      .fact('before-court', court)
       .text('.')
   );
   if (data.withoutHearing) {

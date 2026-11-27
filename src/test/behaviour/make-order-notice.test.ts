@@ -18,7 +18,7 @@ const PAGE = `/case/${CASE_REFERENCE}/make-order`;
 const REVIEW = `/case/${CASE_REFERENCE}/confirm-order-review`;
 
 const OWN_INITIATIVE =
-  "As this order was made on the court's own initiative, any party affected by the order may apply to set aside, " +
+  "As this order was made on the Court's own initiative, any party affected by the order may apply to set aside, " +
   'vary, or stay the order. Any such application must be made by 4pm on';
 const WITHOUT_NOTICE =
   'If you were not notified of the application before this order was made, you may apply to set aside, vary, or ' +

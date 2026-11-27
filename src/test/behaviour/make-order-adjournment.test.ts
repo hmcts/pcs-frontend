@@ -81,7 +81,7 @@ describe('make an order: adjournment', () => {
       [
         'IT IS ORDERED THAT:',
         'The hearing is adjourned to 1 October 2026 at 10:30am with a time estimate of 3 days, 4 hours and 30 minutes. The hearing will be in person.',
-        'The Defendant must by 4pm on 15 September 2026 submit to the court and all other parties a defence.',
+        'The Defendant must by 4pm on 15 September 2026 submit to the Court and all other parties a defence.',
       ].join('\n')
     );
 
@@ -159,7 +159,7 @@ describe('make an order: adjournment', () => {
         'The claim is adjourned generally on condition that the Defendant makes payment of current rent as it falls due together with the following payments towards any arrears:',
         'instalment payments to the Claimant of £50.00 every month, the first instalment to be paid on or before 1 October 2026;',
         'The Claimant may apply to restore the claim if there is a breach of such condition or conditions. This application shall be made on notice to all parties. The Claimant shall set out in such application details of the alleged breach or breaches and attach any evidence relied upon in support.',
-        'If no application to restore the claim is made by 1 March 2027 the claim shall stand as struck out without further application or order of the court.',
+        'If no application to restore the claim is made by 1 March 2027 the claim shall stand as struck out without further application or order of the Court.',
       ].join('\n')
     );
 

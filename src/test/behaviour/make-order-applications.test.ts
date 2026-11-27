@@ -288,10 +288,35 @@ describe('make an order: deciding applications', () => {
       expect(clauseLists()).toEqual([1, 1]);
     });
 
+    it("offers the applicant's draft wording for a freeform decision", async () => {
+      await app.close();
+      app = await bootApp({
+        application: { ...ADJOURN, draftOrderWording: '<p>The hearing is adjourned to 2 November 2026.</p>' },
+      });
+      const page = await openPage((await app.get(TASK_PAGE)).text);
+      check('order-notice', 'none');
+      const draft = control<HTMLElement>('[data-decision-shows="freeform"]');
+      const button = control<HTMLButtonElement>('[data-draft-order]');
+      check(`${P}-decision`, 'dismiss');
+      expect(draft.hidden).toBe(true);
+
+      check(`${P}-decision`, 'freeform');
+      expect(draft.hidden).toBe(false);
+      button.click();
+      expect(ordered(page.documentText())).toEqual([
+        'IT IS ORDERED THAT:',
+        'The hearing is adjourned to 2 November 2026.',
+      ]);
+      expect(page.documentText()).not.toContain('I am in hospital that week.');
+      expect((await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
+    });
+
     it("shows what the applicant asked for and why, and refuses taking an applicant's wording", async () => {
       const page = await openPage((await app.get(TASK_PAGE)).text);
       check('order-notice', 'none');
       expect(document.querySelector(`[name="${P}-decision"][value="applicant-wording"]`)).toBeNull();
+      expect(document.querySelector(`[name="${P}-decision"][value="granted"]`)).toBeNull();
+      expect(document.querySelector('[data-draft-order]')).toBeNull();
       expect(control(`#${P}-explanation`).textContent?.trim()).toBe('I am in hospital that week.');
       check(`${P}-decision`, 'freeform');
       expect(ordered(page.orderText())).toEqual(['IT IS ORDERED THAT:']);
@@ -323,7 +348,7 @@ describe('make an order: deciding applications', () => {
       typeDate(`${P}-list-defence-date`, '20', '10', '2026');
       expect(ordered(page.orderText()).slice(1)).toEqual([
         "The Defendant's application dated 1 October 2026 shall be listed for a hearing on notice to all parties on 2 November 2026 at 10:30am with a time estimate of 30 minutes.",
-        'The Defendant must by 4pm on 20 October 2026 submit to the court and all other parties a defence.',
+        'The Defendant must by 4pm on 20 October 2026 submit to the Court and all other parties a defence.',
       ]);
     });
   });
@@ -354,7 +379,7 @@ describe('make an order: deciding applications', () => {
       type(`${P}-adjourn-specific-time`, '10:30');
       type(`${P}-adjourn-time-estimate-minutes`, '30');
       expect(ordered(page.orderText()).slice(1)).toEqual([
-        'The hearing shall be adjourned to be heard on 2 November 2026 at 10:30am with a time estimate of 30 minutes.',
+        'The hearing is adjourned to 2 November 2026 at 10:30am with a time estimate of 30 minutes.',
       ]);
       expect((await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
       const [submitted] = submittedOrders() as { order: Record<string, unknown> }[];
@@ -419,7 +444,7 @@ describe('make an order: deciding applications', () => {
       typeDate(`${P}-list-hearing-date-next-list`, '2', '11', '2026');
       type(`${P}-list-time-estimate-minutes`, '30');
       expect(ordered(page.orderText()).slice(1)).toEqual([
-        "The Defendant's application dated 1 October 2026 shall be listed for a hearing without notice to the other parties on the next available possession list after 2 November 2026 with a time estimate of 30 minutes. Further details of the hearing will be provided by the court.",
+        "The Defendant's application dated 1 October 2026 shall be listed for a hearing without notice to the other parties on the next available possession list after 2 November 2026 with a time estimate of 30 minutes. Further details of the hearing will be provided by the Court.",
       ]);
     });
   });

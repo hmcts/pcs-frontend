@@ -12,7 +12,7 @@ export function decidedApplications(data: OrderData): OrderApplication[] {
 }
 
 /**
- * "the first claimant's application dated 3 October 2026": the
+ * "the First Claimant's application dated 3 October 2026": the
  * party by role, numbered only where the case has more than one of that role, and never the GA reference.
  */
 export function describeApplication(data: OrderData, application: OrderApplication): string {
@@ -29,7 +29,7 @@ export function describeApplication(data: OrderData, application: OrderApplicati
 function addHearingAdjournment(list: OrderedListBuilder, data: OrderData, prefix: string): void {
   const adjournment = value(data, `${prefix}-adjourn-type`);
   if (adjournment === 'further-hearing') {
-    addListing(list, data, `${prefix}-adjourn`, `${prefix}-adjourn`, 'The hearing shall be adjourned to be heard');
+    addListing(list, data, `${prefix}-adjourn`, `${prefix}-adjourn`, 'The hearing is adjourned to');
   } else if (adjournment === 'generally') {
     list.item(
       `${prefix}-adjourn-generally`,
@@ -71,7 +71,7 @@ function addApplicationClauses(list: OrderedListBuilder, data: OrderData, applic
     });
   } else if (decision === 'list') {
     const notice = application.listWithoutNotice ? 'without notice to the other parties' : 'on notice to all parties';
-    addListing(list, data, `${prefix}-list`, prefix, `${described} shall be listed for a hearing ${notice}`);
+    addListing(list, data, `${prefix}-list`, prefix, `${described} shall be listed for a hearing ${notice} on`);
   }
 }
 

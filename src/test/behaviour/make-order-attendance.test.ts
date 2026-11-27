@@ -69,10 +69,15 @@ describe('make an order: attendance', () => {
     });
     const page = await openPage((await app.get(PAGE)).text);
     check('claimant-claimant-id-attendance', 'solicitor');
-    type('claimant-claimant-id-name', 'Sam Solicitor');
     check('defendant-first-attendance', 'litigant-in-person');
     check('defendant-second-attendance', 'not-present');
 
+    expect(page.orderText().split('\n').slice(0, 2)).toEqual([
+      'The Court heard from the solicitor for the Claimant and the First Defendant in person.',
+      'The Second Defendant did not attend.',
+    ]);
+
+    type('claimant-claimant-id-name', 'Sam Solicitor');
     expect(page.orderText().split('\n').slice(0, 2)).toEqual([
       'The Court heard from Sam Solicitor, solicitor for the Claimant, and the First Defendant in person.',
       'The Second Defendant did not attend.',

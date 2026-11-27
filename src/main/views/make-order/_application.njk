@@ -99,6 +99,16 @@
     default: none if application.required else "none",
     items: items
   }) }}
+  {% if (application.draftOrderWording or "") | trim %}
+    <div data-decision-shows="freeform" {%- if not draftChecked(name, "freeform") %} hidden{% endif %}>
+      {{ govukButton({
+        html: "Add the applicant's draft order to the order<span class=\"govuk-visually-hidden\"> from application " + (application.reference | escape) + "</span>",
+        type: "button",
+        classes: "govuk-button--secondary govuk-!-margin-bottom-3",
+        attributes: { "data-draft-order": application.draftOrderWording }
+      }) }}
+    </div>
+  {% endif %}
 
   {#
     Adjourning a hearing on an application to adjourn it asks, as the adjournment tab does, whether it is adjourned
@@ -189,14 +199,6 @@
       classes: "govuk-!-margin-bottom-3",
       attributes: { id: prefix + "-more" }
     }) }}
-    {% if (application.draftOrderWording or "") | trim %}
-      {{ govukButton({
-        html: "Add the applicant's draft order to the order<span class=\"govuk-visually-hidden\"> from application " + (application.reference | escape) + "</span>",
-        type: "button",
-        classes: "govuk-button--secondary govuk-!-margin-bottom-3",
-        attributes: { "data-draft-order": application.draftOrderWording }
-      }) }}
-    {% endif %}
     {{ decision(application) }}
   </section>
 {% endmacro %}

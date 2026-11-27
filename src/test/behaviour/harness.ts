@@ -633,7 +633,7 @@ export function futureDate(days: number): { day: string; month: string; year: st
 
 /** The order's first sentence, before the judge the harness signs in, at its court, on the date given. */
 export function before(date: string): string {
-  return `This order is made by District Judge Sam Judge at the County Court at Bristol on ${date}.`;
+  return `This order is made by District Judge Sam Judge on ${date} at the County Court at Bristol.`;
 }
 
 /** The first sentence of an order made at the harness's hearing. */
