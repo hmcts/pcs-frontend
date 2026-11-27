@@ -224,17 +224,21 @@ describe("make an order: made on the court's own initiative or without notice", 
     expect(dateValues('without-notice-by')).toEqual(Object.values(workingDate(14)));
   });
 
-  it('leaves an older without-notice draft without a deadline until the judge picks one', async () => {
-    app = await bootApp({
-      order: { id: 'draft-1', orderType: 'FREE_FORM', formData: { 'order-notice': 'without-notice' } },
-    });
-    await openPage((await app.get(PAGE)).text);
+  it.each(['own-initiative', 'without-notice'])(
+    'leaves an older %s draft without a deadline until the judge picks one',
+    async choice => {
+      app = await bootApp({
+        order: { id: 'draft-1', orderType: 'FREE_FORM', formData: { 'order-notice': choice } },
+      });
+      await openPage((await app.get(PAGE)).text);
 
-    expect(control('[name="order-notice"][value="without-notice"]').checked).toBe(true);
-    expect(dateValues('without-notice-by')).toEqual(['', '', '']);
-    control<HTMLButtonElement>('#without-notice-by-pills [data-date-pill-days="10"]').click();
-    expect(dateValues('without-notice-by')).toEqual(Object.values(workingDate(10)));
-  });
+      const prefix = `${choice}-by`;
+      expect(control(`[name="order-notice"][value="${choice}"]`).checked).toBe(true);
+      expect(dateValues(prefix)).toEqual(['', '', '']);
+      control<HTMLButtonElement>(`#${prefix}-pills [data-date-pill-days="10"]`).click();
+      expect(dateValues(prefix)).toEqual(Object.values(workingDate(10)));
+    }
+  );
 
   it('leaves a date the judge cleared blank when it asks for one, rather than fill it in again', async () => {
     app = await bootApp();

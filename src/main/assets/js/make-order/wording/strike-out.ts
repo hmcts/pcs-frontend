@@ -21,7 +21,7 @@ export function addStrikeOutDismissalClauses(list: OrderedListBuilder, data: Ord
     const owner = subject === 'claim' ? claimant : data.defendants.length === 1 ? defendant : '';
     const description = owner ? `${possessive(owner)} ${subject}` : `the ${subject}`;
     list.item(`${subject}-outcome`, content => {
-      content.fact('outcome', `${sentenceCase(description)} ${subject} is ${OUTCOMES[value(data, field)]}.`, {
+      content.fact('outcome', `${sentenceCase(description)} is ${OUTCOMES[value(data, field)]}.`, {
         sourceId: selectedControlId(data, field),
       });
     });

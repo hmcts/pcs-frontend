@@ -4,11 +4,13 @@
 #}
 {% import "make-order/_compact.njk" as compact with context %}
 
-{% macro applyBy(prefix, defaultDate) %}
+{% macro applyBy(choice) %}
+  {# Keep a saved selection without a date blank. #}
+  {% set prefix = choice + "-by" %}
   {{ compact.date({
     id: prefix,
     legend: "Application to be made by 4pm on",
-    default: defaultDate,
+    default: noticeApplyBy if draftValue("order-notice") != choice,
     pills: [10, 14, 28],
     workingDays: true
   }) }}
@@ -21,8 +23,8 @@
   classes: "govuk-radios--small",
   default: orderNoticeDefault,
   items: [
-    { value: "own-initiative", text: "Order on court's own initiative", conditional: { html: applyBy("own-initiative-by", noticeApplyBy) } },
-    { value: "without-notice", text: "Order without notice", conditional: { html: applyBy("without-notice-by", noticeApplyBy if draftValue("order-notice") != "without-notice") } },
+    { value: "own-initiative", text: "Order on court's own initiative", conditional: { html: applyBy("own-initiative") } },
+    { value: "without-notice", text: "Order without notice", conditional: { html: applyBy("without-notice") } },
     { value: "none", text: "Neither" }
   ]
 }) }}
