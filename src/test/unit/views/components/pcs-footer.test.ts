@@ -55,4 +55,20 @@ describe('pcs footer', () => {
     });
     expect(html).not.toContain('ui-component-lib-footer');
   });
+
+  it('uses the translated content licence text in the citizen footer', () => {
+    const html = environment.renderString(
+      '{% from "components/pcs-footer.njk" import pcsFooter %}{{ pcsFooter(false, footerModel, licence) }}',
+      { footerModel: legalRepresentativeFooterModel, licence: '<a href="/licence">Translated licence</a> text' }
+    );
+
+    expect(html).toContain('<a href="/licence">Translated licence</a> text');
+    expect(html).not.toContain('All content is available under the');
+  });
+
+  it('falls back to the GOV.UK content licence text when none is passed', () => {
+    const html = renderFooter(false);
+
+    expect(html).toContain('All content is available under the');
+  });
 });
