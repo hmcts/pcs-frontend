@@ -127,12 +127,6 @@ $pcs-order-panel-collapsed-height: calc(24px + #{govuk-spacing(2) * 2 + 2px});
   box-sizing: border-box;
 }
 
-// On the review page the judge's form has its own case facts panel, which stays in the page under the order.
-.pcs-review-page .pcs-case-facts {
-  position: static;
-  max-height: none;
-}
-
 // The judge's order as they left it, read only, set apart from the page like a document. Docweave marks the
 // clauses they added and changed as its editor showed them, which its stylesheet colours.
 .pcs-order-preview {
