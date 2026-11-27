@@ -397,6 +397,24 @@ export function applicationPrefix(application: { id: string }): string {
   return `app-${application.id}`;
 }
 
+/** A hearing the order was drafted to list the application at that has passed since is not one it can be heard at. */
+function hearingPassed(
+  formData: Record<string, unknown>,
+  application: ApplicationToDecide,
+  upcomingHearingIds: readonly string[]
+): MakeOrderValidationIssue[] {
+  const prefix = applicationPrefix(application);
+  const listAt = value(formData, `${prefix}-list-at`) || 'new';
+  return value(formData, `${prefix}-decision`) !== 'list' || listAt === 'new' || upcomingHearingIds.includes(listAt)
+    ? []
+    : [
+        {
+          id: `${prefix}-list-at`,
+          message: `The hearing application ${application.reference} is listed at has passed`,
+        },
+      ];
+}
+
 /**
  * What the judge decides about each application, and what follows the decision: when the hearing is if they list
  * it, and for an application to suspend enforcement, the conditions if they suspend it. The order may leave any
@@ -426,11 +444,11 @@ function validateApplications(
     if (decision === 'list' && listAt === 'new') {
       issues.push(...validateListing(formData, `${prefix}-list`, 'Enter a valid hearing date'));
     }
-    // A hearing the order was drafted to list it at that has passed since is not one it can be heard at.
-    add(
-      decision !== 'list' || listAt === 'new' || upcomingHearingIds.includes(listAt),
-      `${prefix}-list-at`,
-      `The hearing application ${application.reference} is listed at has passed. Select another hearing`
+    issues.push(
+      ...hearingPassed(formData, application, upcomingHearingIds).map(issue => ({
+        ...issue,
+        message: `${issue.message}. Select another hearing`,
+      }))
     );
     if (decision === 'suspend') {
       issues.push(...validatePaymentConditions(formData, `${prefix}-suspension`));
@@ -564,6 +582,18 @@ function validateNotice(formData: Record<string, unknown>): MakeOrderValidationI
   const today = new Date(`${DateTime.now().setZone('Europe/London').toISODate()}T00:00:00Z`);
   add(!applyBy || applyBy >= today, `${prefix}-day`, APPLY_BY_PASSED);
   return issues;
+}
+
+/** What an order the judge sent can no longer do once time has passed: list at a hearing, or give an apply-by date, gone by. */
+export function validateStillCurrent(
+  formData: Record<string, unknown>,
+  applications: readonly ApplicationToDecide[],
+  upcomingHearingIds: readonly string[]
+): MakeOrderValidationIssue[] {
+  return [
+    ...applications.flatMap(application => hearingPassed(formData, application, upcomingHearingIds)),
+    ...validateNotice(formData).filter(({ message }) => message === APPLY_BY_PASSED),
+  ];
 }
 
 export function validateMakeOrder(
