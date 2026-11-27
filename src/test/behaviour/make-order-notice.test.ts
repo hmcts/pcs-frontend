@@ -18,7 +18,7 @@ const PAGE = `/case/${CASE_REFERENCE}/make-order`;
 const REVIEW = `/case/${CASE_REFERENCE}/confirm-order-review`;
 
 const OWN_INITIATIVE =
-  "As this order was made on the court's own initiative, any party affected by the order may apply to set aside, " +
+  "As this order was made on the Court's own initiative, any party affected by the order may apply to set aside, " +
   'vary, or stay the order. Any such application must be made by 4pm on';
 const WITHOUT_NOTICE =
   'If you were not notified of the application before this order was made, you may apply to set aside, vary, or ' +
@@ -56,15 +56,14 @@ describe("make an order: made on the court's own initiative or without notice", 
     expect(control('[name="order-notice"][value="none"]').checked).toBe(true);
     expect(page.orderText()).not.toContain('set aside');
 
-    // An order on the court's own initiative gives 7 days, to the next working day, unless the judge changes it.
+    // Both statements default to 10 days, to the next working day, unless the judge changes it.
     check('order-notice', 'own-initiative');
-    const week = workingDate(7);
-    expect(dateValues('own-initiative-by')).toEqual([week.day, week.month, week.year]);
-    expect(page.orderText().split('\n').at(-1)).toBe(`${OWN_INITIATIVE} ${shown(week)}.`);
+    const defaultDate = workingDate(10);
+    expect(dateValues('own-initiative-by')).toEqual(Object.values(defaultDate));
+    expect(page.orderText().split('\n').at(-1)).toBe(`${OWN_INITIATIVE} ${shown(defaultDate)}.`);
     const pills = [...document.querySelectorAll<HTMLElement>('#own-initiative-by-pills [data-date-pill-days]')];
-    expect(pills.map(pill => pill.textContent)).toEqual(['7 days', '14 days', '28 days']);
-    // Without notice has no default.
-    expect(dateValues('without-notice-by')).toEqual(['', '', '']);
+    expect(pills.map(pill => pill.textContent)).toEqual(['10 days', '14 days', '28 days']);
+    expect(dateValues('without-notice-by')).toEqual(Object.values(defaultDate));
 
     typeDate('own-initiative-by', '4', '12', '2026');
     expect(page.orderText().split('\n').at(-1)).toBe(`${OWN_INITIATIVE} 4 December 2026.`);
@@ -77,13 +76,13 @@ describe("make an order: made on the court's own initiative or without notice", 
   });
 
   it('moves a date to apply by off a weekend or bank holiday, as the court office is closed then', async () => {
-    // A bank holiday on the working day 7 days would give, so the date runs to the next one.
-    const due = workingDate(7);
+    // A bank holiday on the working day 10 days would give, so the date runs to the next one.
+    const due = workingDate(10);
     const holiday = `${due.year}-${due.month}-${due.day}`;
     app = await bootApp({ bankHolidays: [holiday] });
     await openPage((await app.get(PAGE)).text);
     check('order-notice', 'own-initiative');
-    const after = workingDate(7, [holiday]);
+    const after = workingDate(10, [holiday]);
     expect(dateValues('own-initiative-by')).toEqual([after.day, after.month, after.year]);
 
     // The quick dates for it are working days too.
@@ -164,9 +163,9 @@ describe("make an order: made on the court's own initiative or without notice", 
       },
     });
     const page = await openPage((await app.get(PAGE)).text);
-    const week = workingDate(7);
-    expect(dateValues('own-initiative-by')).toEqual([week.day, week.month, week.year]);
-    expect(dateValues('without-notice-by')).toEqual(['', '', '']);
+    const defaultDate = workingDate(10);
+    expect(dateValues('own-initiative-by')).toEqual(Object.values(defaultDate));
+    expect(dateValues('without-notice-by')).toEqual(Object.values(defaultDate));
 
     expect((await app.post(PAGE, page.body('SAVE_DRAFT'))).status).toBe(302);
     const [saved] = submittedOrders() as { order: { formData: Record<string, unknown> } }[];
@@ -174,8 +173,8 @@ describe("make an order: made on the court's own initiative or without notice", 
 
     const reopened = await openPage((await app.get(PAGE)).text);
     check('order-notice', 'own-initiative');
-    expect(dateValues('own-initiative-by')).toEqual([week.day, week.month, week.year]);
-    expect(reopened.orderText().split('\n').at(-1)).toBe(`${OWN_INITIATIVE} ${shown(week)}.`);
+    expect(dateValues('own-initiative-by')).toEqual(Object.values(defaultDate));
+    expect(reopened.orderText().split('\n').at(-1)).toBe(`${OWN_INITIATIVE} ${shown(defaultDate)}.`);
   });
 
   it('changes nothing else as the judge changes the statement or decides an application without notice', async () => {
@@ -185,12 +184,14 @@ describe("make an order: made on the court's own initiative or without notice", 
     // An order on an application without a hearing starts without notice, which the judge may change.
     check('app-gen-app-1-decision', 'dismiss');
     expect(control('[name="order-notice"][value="without-notice"]').checked).toBe(true);
+    const defaultDate = workingDate(10);
+    expect(page.orderText().split('\n').at(-1)).toBe(`${WITHOUT_NOTICE} ${shown(defaultDate)}.`);
 
     check('order-notice', 'own-initiative');
     const due = futureDate(20);
     typeDate('own-initiative-by', due.day, due.month, due.year);
     check('order-notice', 'without-notice');
-    expect(dateValues('without-notice-by')).toEqual(['', '', '']);
+    expect(dateValues('without-notice-by')).toEqual(Object.values(defaultDate));
     check('order-notice', 'own-initiative');
     expect(dateValues('own-initiative-by')).toEqual([due.day, due.month, due.year]);
 
@@ -202,8 +203,24 @@ describe("make an order: made on the court's own initiative or without notice", 
     // A date the judge asks for with a quick date button is theirs.
     check('order-notice', 'without-notice');
     control<HTMLButtonElement>('#without-notice-by-pills [data-date-pill-days="14"]').click();
-    expect(dateValues('without-notice-by')).toEqual(Object.values(futureDate(14)));
+    expect(dateValues('without-notice-by')).toEqual(Object.values(workingDate(14)));
   });
+
+  it.each(['own-initiative', 'without-notice'])(
+    'leaves an older %s draft without a deadline until the judge picks one',
+    async choice => {
+      app = await bootApp({
+        order: { id: 'draft-1', orderType: 'FREE_FORM', formData: { 'order-notice': choice } },
+      });
+      await openPage((await app.get(PAGE)).text);
+
+      const prefix = `${choice}-by`;
+      expect(control(`[name="order-notice"][value="${choice}"]`).checked).toBe(true);
+      expect(dateValues(prefix)).toEqual(['', '', '']);
+      control<HTMLButtonElement>(`#${prefix}-pills [data-date-pill-days="10"]`).click();
+      expect(dateValues(prefix)).toEqual(Object.values(workingDate(10)));
+    }
+  );
 
   it('leaves a date the judge cleared blank when it asks for one, rather than fill it in again', async () => {
     app = await bootApp();

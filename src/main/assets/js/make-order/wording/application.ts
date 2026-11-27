@@ -2,11 +2,9 @@ import { type DocBuilder, type OrderedListBuilder } from '@hmcts-cft/docweave';
 
 import { type OrderApplication, type OrderData } from '../data';
 
-import { sentenceCase, value } from './common';
+import { partyReference, sentenceCase, value } from './common';
 import { addListing } from './listing';
 import { addPaymentConditions } from './payment-conditions';
-
-const ORDINALS = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth'];
 
 /** The applications the order decides: those the judge has not left as they are. */
 export function decidedApplications(data: OrderData): OrderApplication[] {
@@ -14,7 +12,7 @@ export function decidedApplications(data: OrderData): OrderApplication[] {
 }
 
 /**
- * "the first claimant's application dated 3 October 2026": the
+ * "the First Claimant's application dated 3 October 2026": the
  * party by role, numbered only where the case has more than one of that role, and never the GA reference.
  */
 export function describeApplication(data: OrderData, application: OrderApplication): string {
@@ -23,18 +21,15 @@ export function describeApplication(data: OrderData, application: OrderApplicati
   if (!role) {
     return `the application of ${application.applicant}${dated}`;
   }
-  const kind = role[1].toLowerCase();
-  const rank = Number(role[2] ?? 1);
-  const several = (kind === 'claimant' ? data.claimants : data.defendants).length > 1;
-  const ordinal = several ? `${ORDINALS[rank - 1] ?? `${rank}th`} ` : '';
-  return `the ${ordinal}${kind}'s application${dated}`;
+  const kind = role[1] === 'Claimant' ? 'claimant' : 'defendant';
+  return `${partyReference(data, kind, Number(role[2] ?? 1) - 1)}'s application${dated}`;
 }
 
 /** Adjourning the hearing an application to adjourn asks about: to a further hearing, or generally. */
 function addHearingAdjournment(list: OrderedListBuilder, data: OrderData, prefix: string): void {
   const adjournment = value(data, `${prefix}-adjourn-type`);
   if (adjournment === 'further-hearing') {
-    addListing(list, data, `${prefix}-adjourn`, `${prefix}-adjourn`, 'The hearing shall be adjourned to be heard');
+    addListing(list, data, `${prefix}-adjourn`, `${prefix}-adjourn`, 'The hearing is adjourned to');
   } else if (adjournment === 'generally') {
     list.item(
       `${prefix}-adjourn-generally`,
@@ -45,7 +40,7 @@ function addHearingAdjournment(list: OrderedListBuilder, data: OrderData, prefix
 
 /**
  * The clauses the decision on an application generates; none says it is granted, as the order says what it grants.
- * A freeform decision generates none, for the judge's own wording. Listing it for a new hearing says when, as an
+ * Freeform and applicant-wording decisions are written in the editor. Listing it for a new hearing says when, as an
  * adjournment does, and whether the other parties are given notice; listing it at one of the case's hearings says
  * which. Adjourning an application to adjourn adjourns the hearing as the adjournment tab adjourns the claim.
  * Suspending enforcement sets the suspension's conditions as a suspended possession order does.
@@ -76,7 +71,7 @@ function addApplicationClauses(list: OrderedListBuilder, data: OrderData, applic
     });
   } else if (decision === 'list') {
     const notice = application.listWithoutNotice ? 'without notice to the other parties' : 'on notice to all parties';
-    addListing(list, data, `${prefix}-list`, prefix, `${described} shall be listed for a hearing ${notice}`);
+    addListing(list, data, `${prefix}-list`, prefix, `${described} shall be listed for a hearing ${notice} on`);
   }
 }
 

@@ -8,7 +8,7 @@ import {
   parseMoney,
   parseTime,
 } from '../../../../utils/makeOrderFormat';
-import { type AttendanceEntry, type OrderData, type OrderParty } from '../data';
+import { type AttendanceEntry, type OrderData } from '../data';
 
 import { describeApplication } from './application';
 
@@ -50,7 +50,7 @@ export function sentenceCase(text: string): string {
   return text ? `${text.charAt(0).toUpperCase()}${text.slice(1)}` : text;
 }
 
-function possessive(text: string): string {
+export function possessive(text: string): string {
   return text.endsWith('s') ? `${text}'` : `${text}'s`;
 }
 
@@ -61,11 +61,6 @@ export function joinList(items: readonly string[]): string {
   return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
 }
 
-export function partyNames(parties: readonly OrderParty[], fallback: string): string {
-  const names = parties.map(party => party.name).filter(Boolean);
-  return names.length ? names.join(', ') : fallback;
-}
-
 export function partyLabels(data: OrderData): {
   claimant: string;
   defendant: string;
@@ -73,24 +68,34 @@ export function partyLabels(data: OrderData): {
 } {
   const multipleDefendants = data.defendants.length > 1;
   return {
-    claimant: data.claimants.length > 1 ? 'the claimants' : 'the claimant',
-    defendant: multipleDefendants ? 'the defendants' : 'the defendant',
+    claimant: data.claimants.length > 1 ? 'the Claimants' : 'the Claimant',
+    defendant: multipleDefendants ? 'the Defendants' : 'the Defendant',
     defendantVerb: (singular, plural) => (multipleDefendants ? plural : singular),
   };
 }
 
-const ATTENDANCE_ROLES: Record<string, (party: string) => string> = {
-  counsel: party => `counsel for ${party}`,
-  solicitor: party => `solicitor for ${party}`,
-  'solicitor-agent': party => `solicitor's agent for ${party}`,
-  'housing-officer': party => `the housing officer on behalf of ${party}`,
-  'duty-adviser': party => `the duty adviser on behalf of ${party}`,
-  'litigant-in-person': party => `${party} acting in person`,
+/**
+ * How the order describes who spoke for a party: after their name ("Sam Solicitor, solicitor for the Claimant"), or
+ * as `unnamed` says when no name was given. A litigant in person is never named, as the order names the party.
+ */
+const ATTENDANCE_ROLES: Record<
+  string,
+  { role: (party: string) => string; unnamed?: (party: string) => string; nameless?: true }
+> = {
+  counsel: { role: party => `counsel for ${party}`, unnamed: party => `Counsel for ${party}` },
+  solicitor: { role: party => `solicitor for ${party}`, unnamed: party => `the solicitor for ${party}` },
+  'solicitor-agent': {
+    role: party => `solicitor's agent for ${party}`,
+    unnamed: party => `the solicitor's agent for ${party}`,
+  },
+  'housing-officer': { role: party => `the housing officer on behalf of ${party}` },
+  'duty-adviser': { role: party => `the duty adviser on behalf of ${party}` },
+  'litigant-in-person': { role: party => `${party} in person`, nameless: true },
 };
 
 /**
  * A recital for each application the order decides:
- * "AND UPON considering the first claimant's application dated ...", the first "UPON" unless a recital came before it.
+ * "AND UPON considering the First Claimant's application dated ...", the first "UPON" unless a recital came before it.
  */
 function addApplicationRecitals(order: DocBuilder, data: OrderData, after: boolean): void {
   let upon = after;
@@ -106,50 +111,109 @@ function addApplicationRecitals(order: DocBuilder, data: OrderData, after: boole
   }
 }
 
+const PARTY_ORDINALS = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
+
+function ordinal(position: number): string {
+  const n = position + 1;
+  const suffix = n % 100 >= 11 && n % 100 <= 13 ? 'th' : (['th', 'st', 'nd', 'rd'][n % 10] ?? 'th');
+  return PARTY_ORDINALS[position] ?? `${n}${suffix}`;
+}
+
+/** "the Claimant", or "the Second Defendant" where the case has more than one of that role. */
+export function partyReference(data: OrderData, kind: 'claimant' | 'defendant', position: number): string {
+  const parties = kind === 'claimant' ? data.claimants : data.defendants;
+  const role = sentenceCase(kind);
+  if (parties.length < 2) {
+    return `the ${role}`;
+  }
+  return position < 0 ? `[${kind} not found]` : `the ${ordinal(position)} ${role}`;
+}
+
+function attendanceParty(entry: AttendanceEntry, data: OrderData): string {
+  const parties = entry.partyKind === 'claimant' ? data.claimants : data.defendants;
+  return partyReference(
+    data,
+    entry.partyKind,
+    parties.findIndex(party => party.id === entry.partyId)
+  );
+}
+
+/**
+ * One sentence of who the Court heard from, whose letters it read and who did not attend. A representative named
+ * for several parties is heard from once, for them all.
+ */
+function addAttendance(order: DocBuilder, data: OrderData): void {
+  const heard = new Map<string, { choice: string; name: string; parties: string[] }>();
+  const letters: string[] = [];
+  const absent: string[] = [];
+  let firstLetter: AttendanceEntry | undefined;
+  let firstAbsent: AttendanceEntry | undefined;
+  data.attendance.forEach((entry, index) => {
+    const party = attendanceParty(entry, data);
+    if (entry.choice === 'letter-only') {
+      firstLetter ??= entry;
+      letters.push(party);
+    } else if (entry.choice === 'not-present') {
+      firstAbsent ??= entry;
+      absent.push(party);
+    } else if (ATTENDANCE_ROLES[entry.choice]) {
+      const name = ATTENDANCE_ROLES[entry.choice].nameless ? '' : entry.representativeName;
+      const key = name ? `${entry.choice}|${name}` : String(index);
+      const speaker = heard.get(key) ?? heard.set(key, { choice: entry.choice, name, parties: [] }).get(key)!;
+      speaker.parties.push(party);
+    }
+  });
+
+  const spoken = [...heard.values()].map(({ choice, name, parties }) => {
+    const { role, unnamed = role } = ATTENDANCE_ROLES[choice];
+    return name ? `${name}, ${role(joinList(parties))}` : unnamed(joinList(parties));
+  });
+  // A named speaker's description has a comma in it, so the list separates them with commas throughout.
+  const speakers =
+    spoken.length > 1 && spoken.some(speaker => speaker.includes(','))
+      ? `${spoken.slice(0, -1).join(', ')}, and ${spoken[spoken.length - 1]}`
+      : joinList(spoken);
+  const clauses = [
+    spoken.length ? `heard from ${speakers}` : '',
+    letters.length ? `read ${letters.length === 1 ? 'a letter' : 'letters'} from ${joinList(letters)}` : '',
+  ].filter(Boolean);
+  const absence = absent.length ? `${joinList(absent)} did not attend` : '';
+  const wording = clauses.length
+    ? `The Court ${joinList(clauses)}${absence ? ` and ${absence}` : ''}.`
+    : absence && `${sentenceCase(absence)}.`;
+  if (!wording) {
+    return;
+  }
+  // Wording from what was heard is plain text; otherwise it is a fact linked back to the first letter or absence.
+  const source = spoken.length ? undefined : (firstLetter ?? firstAbsent);
+  if (!source) {
+    order.paragraph('attendance-heard', wording);
+  } else {
+    const id = `attendance-${source === firstLetter ? 'letter' : 'absent'}-${source.rowIndex}`;
+    order.paragraph(id, content => {
+      content.fact('attendance', wording, { sourceId: source.sourceId });
+    });
+  }
+}
+
 export function addPreamble(order: DocBuilder, data: OrderData): void {
   const { judge, court, date: madeOn } = data.before;
   order.paragraph('before', content =>
     content
-      .text('Before ')
+      .text('This order is made by ')
       .fact('before-judge', judge)
-      .text(' sitting at the ')
-      .fact('before-court', court)
       .text(' on ')
       .fact('before-date', madeOn)
+      .text(' at the ')
+      .fact('before-court', court)
+      .text('.')
   );
   if (data.withoutHearing) {
     order.paragraph('papers-considered', 'UPON the Court considering the papers without a hearing');
   }
-  const heard: string[] = [];
-  const paragraphs: { id: string; entry: AttendanceEntry; text: string }[] = [];
-  for (const entry of data.attendance) {
-    const party = `the ${entry.partyKind}`;
-    const role = ATTENDANCE_ROLES[entry.choice];
-    if (entry.choice === 'letter-only') {
-      paragraphs.push({
-        id: `attendance-letter-${entry.rowIndex}`,
-        entry,
-        text: `The Court read a letter from ${entry.representativeName || entry.partyName}.`,
-      });
-    } else if (entry.choice === 'not-present') {
-      paragraphs.push({
-        id: `attendance-absent-${entry.rowIndex}`,
-        entry,
-        text: `${sentenceCase(entry.partyName)} did not attend the hearing, but the Court was satisfied they had received notice of the hearing, and it was reasonable to proceed in their absence.`,
-      });
-    } else if (role) {
-      heard.push(entry.representativeName ? `${entry.representativeName}, ${role(party)}` : role(party));
-    }
-  }
-  if (heard.length) {
-    order.paragraph('attendance-heard', `The Court heard from ${joinList(heard)}.`);
-  }
-  for (const paragraph of paragraphs) {
-    order.paragraph(paragraph.id, content => {
-      content.fact('attendance', paragraph.text, { sourceId: paragraph.entry.sourceId });
-    });
-  }
+  addAttendance(order, data);
   if (selected(data, 'recitals', 'yes')) {
+    order.paragraph('recital-introduction', 'The Court records that:');
     order.text('recital', value(data, 'recitals-text'), { sourceId: 'recitals-text' });
   }
   addApplicationRecitals(order, data, data.withoutHearing);
@@ -206,17 +270,20 @@ export function caseManCosts(claimant: string, defendant: string, of: 'claim' | 
   const defendantPays = `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs`;
   return {
     amounts: {
-      'def-pay-cl-fixed': `${defendantPays} of the ${of} in the fixed sum of £`,
-      'def-pay-cl-summary': `${defendantPays} in the summarily assessed sum of £`,
-      'cl-pay-def-summary': `${sentenceCase(claimant)} shall pay ${possessive(defendant)} costs in the summarily assessed sum of £`,
+      'def-pay-cl-fixed':
+        of === 'claim'
+          ? `${sentenceCase(defendant)} shall pay ${possessive(claimant)} fixed costs of £`
+          : `${defendantPays} of the application in the fixed sum of £`,
+      'def-pay-cl-summary': `${defendantPays} summarily assessed in the sum of £`,
+      'cl-pay-def-summary': `${sentenceCase(claimant)} shall pay ${possessive(defendant)} costs summarily assessed in the sum of £`,
       'fixed-same-terms': `${defendantPays} of the ${of} in the fixed sum of £`,
-      'summary-same-terms': `${defendantPays} in the summarily assessed sum of £`,
+      'summary-same-terms': `${defendantPays} summarily assessed in the sum of £`,
     },
     fixed: {
       'in-case': 'Costs in the case.',
       reserved: 'Costs reserved.',
-      'no-order': 'No order as to costs.',
-      'public-funding': `There be a detailed assessment of ${possessive(defendant)} publicly funded costs.`,
+      'no-order': 'No order for costs.',
+      'public-funding': `There shall be a detailed assessment of ${possessive(defendant)} publicly funded costs.`,
       'same-terms': `${defendantPays}.`,
     },
   };

@@ -245,8 +245,8 @@ export function withoutUnchosenNoticeDates(formData: FormData): FormData {
   );
 }
 
-/** The days an order on the court's own initiative gives to apply to set it aside, vary or stay it, unless changed. */
-export const OWN_INITIATIVE_APPLY_BY_DAYS = 7;
+/** The days an order made of the court's own initiative or without notice gives to apply against it, unless changed. */
+const NOTICE_APPLY_BY_DAYS = 10;
 
 /** A date some days from today in London, moved to the next working day, as the parts of a date input. */
 export function daysFromToday(
@@ -470,7 +470,7 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
           ? 'none'
           : 'without-notice',
     // A date to apply by is a working day, as are the page's quick dates for it.
-    ownInitiativeApplyBy: daysFromToday(OWN_INITIATIVE_APPLY_BY_DAYS, DateTime.now(), start.bankHolidays),
+    noticeApplyBy: daysFromToday(NOTICE_APPLY_BY_DAYS, DateTime.now(), start.bankHolidays),
     hearingRecords: recording.map(choice => hearingModel(choice, choice === hearing)),
     caseBundle: caseContext.caseBundle ? caseBundleModel(caseContext.caseBundle, caseContext.caseReference) : undefined,
   };

@@ -7,20 +7,26 @@ import { date, partyLabels, sentenceCase, value, values } from './common';
 
 /** When the hearing is, after what the order says happens to its subject. */
 const WHEN: Record<string, string> = {
-  'next-list': ' on the next available possession list after ',
-  'next-date': ' on the next available date (non-possession list) after ',
-  specific: ' on ',
+  'next-list': 'the next available possession list after ',
+  'next-date': 'the next available date (non-possession list) after ',
+  specific: '',
+};
+
+const HEARING_FORMATS: Record<string, string> = {
+  'in-person': 'in person',
+  video: 'by video',
+  telephone: 'by telephone',
 };
 
 const DIRECTIONS: Record<string, { party: 'claimant' | 'defendant'; text: string }> = {
-  defence: { party: 'defendant', text: ' submit to the court and all other parties a defence.' },
+  defence: { party: 'defendant', text: ' submit to the Court and all other parties a defence.' },
   counterclaim: {
     party: 'defendant',
-    text: ' submit to the court and all other parties a defence and any counterclaim, having paid any court fees which are due.',
+    text: ' submit to the Court and all other parties a defence and any counterclaim, having paid any court fees which are due.',
   },
   'claimant-reply': {
     party: 'claimant',
-    text: ' submit to the court and all other parties a defence to the counterclaim and any reply.',
+    text: ' submit to the Court and all other parties a defence to the counterclaim and any reply.',
   },
 };
 
@@ -31,20 +37,21 @@ function timeEstimate(data: OrderData, prefix: string): string {
 
 /**
  * The clauses listing a hearing, from the listing questions the form asks with the prefix: when it is and for
- * how long, then any directions before it. The order says what happens to the subject, as in "The claim shall be
- * adjourned to be heard"; ids names the clauses and facts, as the adjournment order always has.
+ * how long, in what format where `withFormat` asks for it, then any directions before it. The order says what happens to the subject, as in "The claim shall be
+ * adjourned to"; ids names the clauses and facts, as the adjournment order always has.
  */
 export function addListing(
   list: OrderedListBuilder,
   data: OrderData,
   prefix: string,
   ids: string,
-  happens: string
+  happens: string,
+  { withFormat = false } = {}
 ): void {
   const labels = partyLabels(data);
   const when = value(data, `${prefix}-when`) || 'next-list';
   list.item(`${ids}-listing`, content => {
-    content.text(`${happens}${WHEN[when]}`).fact(`${ids}-hearing-date`, date(data, `${prefix}-hearing-date-${when}`), {
+    content.text(`${happens} ${WHEN[when]}`).fact(`${ids}-hearing-date`, date(data, `${prefix}-hearing-date-${when}`), {
       sourceId: `${prefix}-hearing-date-${when}`,
     });
     if (when === 'specific') {
@@ -56,7 +63,11 @@ export function addListing(
     content
       .text(' with a time estimate of ')
       .fact(`${ids}-time-estimate`, timeEstimate(data, prefix), { sourceId: `${prefix}-time-estimate-group` })
-      .text(when === 'specific' ? '.' : '. Further details of the hearing will be provided by the court.');
+      .text(when === 'specific' ? '.' : '. Further details of the hearing will be provided by the Court.');
+    const formats = withFormat ? values(data, `${prefix}-format`).flatMap(format => HEARING_FORMATS[format] ?? []) : [];
+    if (formats.length) {
+      content.text(` The hearing will be ${formats.join(' or ')}.`);
+    }
   });
   const directions = values(data, `${prefix}-directions`);
   for (const [direction, { party, text }] of Object.entries(DIRECTIONS)) {

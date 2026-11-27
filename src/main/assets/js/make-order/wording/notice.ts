@@ -11,7 +11,7 @@ import { date, selectedControlId, value } from './common';
  */
 export const NOTICE_STATEMENTS: Record<string, string> = {
   'own-initiative':
-    "As this order was made on the court's own initiative, any party affected by the order may apply to set " +
+    "As this order was made on the Court's own initiative, any party affected by the order may apply to set " +
     'aside, vary, or stay the order. Any such application must be made by 4pm on ',
   'without-notice':
     'If you were not notified of the application before this order was made, you may apply to set aside, vary, ' +

@@ -8,7 +8,6 @@ import {
   addPossessionDeadline,
   caseManCosts,
   hasCosts,
-  joinList,
   money,
   partyLabels,
   selected,
@@ -16,17 +15,17 @@ import {
   value,
   values,
 } from './common';
-import { addPaymentConditions } from './payment-conditions';
+import { addPaymentTermsList } from './payment-conditions';
 
 export function addSuspendedClauses(list: OrderedListBuilder, data: OrderData): void {
   const address = data.propertyAddress || '[property address not provided]';
-  const { claimant, defendant } = partyLabels(data);
+  const { claimant, defendant, defendantVerb } = partyLabels(data);
   const options = values(data, 'suspended-options');
   const costs = caseManCosts(claimant, defendant);
 
   list.item('suspended-possession', content => {
     content
-      .text(`${sentenceCase(defendant)} must give up possession of `)
+      .text(`${sentenceCase(defendant)} must leave and give up possession of `)
       .fact('suspended-address', address)
       .text(` to ${claimant} on or before `);
     addPossessionDeadline(content, data, 'suspended-deadline', 'suspended-by-date', 'suspended-by-time');
@@ -38,39 +37,42 @@ export function addSuspendedClauses(list: OrderedListBuilder, data: OrderData): 
   } else if (options.includes('money-judgment-arrears')) {
     list.item('suspended-money-judgment', content => {
       content
-        .text('Judgment for the claimant in the sum of £')
+        .text(`Judgment is entered for ${claimant} against ${defendant} in the sum of £`)
         .fact('suspended-money-judgment-amount', money(value(data, 'suspended-arrears')), {
           sourceId: 'suspended-arrears',
         })
         .text('.');
+      if (selected(data, 'suspended-mj-same-terms', 'yes')) {
+        content.text(' Enforcement of the money judgment is suspended on the same terms as the possession order.');
+      }
     });
   }
 
-  if (hasCosts(data, costs)) {
-    list.item('costs', content => addCosts(content, data, costs));
-  }
-
-  const suspended = ['Execution of the order for possession'];
-  if (options.includes('money-judgment-arrears') && selected(data, 'suspended-mj-same-terms', 'yes')) {
-    suspended.push('enforcement of the money judgment');
-  }
-  if (selected(data, 'costs', 'yes') && SAME_TERMS_COSTS.has(value(data, 'costs-choice'))) {
-    suspended.push('enforcement of any order for costs');
-  }
-  addPaymentConditions(
+  addPaymentTermsList(
     list,
     data,
     'suspended',
-    `${joinList(suspended)} ${suspended.length === 1 ? 'is' : 'are'} suspended as long as`
+    `${sentenceCase(claimant)} may not enforce the possession order or any money judgment or costs order suspended on the same terms for as long as ` +
+      `${defendant} ${defendantVerb('pays', 'pay')} the current rent when it is due and ${defendantVerb('makes', 'make')} the following payments towards the arrears and any sums suspended on those terms:`
   );
   list.item(
     'suspended-paid-in-full',
-    'This order shall not be enforceable once the total of the sums awarded above have been paid.'
+    `Any payments made by ${defendant} in addition to the current rent will first reduce the rent arrears and then any costs order suspended on those terms. ` +
+      `Once ${defendant} ${defendantVerb('has', 'have')} paid all the sums ordered, ${claimant} may no longer enforce this order.`
   );
+
+  if (hasCosts(data, costs)) {
+    list.item('suspended-costs', content => {
+      addCosts(content, data, costs);
+      if (SAME_TERMS_COSTS.has(value(data, 'costs-choice'))) {
+        content.text(' Enforcement of this costs order is suspended on the same terms as the possession order.');
+      }
+    });
+  }
   if (options.includes('warrant-on-notice')) {
     list.item(
       'suspended-warrant-on-notice',
-      'Any application for a warrant of possession must be heard on notice to all parties unless the court orders otherwise.'
+      'Any application for a warrant of possession must be heard on notice to all parties unless the Court orders otherwise.'
     );
   }
 }

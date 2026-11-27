@@ -16,10 +16,19 @@
   default: "16:00"
 }) }}
 
-{{ conditions.paymentConditions("suspended", "Suspended on condition of") }}
+{{ conditions.paymentConditions("suspended", "Suspended on condition of", askArrears = false) }}
 
-{# Same terms is only available when the money-judgment option reveals it. #}
-{% set sameTermsHtml %}
+{# The judgment's arrears and same terms are only available when the money-judgment option reveals them. #}
+{% set moneyJudgmentHtml %}
+  {% call compact.row({ classes: "govuk-!-margin-bottom-4" }) %}
+    {{ compact.copy("Arrears of") }}
+    {{ compact.money({
+      id: "suspended-arrears",
+      label: "Arrears",
+      labelHidden: true,
+      formGroupClasses: "govuk-!-margin-bottom-0"
+    }) }}
+  {% endcall %}
   {{ compact.checkboxes("suspended-mj-same-terms", {
     items: [{
       value: "yes",
@@ -33,7 +42,7 @@
   legend: "Additional orders (optional)",
   classes: "pcs-divided-options",
   items: [
-    { value: "money-judgment-arrears", text: "Money judgment for the arrears above", conditional: { html: sameTermsHtml } },
+    { value: "money-judgment-arrears", text: "Money judgment for the arrears", conditional: { html: moneyJudgmentHtml } },
     { value: "money-claim-adjourned", text: "Money claim adjourned generally with liberty to restore" },
     { value: "warrant-on-notice", text: "Any application for a warrant of eviction must be made and heard on notice to all parties unless the court orders otherwise" }
   ]

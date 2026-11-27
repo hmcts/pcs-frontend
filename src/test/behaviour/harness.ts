@@ -495,9 +495,11 @@ export interface Page {
   body(action?: string): URLSearchParams;
 }
 
-/** An order's text after its opening line, "Before …", which the clauses' tests leave to make-order-before's. */
+/** An order's text after its opening line, "This order is made by …", which the clauses' tests leave to make-order-before's. */
 function withoutOpening(text: string): string {
-  return text.startsWith('Before ') ? text.slice(text.indexOf('\n') + 1) : text;
+  return text.startsWith('This order is made by ') || text.startsWith('Before ')
+    ? text.slice(text.indexOf('\n') + 1)
+    : text;
 }
 
 /**
@@ -631,7 +633,7 @@ export function futureDate(days: number): { day: string; month: string; year: st
 
 /** The order's first sentence, before the judge the harness signs in, at its court, on the date given. */
 export function before(date: string): string {
-  return `Before District Judge Sam Judge sitting at the County Court at Bristol on ${date}`;
+  return `This order is made by District Judge Sam Judge on ${date} at the County Court at Bristol.`;
 }
 
 /** The first sentence of an order made at the harness's hearing. */

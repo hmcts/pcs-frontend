@@ -19,7 +19,8 @@ export function addAdjournmentClauses(list: OrderedListBuilder, data: OrderData)
   const is = chosen.length > 1 ? 'are' : 'is';
 
   if (type === 'further-hearing') {
-    addListing(list, data, 'adj', 'adjournment', `${sentenceCase(subject)} shall be adjourned to be heard`);
+    const hearing = chosen.includes('counterclaim') ? `The hearing of ${subject}` : 'The hearing';
+    addListing(list, data, 'adj', 'adjournment', `${hearing} is adjourned to`, { withFormat: true });
   } else if (type) {
     const instalments = ['current-rent-plus', 'payments'].find(option => conditions.includes(option));
     const restore = conditions.includes('restore');
@@ -74,7 +75,7 @@ export function addAdjournmentClauses(list: OrderedListBuilder, data: OrderData)
             .fact('adjournment-restore-date', date(data, 'adj-gen-restore-date'), {
               sourceId: 'adj-gen-restore-date',
             })
-            .text(` ${subject} shall stand as struck out without further application or order of the court.`);
+            .text(` ${subject} shall stand as struck out without further application or order of the Court.`);
         });
       }
     } else {

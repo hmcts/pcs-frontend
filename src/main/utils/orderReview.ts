@@ -281,6 +281,7 @@ const DECISION_LABELS: Record<string, string> = {
   dismiss: 'Dismissed',
   'strike-out': 'Struck out',
   list: 'Listed for a hearing',
+  'applicant-wording': 'Use the applicant’s wording',
   freeform: 'Freeform',
 };
 

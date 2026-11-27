@@ -205,6 +205,25 @@ export function initCaseFactDefaults(form: HTMLFormElement): void {
   });
 }
 
+/** Attendance the order names no one for, so the name of whoever attended is not asked. */
+const UNNAMED_ATTENDANCE = new Set(['litigant-in-person', 'letter-only', 'not-present']);
+
+/** Takes the representative's name out of a party's attendance when what they chose names no one. */
+export function initAttendanceNames(form: HTMLFormElement): void {
+  form.querySelectorAll<HTMLElement>('[data-attendance-row]').forEach(row => {
+    const name = row.querySelector<HTMLInputElement>('input[type="text"]');
+    if (!name) {
+      return;
+    }
+    const sync = (): void => {
+      const choice = row.querySelector<HTMLInputElement>('input[type="radio"]:checked')?.value ?? '';
+      name.disabled = UNNAMED_ATTENDANCE.has(choice);
+    };
+    row.addEventListener('change', sync);
+    sync();
+  });
+}
+
 /** A money judgment and an adjourned money claim are alternatives; same terms only applies to a judgment. */
 export function initSuspendedMoneyOptions(form: HTMLFormElement): void {
   const option = (value: string): HTMLInputElement | null =>
@@ -330,6 +349,7 @@ export function initMakeOrder(): void {
   initCaseFactsToggle(form);
   initCaseFactDefaults(form);
   initSuspendedMoneyOptions(form);
+  initAttendanceNames(form);
   initEnforcementTransfer(form);
   const suspendedBy = dateParts(form, 'suspended-by-date');
   if (suspendedBy && !suspendedBy.some(part => part.value)) {
@@ -407,7 +427,9 @@ export function initMakeOrder(): void {
   form.addEventListener('click', ({ target }) => {
     const button = (target as Element).closest<HTMLElement>('[data-draft-order]');
     if (button && editor.insertHtml(button.dataset.draftOrder!, { at: { after: 'paragraph:ordered-that' } })) {
-      const reference = button.closest<HTMLElement>('[data-application]')!.dataset.applicationReference;
+      const application = button.closest<HTMLElement>('[data-application]')!;
+      application.querySelector<HTMLInputElement>('input[name$="-applicant-wording-inserted"]')!.value = 'yes';
+      const reference = application.dataset.applicationReference;
       form.querySelector('#order-editor [role="status"]')!.textContent =
         `The draft order from application ${reference} is added.`;
     }

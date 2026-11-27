@@ -237,8 +237,8 @@ describe('confirm order review', () => {
       const lines = page.documentText().split('\n');
       expect(lines.slice(lines.indexOf('IT IS ORDERED THAT:'))).toEqual([
         'IT IS ORDERED THAT:',
-        "The defendant's application dated 19 October 2026 is dismissed.",
-        "The claimant's application dated 21 October 2026 is dismissed.",
+        "The Defendant's application dated 19 October 2026 is dismissed.",
+        "The Claimant's application dated 21 October 2026 is dismissed.",
       ]);
 
       // The caseworker can go on to issue it as it is.
@@ -266,7 +266,7 @@ describe('confirm order review', () => {
 
       expect(document.querySelector('[name="app-gen-app-2-list-at"]')).toBeNull();
       expect(page.documentText()).toContain(
-        "The claimant's application dated 21 October 2026 shall be heard at the hearing on 12 January 2099 at 10:00am."
+        "The Claimant's application dated 21 October 2026 shall be heard at the hearing on 12 January 2099 at 10:00am."
       );
       expect(errors((await app.post(REVIEW, page.body('ISSUE'))).text)).toEqual([
         'The hearing application GA2 is listed at has passed. Return the order to the Judge with a query.',
@@ -395,7 +395,8 @@ describe('confirm order review', () => {
       );
       expect(editor.querySelector('.docweave-clause--modified')?.textContent).toContain('Wording the judge rewrote');
       expect(document.querySelector('input[name$="-attendance"]')).toBeNull();
-      expect(page.documentText()).toContain('Alex Example did not attend the hearing');
+      // The judge replaced the whole attendance sentence, including its non-attendance wording.
+      expect(page.documentText()).not.toContain('the Defendant did not attend.');
       expect(page.documentText()).toContain('Wording the judge rewrote');
     });
 
@@ -983,7 +984,7 @@ describe('confirm order review', () => {
     it("issues the order with the caseworker's changes and answers, submitting the event that opening the review started", async () => {
       const page = await openPage((await app.get(REVIEW)).text);
       const deadline = document.querySelector('#order-editor [data-generated-text$=":deadline"]');
-      expect(deadline?.textContent).toBe('forthwith');
+      expect(deadline?.textContent).toBe('immediately');
       expect(deadline?.getAttribute('contenteditable')).toBe('false');
       writeInPreview('The claimant may apply to restore the claim.');
       const body = page.body('ISSUE');

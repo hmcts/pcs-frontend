@@ -65,7 +65,7 @@ describe('make an order: without a hearing or an application', () => {
 
     const text = page.orderText();
     expect(text).toContain('UPON the Court considering the papers without a hearing');
-    expect(text).toContain('to the claimant(s) forthwith.');
+    expect(text).toContain('to the Claimant immediately.');
   });
 
   it('transfers enforcement of the possession order to the High Court, whatever else the order is', async () => {
@@ -89,7 +89,7 @@ describe('make an order: without a hearing or an application', () => {
     check('strike-subjects', 'claim');
     check('strike-claim-outcome', 'dismissed');
     expect(page.orderText().split('\n').slice(2)).toEqual([
-      'The claim is dismissed.',
+      "The Claimant's claim is dismissed.",
       'Enforcement of the Order of Possession is transferred to the High Court pursuant to section 42 of the County Courts Act 1984.',
     ]);
   });
@@ -106,16 +106,16 @@ describe('make an order: without a hearing or an application', () => {
     const limit =
       'But the Claimant shall not be entitled to recover from the Defendant any costs of enforcement by a High Court Enforcement Officer insofar as they exceed the costs of enforcement by a County Court bailiff.';
     expect(control<HTMLInputElement>('[name="transfer-enforcement-costs"]').checked).toBe(false);
-    expect(page.orderText().split('\n').slice(2)).toEqual(['The claim is dismissed.', transfer]);
+    expect(page.orderText().split('\n').slice(2)).toEqual(["The Claimant's claim is dismissed.", transfer]);
 
     check('transfer-enforcement-costs', 'bailiff');
-    expect(page.orderText().split('\n').slice(2)).toEqual(['The claim is dismissed.', transfer, limit]);
+    expect(page.orderText().split('\n').slice(2)).toEqual(["The Claimant's claim is dismissed.", transfer, limit]);
 
     uncheck('transfer-enforcement', 'yes');
     expect(control<HTMLInputElement>('[name="transfer-enforcement-costs"]').checked).toBe(false);
-    expect(page.orderText().split('\n').slice(2)).toEqual(['The claim is dismissed.']);
+    expect(page.orderText().split('\n').slice(2)).toEqual(["The Claimant's claim is dismissed."]);
     check('transfer-enforcement', 'yes');
-    expect(page.orderText().split('\n').slice(2)).toEqual(['The claim is dismissed.', transfer]);
+    expect(page.orderText().split('\n').slice(2)).toEqual(["The Claimant's claim is dismissed.", transfer]);
   });
 
   it('transfers enforcement from an order that decides only applications, and keeps it on ordering on the claim', async () => {
@@ -153,7 +153,7 @@ describe('make an order: without a hearing or an application', () => {
     typeDate('list-hearing-date-next-list', '2', '11', '2026');
     type('list-time-estimate-hours', '1');
     expect(page.orderText().split('\n').slice(2)).toEqual([
-      'The claim shall be listed for a hearing on notice to all parties on the next available possession list after 2 November 2026 with a time estimate of 1 hour. Further details of the hearing will be provided by the court.',
+      'The claim shall be listed for a hearing on notice to all parties on the next available possession list after 2 November 2026 with a time estimate of 1 hour. Further details of the hearing will be provided by the Court.',
     ]);
 
     const body = page.body();

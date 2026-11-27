@@ -37,8 +37,13 @@ describe('make an order: attendance', () => {
 
     check('claimant-claimant-id-attendance', 'housing-officer');
     check('defendant-defendant-id-attendance', 'letter-only');
+    // A letter names no one who attended, so its name is not asked.
+    expect(control<HTMLInputElement>('[name="defendant-defendant-id-name"]').disabled).toBe(true);
+    expect(control<HTMLInputElement>('[name="claimant-claimant-id-name"]').disabled).toBe(false);
     // The name of whoever attended is optional; the order then names their role alone.
-    expect(page.orderText()).toContain('The Court heard from the housing officer on behalf of the claimant.');
+    expect(page.orderText()).toContain(
+      'The Court heard from the housing officer on behalf of the Claimant and read a letter from the Defendant.'
+    );
 
     type('claimant-claimant-id-name', 'x'.repeat(121));
     expect(await submit()).toBe(400);
@@ -48,15 +53,37 @@ describe('make an order: attendance', () => {
 
     type('claimant-claimant-id-name', 'Harriet Officer');
     expect(page.orderText()).toContain(
-      'The Court heard from Harriet Officer, the housing officer on behalf of the claimant.'
+      'The Court heard from Harriet Officer, the housing officer on behalf of the Claimant and read a letter from the Defendant.'
     );
-    // The order names the party, not the "Defendant 1:" label the screen shows.
-    expect(page.orderText()).toContain('The Court read a letter from Alex Example.');
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
     const submitted = await app.post(PAGE, body);
     expect(submitted.status).toBe(302);
     expect(submitted.location).toBe(`${PAGE}/sent-for-review`);
+  });
+
+  it('identifies multiple defendants by position and appends non-attendance to the same sentence', async () => {
+    await app.close();
+    app = await bootApp({
+      defendants: [
+        { id: 'first', name: 'Alex Example' },
+        { id: 'second', name: 'Blake Example' },
+      ],
+    });
+    const page = await openPage((await app.get(PAGE)).text);
+    check('claimant-claimant-id-attendance', 'solicitor');
+    check('defendant-first-attendance', 'litigant-in-person');
+    check('defendant-second-attendance', 'not-present');
+
+    expect(page.orderText().split('\n')[0]).toBe(
+      'The Court heard from the solicitor for the Claimant and the First Defendant in person and the Second Defendant did not attend.'
+    );
+
+    type('claimant-claimant-id-name', 'Sam Solicitor');
+    expect(page.orderText().split('\n')[0]).toBe(
+      'The Court heard from Sam Solicitor, solicitor for the Claimant, and the First Defendant in person and the Second Defendant did not attend.'
+    );
+    expect(page.orderText()).not.toMatch(/Alex Example|Blake Example|proceed in their absence/);
   });
 
   it('only accepts the attendance a party can have', async () => {

@@ -50,7 +50,7 @@ describe("make an order: the applicant's draft order", () => {
     await openPage((await app.get(PAGE)).text);
     const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-draft-order]')];
     expect(buttons.map(button => button.textContent?.replace(/\s+/g, ' ').trim())).toEqual([
-      "Add the applicant's draft order to the order from application GA1",
+      'Insert the applicant’s wording from application GA1',
     ]);
     expect(buttons[0].closest<HTMLElement>('[data-application]')?.dataset.applicationReference).toBe('GA1');
   });
