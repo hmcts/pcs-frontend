@@ -264,19 +264,11 @@ Make sure you have those values set correctly for your application.
 
 The application exposes a health endpoint (http://localhost:3209/health), created with the use of
 [Nodejs Healthcheck](https://github.com/hmcts/nodejs-healthcheck) library. This endpoint is defined
-in [health.ts](src/main/routes/health.ts) file and currently checks the following components:
+in [health.ts](src/main/routes/health.ts) file. The readiness check (http://localhost:3209/health/readiness)
+covers:
 
 - Redis
-- pcs-api
-
-### Info endpoint
-
-The application also exposes an info endpoint (http://localhost:3209/info), created with the use of
-[nodejs-info-provider](https://github.com/hmcts/nodejs-info-provider) library. This endpoint is defined
-in [info.ts](src/main/routes/info.ts) file and currently displays info from:
-
-- This service
-- pcs-api
+- shutdown in progress
 
 ## License
 
