@@ -20,13 +20,14 @@ import { Application } from 'express';
 import { CallbackRejectedError, HTTPError } from '../../../main/HttpError';
 import { oidcMiddleware } from '../../../main/middleware';
 
-import recordWarrantReturnRoutes from '@routes/recordWarrantReturn';
+import recordWarrantReturnRoutes, { checkYourAnswersRows } from '@routes/recordWarrantReturn';
 import { ccdCaseService } from '@services/ccdCaseService';
 import {
   EvictionOutcome,
   EvictionSuccessfulReturnName,
   EvictionUnsuccessfulReturnName,
   InterimReturnName,
+  WarrantReturn,
   WarrantReturnType,
   evictionOutcomeList,
   evictionSuccessfulReturnTypeList,
@@ -96,7 +97,7 @@ describe('recordWarrantReturnRoutes', () => {
   describe('GET warrantReturn', () => {
     const mockStartCaseEvent = ccdCaseService.startCaseEvent as jest.Mock;
 
-    it('renders the warrant return page with the case and an empty form', async () => {
+    it('renders the warrant return page with the case and an empty form, and remembers the case details', async () => {
       mockStartCaseEvent.mockReturnValueOnce({
         data: {
           claimantType: {
@@ -113,18 +114,31 @@ describe('recordWarrantReturnRoutes', () => {
         eventToken: 'event-token',
       });
       const res = { render: jest.fn() };
+      const session = {
+        user: { accessToken: 'token' },
+        warrantReturnCaseDetails: { '456': { propertyAddressDisplay: '2 Low Road', caseName: 'Other case' } },
+        save: jest.fn((callback: (error?: Error) => void) => callback()),
+      };
 
       await getHandler(basePath)(
         {
           params: { caseReference: '1794231546115667' },
           originalUrl: '/case/1794231546115667/record-warrant-return',
-          session: { user: { accessToken: 'token' } },
+          session,
         } as unknown as Request,
         res as unknown as Response,
         jest.fn()
       );
 
       expect(mockStartCaseEvent).toHaveBeenCalledWith('token', '1794231546115667', 'ext:recordWarrantReturn', {});
+      expect(session.warrantReturnCaseDetails).toEqual({
+        '1794231546115667': {
+          propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
+          caseName: 'Housing Ltd vs Sam Smith',
+        },
+        '456': { propertyAddressDisplay: '2 Low Road', caseName: 'Other case' },
+      });
+      expect(session.save).toHaveBeenCalled();
       expect(res.render).toHaveBeenCalledTimes(1);
       const [template, model] = res.render.mock.calls[0];
       expect(template).toBe('record-warrant-return/warrant-return');
@@ -178,7 +192,10 @@ describe('recordWarrantReturnRoutes', () => {
       const res = { render: jest.fn() };
 
       await getHandler(basePath)(
-        { params: { caseReference: '123' }, session: { user: { accessToken: 'token' } } } as unknown as Request,
+        {
+          params: { caseReference: '123' },
+          session: { user: { accessToken: 'token' }, save: jest.fn((callback: (error?: Error) => void) => callback()) },
+        } as unknown as Request,
         res as unknown as Response,
         jest.fn()
       );
@@ -229,17 +246,20 @@ describe('recordWarrantReturnRoutes', () => {
       expect(res.send).toHaveBeenCalledWith('Not Found');
       expect(next).not.toHaveBeenCalled();
     });
-  });
 
-  describe('GET checkYourAnswers', () => {
-    it('passes a failure to load the case to the error handler', async () => {
-      const failure = new HTTPError('CCD is down', 502);
-      (ccdCaseService.startCaseEvent as jest.Mock).mockRejectedValueOnce(failure);
+    it('passes a failure to save the session to the error handler', async () => {
+      const failure = new Error('Redis is down');
       const res = { render: jest.fn() };
       const next = jest.fn();
 
-      await getHandler('/case/:caseReference/record-warrant-return/check-your-answers')(
-        { params: { caseReference: '123' }, session: { user: { accessToken: 'token' } } } as unknown as Request,
+      await getHandler(basePath)(
+        {
+          params: { caseReference: '123' },
+          session: {
+            user: { accessToken: 'token' },
+            save: jest.fn((callback: (error?: Error) => void) => callback(failure)),
+          },
+        } as unknown as Request,
         res as unknown as Response,
         next
       );
@@ -247,21 +267,28 @@ describe('recordWarrantReturnRoutes', () => {
       expect(next).toHaveBeenCalledWith(failure);
       expect(res.render).not.toHaveBeenCalled();
     });
+  });
 
-    it('loads the check your answers page', async () => {
-      (ccdCaseService.startCaseEvent as jest.Mock).mockReturnValueOnce({
-        data: {
-          propertyAddress: { AddressLine1: '1 High Street', PostTown: 'London', PostCode: 'SW1A 1AA' },
-          caseNameHmctsInternal: 'Housing Ltd vs Sam Smith',
-        },
-      });
+  describe('GET checkYourAnswers', () => {
+    const path = '/case/:caseReference/record-warrant-return/check-your-answers';
+    const answers = { returnType: WarrantReturnType.INTERIM, returnName: InterimReturnName.CROWDS_OR_PROTESTS };
+    const caseDetails = {
+      propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
+      caseName: 'Housing Ltd vs Sam Smith',
+    };
+
+    it('loads the check your answers page from the session', async () => {
       const res = { render: jest.fn() };
 
-      await getHandler('/case/:caseReference/record-warrant-return/check-your-answers')(
+      await getHandler(path)(
         {
           params: { caseReference: '1794231546115667' },
           originalUrl: '/case/1794231546115667/record-warrant-return/check-your-answers',
-          session: { user: { accessToken: 'token' } },
+          session: {
+            user: { accessToken: 'token' },
+            warrantReturn: { '1794231546115667': answers },
+            warrantReturnCaseDetails: { '1794231546115667': caseDetails },
+          },
         } as unknown as Request,
         res as unknown as Response,
         jest.fn()
@@ -273,8 +300,28 @@ describe('recordWarrantReturnRoutes', () => {
           caseReferenceDisplay: '1794-2315-4611-5667',
           propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
           caseName: 'Housing Ltd vs Sam Smith',
+          answerRows: checkYourAnswersRows('1794231546115667', answers),
         })
       );
+    });
+
+    it.each([
+      ['no answers', { warrantReturnCaseDetails: { '123': caseDetails } }],
+      ['no case details', { warrantReturn: { '123': answers } }],
+    ])('goes back to the start of the event when there are %s', async (_name, saved) => {
+      const res = { render: jest.fn(), redirect: jest.fn() };
+
+      await getHandler(path)(
+        {
+          params: { caseReference: '123' },
+          session: { user: { accessToken: 'token' }, ...saved },
+        } as unknown as Request,
+        res as unknown as Response,
+        jest.fn()
+      );
+
+      expect(res.redirect).toHaveBeenCalledWith('/case/123/record-warrant-return');
+      expect(res.render).not.toHaveBeenCalled();
     });
   });
 
@@ -657,6 +704,10 @@ describe('recordWarrantReturnRoutes', () => {
       outcomeDate: '2026-07-01T08:05:00.000',
       additionalDetails: 'Keys handed over',
     };
+    const caseDetails = {
+      propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
+      caseName: 'Housing Ltd vs Sam Smith',
+    };
 
     const post = async (body: Record<string, unknown>, warrantReturn?: Record<string, unknown>) => {
       const res = { status: jest.fn().mockReturnThis(), render: jest.fn(), redirect: jest.fn() };
@@ -667,6 +718,7 @@ describe('recordWarrantReturnRoutes', () => {
         session: {
           user: { accessToken: 'token' },
           warrantReturn: warrantReturn ? { '123': warrantReturn, '456': { returnType: 'INTERIM' } } : undefined,
+          warrantReturnCaseDetails: { '123': caseDetails },
           save: jest.fn((callback: (error?: Error) => void) => callback()),
         },
       };
@@ -677,11 +729,12 @@ describe('recordWarrantReturnRoutes', () => {
       return { req, res, next };
     };
 
-    it('goes back to the warrant return page for previous', async () => {
-      const { res } = await post({ action: 'previous' }, successful);
+    it('goes back to the warrant return page for previous and keeps the answers', async () => {
+      const { req, res } = await post({ action: 'previous' }, successful);
 
       expect(res.redirect).toHaveBeenCalledWith('/case/123/record-warrant-return');
       expect(mockStartAndSubmitEvent).not.toHaveBeenCalled();
+      expect(req.session.warrantReturn).toEqual({ '123': successful, '456': { returnType: 'INTERIM' } });
     });
 
     it('asks for the answers again when the session has none', async () => {
@@ -698,6 +751,17 @@ describe('recordWarrantReturnRoutes', () => {
         warrantReturn: { ...successful, outcomeDate: '2026-07-01T07:05:00.000' },
       });
       expect(req.session.warrantReturn).toEqual({ '456': { returnType: 'INTERIM' } });
+      expect(req.session).toEqual(
+        expect.objectContaining({
+          warrantReturnConfirmation: {
+            '123': {
+              returnType: WarrantReturnType.FINAL,
+              evictionOutcome: EvictionOutcome.SUCCESSFUL,
+              returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
+            },
+          },
+        })
+      );
       expect(req.session.save).toHaveBeenCalled();
       expect(res.redirect).toHaveBeenCalledWith('/case/123/record-warrant-return/confirmed');
     });
@@ -727,6 +791,9 @@ describe('recordWarrantReturnRoutes', () => {
         expect.objectContaining({
           validationErrors: { 'record-warrant-return-form': { text: 'There is no warrant on this case' } },
           caseReferenceDisplay: '123',
+          propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
+          caseName: 'Housing Ltd vs Sam Smith',
+          answerRows: checkYourAnswersRows('123', successful as WarrantReturn),
         })
       );
       expect(req.session.warrantReturn?.['123']).toEqual(successful);
@@ -744,16 +811,24 @@ describe('recordWarrantReturnRoutes', () => {
       expect(res.redirect).not.toHaveBeenCalled();
     });
 
-    it('passes a failure to load the case after a refusal to the error handler', async () => {
-      const failure = new HTTPError('CCD is down', 502);
+    it('goes back to the start of the event when a refused return has no case details', async () => {
       mockStartAndSubmitEvent.mockRejectedValueOnce(
         new CallbackRejectedError(['There is no warrant on this case'], 422)
       );
-      (ccdCaseService.startCaseEvent as jest.Mock).mockRejectedValueOnce(failure);
+      const res = { status: jest.fn().mockReturnThis(), render: jest.fn(), redirect: jest.fn() };
 
-      const { res, next } = await post({ action: 'continue' }, successful);
+      await postHandler(path)(
+        {
+          params: { caseReference: '123' },
+          body: { action: 'continue' },
+          session: { user: { accessToken: 'token' }, warrantReturn: { '123': successful } },
+        } as unknown as Request,
+        res as unknown as Response,
+        jest.fn()
+      );
+      await new Promise(setImmediate);
 
-      expect(next).toHaveBeenCalledWith(failure);
+      expect(res.redirect).toHaveBeenCalledWith('/case/123/record-warrant-return');
       expect(res.render).not.toHaveBeenCalled();
     });
 
@@ -783,35 +858,110 @@ describe('recordWarrantReturnRoutes', () => {
   });
 
   describe('GET confirmed', () => {
-    it('renders the confirmation page', () => {
-      const res = { render: jest.fn() };
+    const path = '/case/:caseReference/record-warrant-return/confirmed';
+    const caseReference = '1794231546115667';
+    const confirmation = {
+      returnType: WarrantReturnType.FINAL,
+      evictionOutcome: EvictionOutcome.SUCCESSFUL,
+      returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
+    };
+    const caseDetails = {
+      propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
+      caseName: 'Housing Ltd vs Sam Smith',
+    };
+    const remainingSessionData = { '456': {} };
 
-      void getHandler('/case/:caseReference/record-warrant-return/confirmed')(
-        {
-          params: { caseReference: '123' },
-          originalUrl: '/case/123/record-warrant-return/confirmed',
-        } as unknown as Request,
-        res as unknown as Response,
-        jest.fn()
-      );
+    const confirmed = (
+      session: Record<string, unknown>,
+      save = jest.fn((callback: (error?: Error) => void) => callback())
+    ) => {
+      const res = { render: jest.fn(), redirect: jest.fn() };
+      const next = jest.fn();
+      const req = {
+        params: { caseReference },
+        originalUrl: `/case/${caseReference}/record-warrant-return/confirmed`,
+        session: { ...session, save },
+      };
+      void getHandler(path)(req as unknown as Request, res as unknown as Response, next);
+      return { req, res, next };
+    };
+
+    it('shows the recorded outcome and the case number, then deletes the session data', () => {
+      const { req, res } = confirmed({
+        warrantReturnCaseDetails: { [caseReference]: caseDetails, ...remainingSessionData },
+        warrantReturnConfirmation: { [caseReference]: confirmation, ...remainingSessionData },
+      });
 
       expect(res.render).toHaveBeenCalledWith(
         'record-warrant-return/confirmation',
-        expect.objectContaining({ cancelUrl: '/case/123/record-warrant-return/cancel' })
+        expect.objectContaining({
+          caseReferenceDisplay: '1794-2315-4611-5667',
+          propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
+          caseName: 'Housing Ltd vs Sam Smith',
+          title: 'Outcome recorded as Eviction successful',
+          bodyLines: ['Case number: 1794-2315-4611-5667'],
+          closeUrl: expect.stringMatching(/\/cases\/case-details\/PCS\/PCS\/1794231546115667$/),
+        })
       );
+      expect(req.session).toEqual(
+        expect.objectContaining({
+          warrantReturnCaseDetails: remainingSessionData,
+          warrantReturnConfirmation: remainingSessionData,
+        })
+      );
+      expect(req.session.save).toHaveBeenCalled();
+    });
+
+    it.each([
+      ['no recorded outcome', { warrantReturnCaseDetails: { [caseReference]: caseDetails } }],
+      ['no case details', { warrantReturnConfirmation: { [caseReference]: confirmation } }],
+      [
+        'no return name',
+        {
+          warrantReturnCaseDetails: { [caseReference]: caseDetails },
+          warrantReturnConfirmation: { [caseReference]: { ...confirmation, returnName: undefined } },
+        },
+      ],
+    ])('goes back to the start of the event when there is %s', (_name, session) => {
+      const { res } = confirmed(session);
+
+      expect(res.redirect).toHaveBeenCalledWith(`/case/${caseReference}/record-warrant-return`);
+      expect(res.render).not.toHaveBeenCalled();
+    });
+
+    it('passes a failure to save the session to the error handler', () => {
+      const failure = new Error('Redis is down');
+      const { res, next } = confirmed(
+        {
+          warrantReturnCaseDetails: { [caseReference]: caseDetails },
+          warrantReturnConfirmation: { [caseReference]: confirmation },
+        },
+        jest.fn((callback: (error?: Error) => void) => callback(failure))
+      );
+
+      expect(next).toHaveBeenCalledWith(failure);
+      expect(res.render).not.toHaveBeenCalled();
     });
   });
 
   describe('GET cancel', () => {
     const path = '/case/:caseReference/record-warrant-return/cancel';
     const saved = { returnType: WarrantReturnType.INTERIM, returnName: InterimReturnName.CROWDS_OR_PROTESTS };
+    const caseDetails = {
+      propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
+      caseName: 'Housing Ltd vs Sam Smith',
+    };
 
     const cancel = (save = jest.fn((callback: (error?: Error) => void) => callback())) => {
       const res = { redirect: jest.fn() };
       const next = jest.fn();
       const req = {
         params: { caseReference: '123' },
-        session: { warrantReturn: { '123': saved, '456': saved }, save },
+        session: {
+          warrantReturn: { '123': saved, '456': saved },
+          warrantReturnCaseDetails: { '123': caseDetails, '456': caseDetails },
+          save,
+        },
       };
       void getHandler(path)(req as unknown as Request, res as unknown as Response, next);
       return { req, res, next };
@@ -821,6 +971,7 @@ describe('recordWarrantReturnRoutes', () => {
       const { req, res } = cancel();
 
       expect(req.session.warrantReturn).toEqual({ '456': saved });
+      expect(req.session.warrantReturnCaseDetails).toEqual({ '456': caseDetails });
       expect(req.session.save).toHaveBeenCalled();
       expect(res.redirect).toHaveBeenCalledWith(expect.stringMatching(/\/cases\/case-details\/PCS\/PCS\/123$/));
     });
@@ -942,13 +1093,95 @@ describe('recordWarrantReturnRoutes', () => {
       await getHandler(basePath)(
         {
           params: { caseReference: '123' },
-          session: { user: { accessToken: 'token' }, warrantReturn: saved ? { '123': saved } : undefined },
+          session: {
+            user: { accessToken: 'token' },
+            warrantReturn: saved ? { '123': saved } : undefined,
+            save: jest.fn((callback: (error?: Error) => void) => callback()),
+          },
         } as unknown as Request,
         res as unknown as Response,
         jest.fn()
       );
 
       expect(res.render.mock.calls[0][1].answers).toEqual(answers);
+    });
+  });
+
+  describe('checkYourAnswersRows', () => {
+    const change = (visuallyHiddenText: string) => ({
+      items: [{ href: '/case/123/record-warrant-return', text: 'Change', visuallyHiddenText }],
+    });
+
+    it.each([
+      [
+        'a successful eviction',
+        {
+          returnType: WarrantReturnType.FINAL,
+          evictionOutcome: EvictionOutcome.SUCCESSFUL,
+          returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
+          outcomeDate: '2026-07-01T08:05:00.000',
+          additionalDetails: 'Keys handed over\nLocks changed',
+        },
+        [
+          { key: { text: 'Return' }, value: { text: 'Final' }, actions: change('return') },
+          { key: { text: 'Outcome' }, value: { text: 'Eviction successful' }, actions: change('outcome') },
+          { key: { text: 'Return name' }, value: { text: 'Eviction successful' }, actions: change('return name') },
+          {
+            key: { text: 'Eviction date and time' },
+            value: { text: '1 Jul 2026, 8:05:00 AM' },
+            actions: change('eviction date and time'),
+          },
+          {
+            key: { text: 'Additional details' },
+            value: { html: 'Keys handed over<br>Locks changed' },
+            actions: change('additional details'),
+          },
+        ],
+      ],
+      [
+        'a cancelled eviction',
+        {
+          returnType: WarrantReturnType.FINAL,
+          evictionOutcome: EvictionOutcome.CANCELLED,
+          returnName: EvictionUnsuccessfulReturnName.WARRANT_WITHDRAWN,
+          outcomeDate: '2026-01-15T13:05:00.000',
+        },
+        [
+          { key: { text: 'Return' }, value: { text: 'Final' }, actions: change('return') },
+          { key: { text: 'Outcome' }, value: { text: 'Eviction cancelled' }, actions: change('outcome') },
+          { key: { text: 'Return name' }, value: { text: 'Warrant withdrawn' }, actions: change('return name') },
+          {
+            key: { text: 'Return date and time' },
+            value: { text: '15 Jan 2026, 1:05:00 PM' },
+            actions: change('return date and time'),
+          },
+        ],
+      ],
+      [
+        'an interim return',
+        {
+          returnType: WarrantReturnType.INTERIM,
+          returnName: InterimReturnName.CROWDS_OR_PROTESTS,
+          outcomeDate: '2026-03-01T00:00:00.000',
+          additionalDetails: 'Crowd at the door',
+        },
+        [
+          { key: { text: 'Return' }, value: { text: 'Interim' }, actions: change('return') },
+          { key: { text: 'Return name' }, value: { text: 'Crowds or protests' }, actions: change('return name') },
+          {
+            key: { text: 'Return date and time' },
+            value: { text: '1 Mar 2026, 12:00:00 AM' },
+            actions: change('return date and time'),
+          },
+          {
+            key: { text: 'Additional details' },
+            value: { html: 'Crowd at the door' },
+            actions: change('additional details'),
+          },
+        ],
+      ],
+    ])('lists the answers for %s', (_name, warrantReturn, rows) => {
+      expect(checkYourAnswersRows('123', warrantReturn)).toEqual(rows);
     });
   });
 });

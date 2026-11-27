@@ -1,0 +1,10 @@
+{% macro xuiConfirmationPanel(params) %}
+  <div class="govuk-panel govuk-panel--confirmation govuk-!-padding-top-3 govuk-!-padding-bottom-3 govuk-!-margin-bottom-6">
+    <h1 class="govuk-panel__title govuk-!-font-size-36">{{ params.title }}</h1>
+    {% for bodyLine in params.bodyLines %}
+      {% if bodyLine %}
+        <p class="govuk-panel__body govuk-!-font-size-24 govuk-!-margin-bottom-1{% if loop.first %} govuk-!-margin-top-5{% endif %}">{{ bodyLine }}</p>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endmacro %}
