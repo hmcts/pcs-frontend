@@ -28,7 +28,16 @@ describe('make an order: adjournment', () => {
     await app.close();
     app = await bootApp({
       openCounterclaim: true,
-      applications: [{ id: 'gen-app-1', reference: 'GA1', type: 'Adjourn the hearing', documents: [] }],
+      applications: [
+        {
+          id: 'gen-app-1',
+          reference: 'GA1',
+          type: 'Adjourn the hearing',
+          applicant: 'Alex Example (Defendant 1)',
+          submittedOn: '2026-10-01',
+          documents: [],
+        },
+      ],
     });
     const page = await openPage((await app.get(PAGE)).text);
     // With an application open, the claim waits behind a tick box.
@@ -61,15 +70,17 @@ describe('make an order: adjournment', () => {
     typeDate('adj-hearing-date-specific', '1', '10', '2026');
     expect(control('[name="adj-when"][value="specific"]').checked).toBe(true);
     type('adj-specific-time', '10:30am');
-    type('adj-time-estimate', '1');
-    type('adj-time-estimate-unit', 'hours');
+    // Days, hours and minutes, as HMC and List Assist take a hearing's duration.
+    type('adj-time-estimate-days', '3');
+    type('adj-time-estimate-hours', '4');
+    type('adj-time-estimate-minutes', '30');
     check('adj-directions', 'defence');
     typeDate('adj-defence-date', '15', '9', '2026');
 
     expect(page.orderText()).toBe(
       [
         'IT IS ORDERED THAT:',
-        'The claim shall be adjourned to be heard on 1 October 2026 at 10:30am with a time estimate of 1 hour.',
+        'The claim shall be adjourned to be heard on 1 October 2026 at 10:30am with a time estimate of 3 days, 4 hours and 30 minutes.',
         'The defendant must by 4pm on 15 September 2026 submit to the court and all other parties a defence.',
       ].join('\n')
     );

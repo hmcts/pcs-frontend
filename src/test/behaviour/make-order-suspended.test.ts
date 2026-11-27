@@ -61,7 +61,7 @@ describe('make an order: suspended possession', () => {
     expect(page.orderText()).toBe(
       [
         'IT IS ORDERED THAT:',
-        'The defendant must give up possession of 10 Test Street, Bristol, BS1 1AA to the claimant on or before 1 December 2026.',
+        'The defendant must give up possession of 10 Test Street, Bristol, BS1 1AA to the claimant on or before 4pm on 1 December 2026.',
         'Judgment for the claimant in the sum of £1,200.00.',
         "The defendant shall pay the claimant's costs of the claim in the fixed sum of £250.00.",
         'Execution of the order for possession, enforcement of the money judgment and enforcement of any order for costs are suspended as long as the defendant pays (i) the rent as it falls due plus (ii) the arrears of £1,200.00 by payments of £100.00 to the claimant every month, the first instalment to be paid on or before 1 November 2026.',

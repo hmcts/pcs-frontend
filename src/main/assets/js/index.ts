@@ -4,6 +4,7 @@ import { initAll } from 'govuk-frontend';
 
 import { initCounterClaimPaymentChoice } from './counter-claim-payment-choice';
 import { initMultiFileUpload } from './multi-file-upload';
+import { initOrderPanel } from './order-panel';
 import { initPostcodeLookup } from './postcode-lookup';
 import { initPostcodeSelection } from './postcode-select';
 import { initRedirectOnBack } from './redirect-on-back';
@@ -24,3 +25,4 @@ initSessionTimeout();
 initMultiFileUpload();
 initRedirectOnBack();
 initCounterClaimPaymentChoice();
+initOrderPanel();

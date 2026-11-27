@@ -3,11 +3,14 @@ import {
   type TestApp,
   bootApp,
   check,
+  control,
+  offered,
   openPage,
   selectTab,
   submittedOrders,
   type,
   typeDate,
+  uncheck,
 } from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
@@ -29,13 +32,16 @@ describe('make an order: without a hearing or an application', () => {
   });
   afterEach(() => app.close());
 
-  it('offers every order type but possession, starting on free form, without anyone attending', async () => {
+  it('offers every order type, possession too, without anyone attending', async () => {
     const page = await openPage((await app.get(PAGE)).text);
+    check('order-notice', 'none');
 
     expect(document.querySelector('h1')?.textContent).toBe('Make an order');
-    expect(document.querySelector('[data-attendance-row]')).toBeNull();
+    expect(offered('[data-attendance-row]')).toBe(false);
     expect(document.querySelector('[data-application]')).toBeNull();
     expect([...document.querySelectorAll<HTMLElement>('[data-order-type]')].map(tab => tab.dataset.orderType)).toEqual([
+      'OUTRIGHT_POSSESSION',
+      'SUSPENDED_POSSESSION',
       'ADJOURNMENT',
       'STRIKE_OUT_DISMISSAL',
       'FREE_FORM',
@@ -52,71 +58,74 @@ describe('make an order: without a hearing or an application', () => {
     expect(submitted.order.orderType).toBe('FREE_FORM');
   });
 
-  it('refuses a possession order sent without a hearing', async () => {
+  it('makes a possession order on the papers, as the judge decides is right in the case', async () => {
     const page = await openPage((await app.get(PAGE)).text);
-    expect(document.querySelector('#tab-outright')).toBeNull();
-    expect(document.querySelector('#tab-suspended')).toBeNull();
+    selectTab('tab-outright');
+    check('outright-possession', 'forthwith');
 
-    const body = page.body();
-    body.set('action', 'SUBMIT_FOR_REVIEW');
-    body.set('orderType', 'OUTRIGHT_POSSESSION');
-    const rejected = await app.post(PAGE, body);
-    expect(rejected.status).toBe(400);
-    expect(rejected.text).toContain('Select an order type made without a hearing');
-    expect(submittedOrders()).toEqual([]);
+    const text = page.orderText();
+    expect(text).toContain('UPON the Court considering the papers without a hearing');
+    expect(text).toContain('to the claimant(s) forthwith.');
   });
 
   it('transfers enforcement of the possession order to the High Court, whatever else the order is', async () => {
     const page = await openPage((await app.get(PAGE)).text);
+    check('order-notice', 'none');
+    // Last on the form, after own initiative or without notice, as the judges seldom need it.
+    const headings = [...document.querySelectorAll('h2.govuk-heading-l')].map(heading => heading.textContent?.trim());
+    expect(headings.slice(-3)).toEqual(['Own initiative or without notice', 'Enforcement', 'Order preview']);
     check('transfer-enforcement', 'yes');
-
-    const unchosen = page.body();
-    unchosen.set('action', 'SUBMIT_FOR_REVIEW');
-    const noCourt = await app.post(PAGE, unchosen);
-    expect(noCourt.status).toBe(400);
-    expect(noCourt.text).toContain('Select King&#39;s Bench Division or a District Registry');
-
-    check('transfer-enforcement-court', 'district-registry');
-    const unnamed = page.body();
-    unnamed.set('action', 'SUBMIT_FOR_REVIEW');
-    const noRegistry = await app.post(PAGE, unnamed);
-    expect(noRegistry.status).toBe(400);
-    expect(noRegistry.text).toContain('Enter the District Registry');
-
-    type('transfer-enforcement-registry', 'District Registry');
-    const suffixOnly = page.body();
-    suffixOnly.set('action', 'SUBMIT_FOR_REVIEW');
-    expect((await app.post(PAGE, suffixOnly)).text).toContain('Enter the District Registry');
-
-    type('transfer-enforcement-registry', 'Bristol District Registry');
     expect(page.orderText().split('\n').slice(2)).toEqual([
-      'Enforcement of the Order of Possession is transferred to the High Court, Bristol District Registry, pursuant to section 42 of the County Courts Act 1984.',
+      'Enforcement of the Order of Possession is transferred to the High Court pursuant to section 42 of the County Courts Act 1984.',
     ]);
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
     expect((await app.post(PAGE, body)).status).toBe(302);
     const [submitted] = submittedOrders() as { order: { formData: Record<string, unknown> } }[];
-    expect(submitted.order.formData['transfer-enforcement-registry']).toBe('Bristol District Registry');
+    expect(submitted.order.formData['transfer-enforcement']).toEqual('yes');
 
     // The transfer follows the judge to another order type.
     selectTab('tab-strike-out');
     check('strike-subjects', 'claim');
     check('strike-claim-outcome', 'dismissed');
-    check('transfer-enforcement-court', 'kings-bench');
     expect(page.orderText().split('\n').slice(2)).toEqual([
       'The claim is dismissed.',
-      "Enforcement of the Order of Possession is transferred to the High Court, King's Bench Division, pursuant to section 42 of the County Courts Act 1984.",
+      'Enforcement of the Order of Possession is transferred to the High Court pursuant to section 42 of the County Courts Act 1984.',
     ]);
+  });
+
+  it("limits the costs of enforcing in the High Court to a bailiff's, only with the transfer", async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    check('order-notice', 'none');
+    selectTab('tab-strike-out');
+    check('strike-subjects', 'claim');
+    check('strike-claim-outcome', 'dismissed');
+    check('transfer-enforcement', 'yes');
+    const transfer =
+      'Enforcement of the Order of Possession is transferred to the High Court pursuant to section 42 of the County Courts Act 1984.';
+    const limit =
+      'But the Claimant shall not be entitled to recover from the Defendant any costs of enforcement by a High Court Enforcement Officer insofar as they exceed the costs of enforcement by a County Court bailiff.';
+    expect(control<HTMLInputElement>('[name="transfer-enforcement-costs"]').checked).toBe(false);
+    expect(page.orderText().split('\n').slice(2)).toEqual(['The claim is dismissed.', transfer]);
+
+    check('transfer-enforcement-costs', 'bailiff');
+    expect(page.orderText().split('\n').slice(2)).toEqual(['The claim is dismissed.', transfer, limit]);
+
+    uncheck('transfer-enforcement', 'yes');
+    expect(control<HTMLInputElement>('[name="transfer-enforcement-costs"]').checked).toBe(false);
+    expect(page.orderText().split('\n').slice(2)).toEqual(['The claim is dismissed.']);
+    check('transfer-enforcement', 'yes');
+    expect(page.orderText().split('\n').slice(2)).toEqual(['The claim is dismissed.', transfer]);
   });
 
   it('transfers enforcement from an order that decides only applications, and keeps it on ordering on the claim', async () => {
     await app.close();
     app = await bootApp({ hearing: null, applications: [APPLICATION] });
     const page = await openPage((await app.get(PAGE)).text);
+    check('order-notice', 'none');
     check('transfer-enforcement', 'yes');
-    check('transfer-enforcement-court', 'kings-bench');
     const transfer =
-      "Enforcement of the Order of Possession is transferred to the High Court, King's Bench Division, pursuant to section 42 of the County Courts Act 1984.";
+      'Enforcement of the Order of Possession is transferred to the High Court pursuant to section 42 of the County Courts Act 1984.';
     expect(page.documentText()).toContain(transfer);
 
     check('claim-order', 'yes');
@@ -132,6 +141,7 @@ describe('make an order: without a hearing or an application', () => {
 
   it('lists a hearing on notice from a free form order, asking when as an adjournment does', async () => {
     const page = await openPage((await app.get(PAGE)).text);
+    check('order-notice', 'none');
     check('list-on-notice', 'yes');
 
     const incomplete = page.body();
@@ -141,8 +151,7 @@ describe('make an order: without a hearing or an application', () => {
     expect(rejected.text).toContain('Enter a valid hearing date');
 
     typeDate('list-hearing-date-next-list', '2', '11', '2026');
-    type('list-time-estimate', '1');
-    type('list-time-estimate-unit', 'hours');
+    type('list-time-estimate-hours', '1');
     expect(page.orderText().split('\n').slice(2)).toEqual([
       'The claim shall be listed for a hearing on notice to all parties on the next available possession list after 2 November 2026 with a time estimate of 1 hour. Further details of the hearing will be provided by the court.',
     ]);
@@ -152,15 +161,14 @@ describe('make an order: without a hearing or an application', () => {
     expect((await app.post(PAGE, body)).status).toBe(302);
   });
 
-  it('asks who attended a hearing order, and offers it possession but no listing or transfer of its own', async () => {
+  it('asks who attended a hearing order, and offers it possession but no listing', async () => {
     await app.close();
     app = await bootApp();
     const page = await openPage((await app.get(PAGE)).text);
 
-    expect(document.querySelector('[data-attendance-row]')).not.toBeNull();
-    expect(document.querySelector('input[name="list-on-notice"]')).toBeNull();
-    expect(document.querySelector('input[name="transfer-enforcement"]')).toBeNull();
-    expect(document.querySelector('#tab-outright')).not.toBeNull();
+    expect(offered('[data-attendance-row]')).toBe(true);
+    expect(offered('input[name="list-on-notice"]')).toBe(false);
+    expect(document.querySelector('[href="#tab-outright"]')).not.toBeNull();
     expect(page.orderText()).not.toContain('considering the papers');
   });
 });

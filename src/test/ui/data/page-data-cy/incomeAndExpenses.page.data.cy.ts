@@ -1,0 +1,16 @@
+export const incomeAndExpenses = {
+  mainHeader: `Incwm a chostau`,
+  doYouWantToProvideDetailsHeader: `A ydych eisiau darparu manylion am eich incwm a chostau?`,
+  detailsAboutYourIncomeParagraph: `Gall barnwr ddefnyddio manylion am eich incwm a chostau i ddod i benderfyniad ar eich achos, a hefyd i benderfynu faint y gallech fforddio ei ad-dalu os oes gennych ôl-ddyledion rhent.`,
+  onTheDayOfHearingParagraph: `Ar ddiwrnod y gwrandawiad, mae’n bosibl y bydd cynghorydd ar ddyletswydd yn y llys a all roi cyngor i chi a’ch cynrychioli am ddim. Gallant hefyd ddefnyddio’r wybodaeth hon i weld a oes unrhyw fudd-daliadau neu gymorth ychwanegol y gallech fod â hawl iddynt.`,
+  saveAndContinueButton: `Cadw a pharhau`,
+  saveForLaterButton: `Cadw at hwyrach ymlaen`,
+  yesRadioOption: `Ydw`,
+  noRadioOption: `Nac ydw`,
+  cymraegLink: `English`,
+  backLink: `Yn ôl`,
+  feedbackLink: `adborth (yn agor mewn tab newydd)`,
+  pageSlug: `income-and-expenses`,
+  errorValidationHeader: `Mae yna broblem`,
+  selectIfYouWantToProvideDetailsErrorMessage: `Dewiswch a ydych eisiau darparu manylion am eich incwm a chostau`,
+};
