@@ -379,6 +379,7 @@ describe('confirm order review', () => {
     it('warns of what the judge added and changed, and shows their wording for the caseworker to edit', async () => {
       app = await caseworkerReviewing(
         await judgesOrder({
+          staffMessage: 'Please review the additional clause.',
           edit: () => {
             changeGeneratedWording();
             writeInPreview('The defendant may apply to vary this order.');
@@ -391,6 +392,8 @@ describe('confirm order review', () => {
       const edits = document.querySelector('#judge-edits')?.textContent;
       expect(edits).toContain('The Judge added wording to the order');
       expect(edits).toContain('The Judge changed generated wording');
+      expect(document.querySelector('#judge-edits')?.nextElementSibling?.id).toBe('judge-message');
+      expect(document.querySelector('#judge-message')?.textContent).toContain('Please review the additional clause.');
       // Docweave marks the clauses the judge added and changed as its editor showed them.
       const preview = document.querySelector('[data-order-preview]')!;
       expect(preview.querySelector('.docweave-clause--inserted')?.textContent).toContain(

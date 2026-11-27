@@ -13,8 +13,8 @@
 
 {% block page %}
   <div class="pcs-review-page">
-    {# What the Judge submitted stays above the page, read only, whatever the caseworker changes in the editor. #}
-    {% call orderPanel.panel("Order the Judge submitted", staffMessage) %}
+    {# The submitted order remains read only while the caseworker edits the order to issue. #}
+    {% call orderPanel.panel("Order the Judge submitted", sticky=false) %}
       {% if edits.added or edits.changed %}
         <p class="govuk-body-s" id="judge-changes-key">
           Clauses the Judge added are highlighted in green. Generated clauses they changed are highlighted in blue.
@@ -54,9 +54,12 @@
         }) }}
       {% endif %}
 
-      <p class="govuk-body" id="order-changes-guidance">
-        Correct minor errors in the wording before issuing the order. Return it to the Judge if a decision needs changing.
-      </p>
+      {% if staffMessage %}
+        <section class="govuk-inset-text" id="judge-message" aria-labelledby="judge-message-heading">
+          <h2 class="govuk-heading-s govuk-!-margin-bottom-2" id="judge-message-heading">Message from the Judge</h2>
+          <p class="govuk-body pcs-preserve-lines govuk-!-margin-bottom-0">{{ staffMessage }}</p>
+        </section>
+      {% endif %}
 
       {% include "make-order/_editor.njk" %}
       {% if judgeDocument %}

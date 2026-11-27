@@ -1,9 +1,6 @@
 @use 'govuk-frontend' as *;
 
-// Court staff review a judge's order and record what it says, so the order runs across the top of the page, above
-// its questions, as the judge's case facts do on their form. At desktop sizes with room for it, it stays in view as the
-// page scrolls, up to a share of the screen, with the order scrolling on its own; on a smaller screen, zoomed in, or a
-// short one, it is part of the page (WCAG 1.4.10).
+// On the recording and check-your-answers pages, the order stays in view on desktop screens with room for it.
 $pcs-order-panel-max-height: 45vh;
 $pcs-order-panel-collapsed-height: calc(24px + #{govuk-spacing(2) * 2 + 2px});
 
@@ -14,13 +11,13 @@ $pcs-order-panel-collapsed-height: calc(24px + #{govuk-spacing(2) * 2 + 2px});
 }
 
 // Keyboard focus scrolls into view below the panel rather than under it (WCAG 2.4.11).
-.govuk-template:has(.pcs-order-panel) {
+.govuk-template:has(.pcs-order-panel--sticky) {
   @include pcs-order-sticky {
     scroll-padding-top: calc(#{$pcs-order-panel-max-height} + #{govuk-spacing(3)});
   }
 }
 
-.govuk-template:has(.pcs-order-panel--collapsed) {
+.govuk-template:has(.pcs-order-panel--sticky.pcs-order-panel--collapsed) {
   @include pcs-order-sticky {
     scroll-padding-top: calc(#{$pcs-order-panel-collapsed-height} + #{govuk-spacing(3)});
   }
@@ -45,7 +42,9 @@ $pcs-order-panel-collapsed-height: calc(24px + #{govuk-spacing(2) * 2 + 2px});
   border-top: 1px solid $govuk-border-colour;
   border-bottom: 1px solid $govuk-border-colour;
   background: govuk-colour('black', $variant: 'tint-95');
+}
 
+.pcs-order-panel--sticky {
   @include pcs-order-sticky {
     position: sticky;
     top: 0;
@@ -106,8 +105,8 @@ $pcs-order-panel-collapsed-height: calc(24px + #{govuk-spacing(2) * 2 + 2px});
   }
 }
 
-.pcs-order-panel__message,
-.pcs-order-panel__order {
+.pcs-order-panel--sticky .pcs-order-panel__message,
+.pcs-order-panel--sticky .pcs-order-panel__order {
   @include pcs-order-sticky {
     min-height: 0;
     overflow-y: auto;
