@@ -1,4 +1,6 @@
-export const priorityDebtDetails = {
+import { RELEASE_1_4_ENABLED, whenLdFlagPageData } from '../../../utils/actions/custom-actions/launchDarkly.action';
+
+const priorityDebtDetailsDefault = {
   mainHeader: `Priority debt details`,
   whatIsTheTotalAmountQuestion: `What is the total amount the defendant owes for all their priority debts?`,
   howMuchDoesDefendantPayQuestion: `How much does the defendant pay towards their priority debts each week or month?`,
@@ -26,3 +28,15 @@ export const priorityDebtDetails = {
   feedbackLink: `feedback`,
   pageSlug: `priority-debt-details`,
 };
+
+const priorityDebtDetailsLegacy = {
+  ...priorityDebtDetailsDefault,
+  paidEveryParagraph: `Paid every:`,
+  weekRadioOption: `Week`,
+  monthRadioOption: `Month`,
+};
+
+export const priorityDebtDetails = whenLdFlagPageData(RELEASE_1_4_ENABLED, {
+  on: priorityDebtDetailsDefault,
+  off: priorityDebtDetailsLegacy,
+});

@@ -1,6 +1,7 @@
+import { RELEASE_1_4_ENABLED, whenLdFlagPageData } from '../../utils/actions/custom-actions/launchDarkly.action';
 import { generateRandomString } from '../../utils/common/string.utils';
 
-export const whatRegularIncomeDoYouReceive = {
+const whatRegularIncomeDoYouReceiveDefault = {
   mainHeader: `What regular income do you receive? (Optional)`,
   selectAllThatApplyHintText: `Select all that apply. Enter total amount in pounds and pence, for example £148 or £148.50. The information you provide must be truthful and accurate. `,
   incomeFromAllJobsParagraph: `Income from all jobs you do`,
@@ -53,3 +54,14 @@ export const whatRegularIncomeDoYouReceive = {
   pageSlug: `what-regular-income-do-you-receive`,
   threeDecimalIncorrectFormatTextInput: `20.003`,
 };
+
+const whatRegularIncomeDoYouReceiveLegacy = {
+  ...whatRegularIncomeDoYouReceiveDefault,
+  weekHiddenRadioOption: `Week`,
+  monthHiddenRadioOption: `Month`,
+};
+
+export const whatRegularIncomeDoYouReceive = whenLdFlagPageData(RELEASE_1_4_ENABLED, {
+  on: whatRegularIncomeDoYouReceiveDefault,
+  off: whatRegularIncomeDoYouReceiveLegacy,
+});

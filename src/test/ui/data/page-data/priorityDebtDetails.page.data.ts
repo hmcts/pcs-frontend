@@ -1,9 +1,11 @@
-export const priorityDebtDetails = {
+import { RELEASE_1_4_ENABLED, whenLdFlagPageData } from '../../utils/actions/custom-actions/launchDarkly.action';
+
+const priorityDebtDetailsDefault = {
   mainHeader: `Priority debt details`,
   whatIsTheTotalAmountQuestion: `What is the total amount you owe for all your priority debts?`,
   howMuchDoYouPayQuestion: `How much do you pay towards your priority debts each week or month?`,
-  enterTotalAmountHintText: `Enter total amount in pounds and pence, for example £148 or £148.50`,
   paidEveryParagraph: `How often do you pay towards your priority debts?`,
+  enterTotalAmountHintText: `Enter total amount in pounds and pence, for example £148 or £148.50`,
   weekRadioOption: `Paid every week`,
   monthRadioOption: `Paid every month`,
   saveAndContinueButton: `Save and continue`,
@@ -30,3 +32,15 @@ export const priorityDebtDetails = {
   pageSlug: `priority-debt-details`,
   threeDecimalIncorrectFormatTextInput: `20.003`,
 };
+
+const priorityDebtDetailsLegacy = {
+  ...priorityDebtDetailsDefault,
+  paidEveryParagraph: `Paid every:`,
+  weekRadioOption: `Week`,
+  monthRadioOption: `Month`,
+};
+
+export const priorityDebtDetails = whenLdFlagPageData(RELEASE_1_4_ENABLED, {
+  on: priorityDebtDetailsDefault,
+  off: priorityDebtDetailsLegacy,
+});

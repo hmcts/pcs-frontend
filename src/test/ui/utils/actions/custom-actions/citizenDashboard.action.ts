@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { Page } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
 import { dashboard, getDefendantDetails, getStatementOfTruthDetails, viewTheResponse } from '../../../data/page-data';
@@ -7,7 +7,13 @@ import { viewTheClaim } from '../../../data/page-data/theClaim-page-data';
 import { performAction, performValidation, performValidations } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
-import { getSelectedDefendantNumber, getSelectedPinUser, pinUsers } from './fetchPINsAndValidateAccessCodeAPI.action';
+import {
+  getPinUsersInClaimOrder,
+  getSelectedDefendantNumber,
+  getSelectedPinUser,
+  pinUsers,
+} from './fetchPINsAndValidateAccessCodeAPI.action';
+import { RELEASE_1_4_ENABLED, getLdFlag } from './launchDarkly.action';
 
 export class CitizenDashboardAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
@@ -32,61 +38,65 @@ export class CitizenDashboardAction implements IAction {
     await actionToPerform();
   }
 
-  private async verifyRespondToClaimNotificationAndTag(page: Page, notificationData: actionRecord) {
-    const respondToClaimBeforeHearingParagraph = page.locator('p.govuk-body', {
-      hasText: String(notificationData.notificationText),
+  private async verifyRespondToClaimNotificationAndTag(_page: Page, notificationData: actionRecord) {
+    await performValidation('text', {
+      elementType: 'paragraphWithLink',
+      text: notificationData.notificationText,
     });
-    await expect(respondToClaimBeforeHearingParagraph).toBeVisible();
     const isCompleted = String(notificationData.tag).toLowerCase() === 'completed';
     if (notificationData.responseLink) {
-      const yourResponseLink = page.getByRole('link', {
-        name: String(notificationData.responseLink),
-      });
-
       //Verify Respond to claim link
       if (isCompleted) {
         // Verify link is deactivated (not rendered as a link)
-        await expect(yourResponseLink).toHaveCount(0);
+        await performValidation('textNotVisible', {
+          elementType: 'link',
+          text: notificationData.responseLink,
+        });
         // Verify text still exists
-        await expect(page.getByText(String(notificationData.respondToTheClaimHeader), { exact: true })).toBeVisible();
+        await performValidation('text', {
+          elementType: 'inlineText',
+          text: notificationData.respondToTheClaimHeader,
+        });
       } else {
         // Verify active link
-        await expect(yourResponseLink).toBeVisible();
+        await performValidation('text', {
+          elementType: 'link',
+          text: notificationData.responseLink,
+        });
       }
     }
     //Verify View response link
-    const viewResponseLink = page.getByRole('link', {
-      name: String(notificationData.viewResponseHeader),
-    });
     if (isCompleted) {
       // Verify active link with tag
-      await expect(viewResponseLink).toBeVisible();
-
-      const vireResponseTask = page.locator('li.govuk-task-list__item').filter({
-        hasText: String(notificationData.viewResponseHeader),
+      await performValidation('text', {
+        elementType: 'link',
+        text: notificationData.viewResponseHeader,
       });
-      await expect(vireResponseTask.locator('.govuk-task-list__status')).toHaveText(
-        String(notificationData.viewResponseTag)
-      );
+      await performValidation('text', notificationData.viewResponseHeader, {
+        elementType: 'taskListStatus',
+        text: notificationData.viewResponseTag,
+      });
     } else {
       // Verify link is deactivated (not rendered as a link)
-      await expect(viewResponseLink).toHaveCount(0);
+      await performValidation('textNotVisible', {
+        elementType: 'link',
+        text: notificationData.viewResponseHeader,
+      });
       // Verify text still exists
-      await expect(page.getByText(String(notificationData.viewResponseHeader), { exact: true })).toBeVisible();
+      await performValidation('text', {
+        elementType: 'inlineText',
+        text: notificationData.viewResponseHeader,
+      });
     }
 
-    const respondToClaimTask = page.locator('li.govuk-task-list__item').filter({
-      hasText: String(notificationData.respondToTheClaimHeader),
+    await performValidation('text', notificationData.respondToTheClaimHeader, {
+      elementType: 'taskListStatus',
+      text: notificationData.tag,
     });
-    await expect(respondToClaimTask.locator('.govuk-task-list__status')).toHaveText(String(notificationData.tag));
   }
 
   private async verifyNavigationFromNotificationLink(page: Page, notificationData: actionRecord) {
-    const yourResponseLink = page.getByRole('link', {
-      name: String(notificationData.responseLink),
-    });
-    await expect(yourResponseLink).toBeVisible();
-    await yourResponseLink.click();
+    await performAction('clickLink', notificationData.responseLink);
     await performValidation('mainHeader', notificationData.nextPageHeader);
     await page.goBack();
   }
@@ -121,14 +131,17 @@ export class CitizenDashboardAction implements IAction {
     });
   }
 
-  private async verifyResponseDetailsOnViewTheResponsePage(page: Page) {
+  private async verifyResponseDetailsOnViewTheResponsePage(_page: Page) {
     const selectedDefendant = getSelectedPinUser();
     if (!selectedDefendant) {
       throw new Error('No authenticated defendant PIN user is available for response validation');
     }
     const defendantName = `${selectedDefendant.firstName} ${selectedDefendant.lastName}`;
     const defendantNumber = getSelectedDefendantNumber();
-    const defendantDetailsSubHeader = `Defendant ${defendantNumber} details`;
+    const release14Enabled = await getLdFlag(RELEASE_1_4_ENABLED);
+    const defendantDetailsSubHeader = release14Enabled
+      ? `Defendant ${defendantNumber} details`
+      : viewTheResponse.defendant1SubHeader;
     await performValidation('text', {
       elementType: 'paragraph',
       text: `Property address: ${viewTheClaim.dateAndCaseDetails['Property address']}`,
@@ -141,7 +154,10 @@ export class CitizenDashboardAction implements IAction {
       'Date issued': viewTheClaim.dateAndCaseDetails['Date issued'],
       'Date submitted': viewTheClaim.dateAndCaseDetails['Date submitted'],
     });
-    await expect(page.getByRole('heading', { name: defendantDetailsSubHeader, exact: true })).toBeVisible();
+    await performValidation('text', {
+      elementType: 'subHeader',
+      text: defendantDetailsSubHeader,
+    });
     await performValidation(
       'viewClaimOrResponseTable',
       defendantDetailsSubHeader,
@@ -149,9 +165,13 @@ export class CitizenDashboardAction implements IAction {
     );
     for (const defendant of pinUsers) {
       const otherDefendantName = `${defendant.firstName} ${defendant.lastName}`;
-      if (otherDefendantName !== defendantName) {
-        await expect(page.getByText(otherDefendantName, { exact: true })).toHaveCount(0);
+      if (otherDefendantName === defendantName) {
+        continue;
       }
+      await performValidation(release14Enabled ? 'textNotVisible' : 'text', {
+        elementType: 'summaryListValue',
+        text: otherDefendantName,
+      });
     }
     await performValidations(
       'View the response page validation',
@@ -174,18 +194,27 @@ export class CitizenDashboardAction implements IAction {
       ['viewClaimOrResponseTable', viewTheResponse.counterclaimSubHeader, viewTheResponse.counterclaimDetails],
       ['viewClaimOrResponseTable', viewTheResponse.statementOfTruthSubHeader, getStatementOfTruthDetails(defendantName)]
     );
-    await expect(async () => {
-      await performAction('reloadPage');
-      await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
-      await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
+    await performAction('reloadPage');
+    await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
+    await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
+    if (await getLdFlag(RELEASE_1_4_ENABLED)) {
       await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.counterClaimPDFLink });
-    }).toPass({
-      timeout: 30_000,
-      intervals: [1_000, 2_000, 3_000],
-    });
+    } else {
+      await performValidation('textNotVisible', {
+        elementType: 'link',
+        text: viewTheResponse.counterClaimPDFLink,
+      });
+    }
   }
 
   private async verifyClaimDetailsOnViewTheClaimPage(): Promise<void> {
+    const defendantDetails = getPinUsersInClaimOrder().map((defendant, index) => ({
+      ...viewTheClaim[
+        `defendant${index + 1}Details` as 'defendant1Details' | 'defendant2Details' | 'defendant3Details'
+      ],
+      Name: `${defendant.firstName} ${defendant.lastName}`,
+    }));
+
     await performValidation('viewClaimHeaderDetails', '', viewTheClaim.dateAndCaseDetails);
     await performValidation('viewClaimHeaderDetails', '', {
       ...viewTheClaim.dateAndCaseDetails,
@@ -195,9 +224,9 @@ export class CitizenDashboardAction implements IAction {
     await performValidations(
       'View the claim page validation',
       ['viewClaimOrResponseTable', viewTheClaim.claimantDetailsSubHeader, viewTheClaim.claimantDetails],
-      ['viewClaimOrResponseTable', viewTheClaim.defendant1SubHeader, viewTheClaim.defendant1Details],
-      ['viewClaimOrResponseTable', viewTheClaim.defendant2SubHeader, viewTheClaim.defendant2Details],
-      ['viewClaimOrResponseTable', viewTheClaim.defendant3SubHeader, viewTheClaim.defendant3Details],
+      ['viewClaimOrResponseTable', viewTheClaim.defendant1SubHeader, defendantDetails[0]],
+      ['viewClaimOrResponseTable', viewTheClaim.defendant2SubHeader, defendantDetails[1]],
+      ['viewClaimOrResponseTable', viewTheClaim.defendant3SubHeader, defendantDetails[2]],
       ['viewClaimOrResponseTable', viewTheClaim.claimDetailsSubHeader, viewTheClaim.claimDetails],
       ['viewClaimOrResponseTable', viewTheClaim.rentArrearsSubHeader, viewTheClaim.rentArrearsDetails],
       ['viewClaimOrResponseTable', viewTheClaim.actionTakenSubHeader, viewTheClaim.actionTakenDetails],
