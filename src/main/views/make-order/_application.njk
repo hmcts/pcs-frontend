@@ -6,9 +6,10 @@
   The details are folded away, as the judge has the file, but for the application the judge's task asked them to
   decide, which is open and which the order must decide. Any other may be left as it is.
 
-  The applicant’s wording can be inserted when supplied. A freeform decision leaves the wording to the judge. Adjourning, offered on an application to adjourn a
-  hearing, adjourns it to a further hearing or generally, as the adjournment tab does. Suspending
-  enforcement, offered on an application to suspend it, does so on the conditions a suspended possession order has.
+  Using the applicant's wording, offered when they supplied a draft order, has the judge insert it into the order; a
+  freeform decision leaves the wording to the judge. Adjourning, offered on an application to adjourn a hearing,
+  adjourns it to a further hearing or generally, as the adjournment tab does. Suspending enforcement, offered on an
+  application to suspend it, does so on the conditions a suspended possession order has.
   Listing it for a hearing asks when, as the adjournment tab does, and leaves the application open, as not dealing with
   it does; any other decision closes it. Inline radios can't reveal a question, so what follows a decision is on its own
   rows, shown while it is chosen (initApplicationDecisions in make-order.ts).
@@ -66,6 +67,7 @@
   them to decide, which starts undecided.
 #}
 {% macro decision(application) %}
+  {% set applicantWording = (application.draftOrderWording or "") | trim %}
   {% set prefix = application.prefix %}
   {% set name = prefix + "-decision" %}
   {#
@@ -91,7 +93,7 @@
   {% set items = items.concat([
     { value: "list", text: "Listed for a hearing" }
   ]) %}
-  {% if (application.draftOrderWording or "") | trim %}
+  {% if applicantWording %}
     {% set items = items.concat([{ value: "applicant-wording", text: "Use the applicant’s wording" }]) %}
   {% endif %}
   {% set items = items.concat([{ value: "freeform", text: "Freeform" }]) %}
@@ -101,7 +103,7 @@
     default: none if application.required else "none",
     items: items
   }) }}
-  {% if (application.draftOrderWording or "") | trim %}
+  {% if applicantWording %}
     <div data-decision-shows="applicant-wording" {%- if not draftChecked(name, "applicant-wording") %} hidden{% endif %}>
       <input type="hidden" name="{{ prefix }}-applicant-wording-inserted"
              value="{{ 'yes' if draftChecked(prefix + '-applicant-wording-inserted', 'yes') else '' }}">

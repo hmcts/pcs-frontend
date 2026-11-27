@@ -15,7 +15,7 @@ import {
   value,
   values,
 } from './common';
-import { addPaymentConditions } from './payment-conditions';
+import { addPaymentTermsList } from './payment-conditions';
 
 export function addSuspendedClauses(list: OrderedListBuilder, data: OrderData): void {
   const address = data.propertyAddress || '[property address not provided]';
@@ -48,10 +48,13 @@ export function addSuspendedClauses(list: OrderedListBuilder, data: OrderData): 
     });
   }
 
-  const fixedIntroduction =
+  addPaymentTermsList(
+    list,
+    data,
+    'suspended',
     `${sentenceCase(claimant)} may not enforce the possession order or any money judgment or costs order suspended on the same terms for as long as ` +
-    `${defendant} ${defendantVerb('pays', 'pay')} the current rent when it is due and ${defendantVerb('makes', 'make')} the following payments towards the arrears and any sums suspended on those terms:`;
-  addPaymentConditions(list, data, 'suspended', fixedIntroduction, { fixedIntroduction: true });
+      `${defendant} ${defendantVerb('pays', 'pay')} the current rent when it is due and ${defendantVerb('makes', 'make')} the following payments towards the arrears and any sums suspended on those terms:`
+  );
   list.item(
     'suspended-paid-in-full',
     `Any payments made by ${defendant} in addition to the current rent will first reduce the rent arrears and then any costs order suspended on those terms. ` +

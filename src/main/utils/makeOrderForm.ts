@@ -245,6 +245,7 @@ export function withoutUnchosenNoticeDates(formData: FormData): FormData {
   );
 }
 
+/** The days an order made of the court's own initiative or without notice gives to apply against it, unless changed. */
 const NOTICE_APPLY_BY_DAYS = 10;
 
 /** A date some days from today in London, moved to the next working day, as the parts of a date input. */

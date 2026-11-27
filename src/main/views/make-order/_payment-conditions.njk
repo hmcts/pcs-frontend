@@ -1,11 +1,12 @@
 {#
   What a suspension is conditional on: the arrears, paid with the rent, and how they are paid. A suspended
-  possession order and a suspended enforcement ask it alike, with ids that start with the prefix. The conditions are
-  one question, each payment row named for assistive technology.
+  possession order and a suspended enforcement ask it alike, with ids that start with the prefix, but a suspended
+  possession order asks its arrears with the money judgment instead. The conditions are one question, each payment
+  row named for assistive technology.
 #}
 {% import "make-order/_compact.njk" as compact with context %}
 
-{% macro paymentConditions(prefix, legend) %}
+{% macro paymentConditions(prefix, legend, askArrears = true) %}
   {% set oneOffHtml %}
     {% call compact.row({ groupLabel: "One-off payment" }) %}
       {{ compact.money({ id: prefix + "-oneoff-amount", label: "One-off payment amount", labelHidden: true }) }}
@@ -29,15 +30,17 @@
   <div class="govuk-form-group">
     <fieldset class="govuk-fieldset">
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ legend }}</legend>
-      {% call compact.row({ classes: "govuk-!-margin-bottom-4" }) %}
-        {{ compact.copy("Arrears for the money judgment, if ordered" if prefix == "suspended" else "Payment of current rent plus arrears of") }}
-        {{ compact.money({
-          id: prefix + "-arrears",
-          label: "Arrears",
-          labelHidden: true,
-          formGroupClasses: "govuk-!-margin-bottom-0"
-        }) }}
-      {% endcall %}
+      {% if askArrears %}
+        {% call compact.row({ classes: "govuk-!-margin-bottom-4" }) %}
+          {{ compact.copy("Payment of current rent plus arrears of") }}
+          {{ compact.money({
+            id: prefix + "-arrears",
+            label: "Arrears",
+            labelHidden: true,
+            formGroupClasses: "govuk-!-margin-bottom-0"
+          }) }}
+        {% endcall %}
+      {% endif %}
 
       {# A single payment and instalments may both apply. #}
       {{ compact.checkboxes(prefix + "-payment-terms", {

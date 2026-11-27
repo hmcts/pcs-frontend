@@ -158,16 +158,11 @@ function validateCosts(formData: Record<string, unknown>, suspended: boolean): M
   return error ? [{ id, message: error }] : [];
 }
 
-/** The arrears a suspension is conditional on and how they are paid, asked with ids that start with the prefix. */
-function validatePaymentConditions(
-  formData: Record<string, unknown>,
-  prefix: string,
-  requiresArrears = true
-): MakeOrderValidationIssue[] {
-  const { issues, add, money, optionalMoney, date, frequency } = validation(formData);
+/** How a suspension's payments are made, asked with ids that start with the prefix. */
+function validatePaymentTerms(formData: Record<string, unknown>, prefix: string): MakeOrderValidationIssue[] {
+  const { issues, add, money, date, frequency } = validation(formData);
   const terms = values(formData, `${prefix}-payment-terms`);
 
-  (requiresArrears ? money : optionalMoney)(`${prefix}-arrears`, 'Enter valid arrears');
   add(
     terms.includes('one-off') || terms.includes('instalments'),
     `${prefix}-payment-terms`,
@@ -185,6 +180,13 @@ function validatePaymentConditions(
   return issues;
 }
 
+/** The arrears a suspension is conditional on and how they are paid, asked with ids that start with the prefix. */
+function validatePaymentConditions(formData: Record<string, unknown>, prefix: string): MakeOrderValidationIssue[] {
+  const { issues, money } = validation(formData);
+  money(`${prefix}-arrears`, 'Enter valid arrears');
+  return [...issues, ...validatePaymentTerms(formData, prefix)];
+}
+
 /** The time possession is ordered by, which the judge may leave blank. */
 function possessionTime(formData: Record<string, unknown>, id: string): MakeOrderValidationIssue[] {
   const time = value(formData, id);
@@ -192,15 +194,13 @@ function possessionTime(formData: Record<string, unknown>, id: string): MakeOrde
 }
 
 function validateSuspended(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
-  const { issues, date } = validation(formData);
+  const { issues, date, money, optionalMoney } = validation(formData);
   date('suspended-by-date', 'Enter a valid possession date');
-  issues.push(...possessionTime(formData, 'suspended-by-time'));
+  issues.push(...possessionTime(formData, 'suspended-by-time'), ...validatePaymentTerms(formData, 'suspended'));
+  // The arrears are the money judgment's, asked with it.
   const ordersMoneyJudgment = values(formData, 'suspended-options').includes('money-judgment-arrears');
-  return [
-    ...issues,
-    ...validatePaymentConditions(formData, 'suspended', ordersMoneyJudgment),
-    ...validateCosts(formData, true),
-  ];
+  (ordersMoneyJudgment ? money : optionalMoney)('suspended-arrears', 'Enter valid arrears');
+  return [...issues, ...validateCosts(formData, true)];
 }
 
 function validateOutright(formData: Record<string, unknown>): MakeOrderValidationIssue[] {

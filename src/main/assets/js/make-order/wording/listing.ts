@@ -37,7 +37,7 @@ function timeEstimate(data: OrderData, prefix: string): string {
 
 /**
  * The clauses listing a hearing, from the listing questions the form asks with the prefix: when it is and for
- * how long, then any directions before it. The order says what happens to the subject, as in "The claim shall be
+ * how long, in what format where `withFormat` asks for it, then any directions before it. The order says what happens to the subject, as in "The claim shall be
  * adjourned to"; ids names the clauses and facts, as the adjournment order always has.
  */
 export function addListing(
@@ -45,7 +45,8 @@ export function addListing(
   data: OrderData,
   prefix: string,
   ids: string,
-  happens: string
+  happens: string,
+  { withFormat = false } = {}
 ): void {
   const labels = partyLabels(data);
   const when = value(data, `${prefix}-when`) || 'next-list';
@@ -63,13 +64,9 @@ export function addListing(
       .text(' with a time estimate of ')
       .fact(`${ids}-time-estimate`, timeEstimate(data, prefix), { sourceId: `${prefix}-time-estimate-group` })
       .text(when === 'specific' ? '.' : '. Further details of the hearing will be provided by the Court.');
-    if (prefix === 'adj') {
-      const formats = values(data, `${prefix}-format`)
-        .map(format => HEARING_FORMATS[format])
-        .filter(Boolean);
-      if (formats.length) {
-        content.text(` The hearing will be ${formats.join(' or ')}.`);
-      }
+    const formats = withFormat ? values(data, `${prefix}-format`).flatMap(format => HEARING_FORMATS[format] ?? []) : [];
+    if (formats.length) {
+      content.text(` The hearing will be ${formats.join(' or ')}.`);
     }
   });
   const directions = values(data, `${prefix}-directions`);

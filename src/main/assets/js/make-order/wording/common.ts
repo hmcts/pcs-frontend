@@ -74,13 +74,23 @@ export function partyLabels(data: OrderData): {
   };
 }
 
-const ATTENDANCE_ROLES: Record<string, (party: string) => string> = {
-  counsel: party => `counsel for ${party}`,
-  solicitor: party => `solicitor for ${party}`,
-  'solicitor-agent': party => `solicitor's agent for ${party}`,
-  'housing-officer': party => `the housing officer on behalf of ${party}`,
-  'duty-adviser': party => `the duty adviser on behalf of ${party}`,
-  'litigant-in-person': party => `${party} in person`,
+/**
+ * How the order describes who spoke for a party: after their name ("Sam Solicitor, solicitor for the Claimant"), or
+ * as `unnamed` says when no name was given. A litigant in person is never named, as the order names the party.
+ */
+const ATTENDANCE_ROLES: Record<
+  string,
+  { role: (party: string) => string; unnamed?: (party: string) => string; nameless?: true }
+> = {
+  counsel: { role: party => `counsel for ${party}`, unnamed: party => `Counsel for ${party}` },
+  solicitor: { role: party => `solicitor for ${party}`, unnamed: party => `the solicitor for ${party}` },
+  'solicitor-agent': {
+    role: party => `solicitor's agent for ${party}`,
+    unnamed: party => `the solicitor's agent for ${party}`,
+  },
+  'housing-officer': { role: party => `the housing officer on behalf of ${party}` },
+  'duty-adviser': { role: party => `the duty adviser on behalf of ${party}` },
+  'litigant-in-person': { role: party => `${party} in person`, nameless: true },
 };
 
 /**
@@ -103,14 +113,20 @@ function addApplicationRecitals(order: DocBuilder, data: OrderData, after: boole
 
 const PARTY_ORDINALS = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
 
+function ordinal(position: number): string {
+  const n = position + 1;
+  const suffix = n % 100 >= 11 && n % 100 <= 13 ? 'th' : (['th', 'st', 'nd', 'rd'][n % 10] ?? 'th');
+  return PARTY_ORDINALS[position] ?? `${n}${suffix}`;
+}
+
+/** "the Claimant", or "the Second Defendant" where the case has more than one of that role. */
 export function partyReference(data: OrderData, kind: 'claimant' | 'defendant', position: number): string {
   const parties = kind === 'claimant' ? data.claimants : data.defendants;
   const role = sentenceCase(kind);
-  if (parties.length < 2 || position < 0) {
+  if (parties.length < 2) {
     return `the ${role}`;
   }
-  const ordinal = PARTY_ORDINALS[position];
-  return ordinal ? `the ${ordinal} ${role}` : `${role} ${position + 1}`;
+  return position < 0 ? `[${kind} not found]` : `the ${ordinal(position)} ${role}`;
 }
 
 function attendanceParty(entry: AttendanceEntry, data: OrderData): string {
@@ -122,64 +138,60 @@ function attendanceParty(entry: AttendanceEntry, data: OrderData): string {
   );
 }
 
+/**
+ * One sentence of who the Court heard from, whose letters it read and who did not attend. A representative named
+ * for several parties is heard from once, for them all.
+ */
 function addAttendance(order: DocBuilder, data: OrderData): void {
-  const heard: { choice: string; name: string; parties: string[] }[] = [];
-  const letters: AttendanceEntry[] = [];
-  const absent: AttendanceEntry[] = [];
-  for (const entry of data.attendance) {
+  const heard = new Map<string, { choice: string; name: string; parties: string[] }>();
+  const letters: string[] = [];
+  const absent: string[] = [];
+  let firstLetter: AttendanceEntry | undefined;
+  let firstAbsent: AttendanceEntry | undefined;
+  data.attendance.forEach((entry, index) => {
     const party = attendanceParty(entry, data);
     if (entry.choice === 'letter-only') {
-      letters.push(entry);
+      firstLetter ??= entry;
+      letters.push(party);
     } else if (entry.choice === 'not-present') {
-      absent.push(entry);
+      firstAbsent ??= entry;
+      absent.push(party);
     } else if (ATTENDANCE_ROLES[entry.choice]) {
-      const name = entry.choice === 'litigant-in-person' ? '' : entry.representativeName;
-      const representative = name && heard.find(item => item.name === name && item.choice === entry.choice);
-      if (representative) {
-        representative.parties.push(party);
-      } else {
-        heard.push({ choice: entry.choice, name, parties: [party] });
-      }
+      const name = ATTENDANCE_ROLES[entry.choice].nameless ? '' : entry.representativeName;
+      const key = name ? `${entry.choice}|${name}` : String(index);
+      const speaker = heard.get(key) ?? heard.set(key, { choice: entry.choice, name, parties: [] }).get(key)!;
+      speaker.parties.push(party);
     }
-  }
-  const spoken = heard.map(({ choice, name, parties }) => {
-    const description = ATTENDANCE_ROLES[choice](joinList(parties));
-    if (name) {
-      return `${name}, ${description}`;
-    }
-    return choice === 'solicitor'
-      ? `the ${description}`
-      : choice === 'counsel'
-        ? sentenceCase(description)
-        : description;
   });
-  const firstAbsent = absent[0];
-  const absentParties = joinList(absent.map(entry => attendanceParty(entry, data)));
-  const absence = `${absentParties} did not attend`;
-  if (spoken.length || letters.length) {
-    const speakers =
-      spoken.length > 1 && spoken.some(speaker => speaker.includes(','))
-        ? `${spoken.slice(0, -1).join(', ')}, and ${spoken[spoken.length - 1]}`
-        : joinList(spoken);
-    const heardFrom = spoken.length ? `heard from ${speakers}` : '';
-    const readFrom = letters.length
-      ? `read ${letters.length === 1 ? 'a letter' : 'letters'} from ${joinList(
-          letters.map(entry => attendanceParty(entry, data))
-        )}`
-      : '';
-    const attendance = joinList([heardFrom, readFrom].filter(Boolean));
-    const wording = `The Court ${attendance}${firstAbsent ? ` and ${absence}` : ''}.`;
-    if (spoken.length) {
-      order.paragraph('attendance-heard', wording);
-    } else {
-      const firstLetter = letters[0];
-      order.paragraph(`attendance-letter-${firstLetter.rowIndex}`, content => {
-        content.fact('attendance', wording, { sourceId: firstLetter.sourceId });
-      });
-    }
-  } else if (firstAbsent) {
-    order.paragraph(`attendance-absent-${firstAbsent.rowIndex}`, content => {
-      content.fact('attendance', `${sentenceCase(absence)}.`, { sourceId: firstAbsent.sourceId });
+
+  const spoken = [...heard.values()].map(({ choice, name, parties }) => {
+    const { role, unnamed = role } = ATTENDANCE_ROLES[choice];
+    return name ? `${name}, ${role(joinList(parties))}` : unnamed(joinList(parties));
+  });
+  // A named speaker's description has a comma in it, so the list separates them with commas throughout.
+  const speakers =
+    spoken.length > 1 && spoken.some(speaker => speaker.includes(','))
+      ? `${spoken.slice(0, -1).join(', ')}, and ${spoken[spoken.length - 1]}`
+      : joinList(spoken);
+  const clauses = [
+    spoken.length ? `heard from ${speakers}` : '',
+    letters.length ? `read ${letters.length === 1 ? 'a letter' : 'letters'} from ${joinList(letters)}` : '',
+  ].filter(Boolean);
+  const absence = absent.length ? `${joinList(absent)} did not attend` : '';
+  const wording = clauses.length
+    ? `The Court ${joinList(clauses)}${absence ? ` and ${absence}` : ''}.`
+    : absence && `${sentenceCase(absence)}.`;
+  if (!wording) {
+    return;
+  }
+  // Wording from what was heard is plain text; otherwise it is a fact linked back to the first letter or absence.
+  const source = spoken.length ? undefined : (firstLetter ?? firstAbsent);
+  if (!source) {
+    order.paragraph('attendance-heard', wording);
+  } else {
+    const id = `attendance-${source === firstLetter ? 'letter' : 'absent'}-${source.rowIndex}`;
+    order.paragraph(id, content => {
+      content.fact('attendance', wording, { sourceId: source.sourceId });
     });
   }
 }

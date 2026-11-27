@@ -20,7 +20,7 @@ export function addAdjournmentClauses(list: OrderedListBuilder, data: OrderData)
 
   if (type === 'further-hearing') {
     const hearing = chosen.includes('counterclaim') ? `The hearing of ${subject}` : 'The hearing';
-    addListing(list, data, 'adj', 'adjournment', `${hearing} is adjourned to`);
+    addListing(list, data, 'adj', 'adjournment', `${hearing} is adjourned to`, { withFormat: true });
   } else if (type) {
     const instalments = ['current-rent-plus', 'payments'].find(option => conditions.includes(option));
     const restore = conditions.includes('restore');

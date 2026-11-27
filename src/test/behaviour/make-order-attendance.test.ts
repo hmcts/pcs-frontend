@@ -37,6 +37,9 @@ describe('make an order: attendance', () => {
 
     check('claimant-claimant-id-attendance', 'housing-officer');
     check('defendant-defendant-id-attendance', 'letter-only');
+    // A letter names no one who attended, so its name is not asked.
+    expect(control<HTMLInputElement>('[name="defendant-defendant-id-name"]').disabled).toBe(true);
+    expect(control<HTMLInputElement>('[name="claimant-claimant-id-name"]').disabled).toBe(false);
     // The name of whoever attended is optional; the order then names their role alone.
     expect(page.orderText()).toContain(
       'The Court heard from the housing officer on behalf of the Claimant and read a letter from the Defendant.'
