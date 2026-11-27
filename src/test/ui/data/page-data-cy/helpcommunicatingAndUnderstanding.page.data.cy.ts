@@ -1,0 +1,15 @@
+export const helpcommunicatingAndUnderstanding = {
+  mainHeader: `Rwyf angen cymorth gyda chyfathrebu a deall pethau`,
+  backLink: `Yn ôl`,
+  continueButton: `Parhau`,
+  cancelLink: `Canslo`,
+  explanationOfCourtOrTribunalAndWhosInTheRoomCheckbox: `Esboniad o osodiad y llys neu’r tribiwnlys a phwy fydd yn yr ystafell wrandawiadau`,
+  extraTimeToThinkAndExplainMyselfCheckbox: `Amser ychwanegol i feddwl ac egluro fy hun`,
+  hearingEnhancementSystemCheckbox: `System Gwella Clyw (Dolen Glyw/Sain, Derbynnydd Isgoch)`,
+  intermediaryCheckbox: `Cyfryngwr`,
+  needToBeCloseToWhoIsSpeakingCheckbox: `Angen bod yn agos at bwy bynnag sy'n siarad`,
+  signLanguageInterpreterCheckbox: `Dehonglydd Iaith Arwyddion`,
+  visitToCourtOrTribunalBeforeTheHearingCheckbox: `Ymweld â’r llys neu’r tribiwnlys cyn y gwrandawiad`,
+  otherCheckbox: `Arall`,
+  noHelpCommunicatingAndUnderstandingCheckbox: `Nid oes arnaf angen unrhyw gymorth gyda chyfathrebu a deall ar hyn o bryd`,
+};

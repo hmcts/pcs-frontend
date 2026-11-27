@@ -13,8 +13,8 @@ import {
 
 import type { DocumentStorage } from '@modules/documents/storage';
 import type { BuiltFormContent } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import { RELEASE_1_4_ENABLED } from '@utils/featureFlags';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
-import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 
 const mockGetLaunchDarklyFlag = getLaunchDarklyFlag as jest.MockedFunction<typeof getLaunchDarklyFlag>;
 

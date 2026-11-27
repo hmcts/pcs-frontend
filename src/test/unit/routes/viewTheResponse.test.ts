@@ -11,9 +11,9 @@ import { getRequestLanguage, getTranslationFunction } from '@modules/i18n';
 import viewTheResponseRoute from '@routes/viewTheResponse';
 import type { CcdCaseData, CcdDefendantResponses } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { RELEASE_1_4_ENABLED } from '@utils/featureFlags';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
-import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 
 const mockIsRespondToClaimEnabledForRelease = isRespondToClaimEnabledForRelease as jest.MockedFunction<
   typeof isRespondToClaimEnabledForRelease
