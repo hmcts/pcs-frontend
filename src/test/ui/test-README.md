@@ -146,26 +146,6 @@ For **Jenkins nightly**, pick `E2E_TARGET_ENV` (`aat`, `demo`, `perftest`, or `i
 yarn test:functional
 ```
 
-### IDAM sign-in compatibility
-
-The shared browser login helper supports both `idam-web-public` (email and password
-on one page) and `idam-hmcts-access` (email, then password, with an optional
-**Sign in or create an account** landing page, or direct entry to the password page).
-Following `idam-user-dashboard`, the helper identifies each page by its heading,
-fills fields by label with a field-name fallback, and checks the email-to-password
-transition. Unexpected headings fail explicitly. The group-access tests use the same
-helper, including checks performed in an isolated browser session.
-
-Point `TEST_URL` at the PCS deployment to test. That deployment's `OIDC_ISSUER`
-and IDAM discovery metadata determine the authentication endpoints and sign-in UI;
-the tests recognise the pages automatically. To exercise both UIs end to end, run
-the same smoke/functional suite against deployments configured for each UI.
-Changing `IDAM_WEB_URL` in the test process alone does not switch browser sign-in:
-that variable is used by the API helpers. Keep those API URLs pointing at the
-corresponding IDAM backend and testing-support service.
-
-MFA and external-provider sign-in are outside this password-login helper's scope.
-
 ### PFT test-env debug logging
 
 In [`playwright.config.ts`](../../../playwright.config.ts), `enable_pft_debug_log` is **`false` by default**. Set it to **`true`** if you want environment variables to be printed in the console while you debug.
