@@ -5,6 +5,7 @@
   "beforeUploadHeading": "cyBefore you upload your file",
   "beforeUploadText": "cyGive your file a name that explains what it is. For example, 'Notice for 15 Garden Drive’",
   "uploadLabel": "cyUpload files",
+  "uploadHint": "cyYou can upload a PDF, Word (DOCX) or Excel (XLSX) file. Each file must be smaller than 20MB.",
   "uploadButton": "cyUpload file",
   "filesAddedHeading": "cyFiles added",
   "deleteButton": "cyRemove",

@@ -5,6 +5,7 @@
   "beforeUploadHeading": "Before you upload your file",
   "beforeUploadText": "Give your file a name that explains what it is. For example, 'tenancy agreement - 15 Garden Drive'",
   "uploadLabel": "Upload files",
+  "uploadHint": "You can upload a PDF, Word (DOCX) or Excel (XLSX) file. Each file must be smaller than 20MB.",
   "uploadButton": "Upload file",
   "filesAddedHeading": "Files added",
   "deleteButton": "Remove",

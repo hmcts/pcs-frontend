@@ -8,7 +8,9 @@ import {
   UPLOAD_MAX_MEDIA_FILE_SIZE_MB,
   UPLOAD_MAX_TOTAL_SIZE_BYTES,
   UPLOAD_MAX_TOTAL_SIZE_MB,
+  type UploadRestriction,
   type ValidatableFile,
+  effectivePerFileByteLimit,
   formatSizeForDisplay,
   getFileExtensionLower,
   getUploadErrorKey,
@@ -405,6 +407,99 @@ describe('documentUploadValidation', () => {
         key: 'errors.documentUpload.fileTooLargeDocStore',
         params: { maxSize: 100 },
       });
+    });
+  });
+
+  describe('with a restriction', () => {
+    const DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    const XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    const restriction: UploadRestriction = {
+      types: [
+        { extension: '.pdf', mimeType: 'application/pdf' },
+        { extension: '.docx', mimeType: DOCX },
+        { extension: '.xlsx', mimeType: XLSX },
+      ],
+      maxBytes: 20 * MB,
+      wrongTypeKey: 'errors.documentUpload.restrictedFileType',
+      tooLargeKey: 'errors.documentUpload.restrictedFileTooLarge',
+    };
+
+    it.each([
+      ['statement.pdf', 'application/pdf'],
+      ['statement.PDF', 'application/pdf'],
+      ['statement.docx', DOCX],
+      ['statement.xlsx', XLSX],
+      ['statement.pdf', ''],
+      ['statement.docx', 'application/octet-stream'],
+    ])('allows %s sent as "%s"', (originalname, mimetype) => {
+      expect(validateUploadedFile(file({ originalname, mimetype }), { restriction })).toBeNull();
+    });
+
+    it.each([
+      ['statement.doc', 'application/msword'],
+      ['statement.xls', 'application/vnd.ms-excel'],
+      ['statement.docm', 'application/vnd.ms-word.document.macroEnabled.12'],
+      ['statement.xlsm', 'application/vnd.ms-excel.sheet.macroEnabled.12'],
+      ['statement.csv', 'text/csv'],
+      ['statement.jpg', 'image/jpeg'],
+      ['statement.png', 'image/png'],
+      ['statement.txt', 'text/plain'],
+      ['statement', 'application/pdf'],
+    ])('refuses %s sent as "%s"', (originalname, mimetype) => {
+      expect(validateUploadedFile(file({ originalname, mimetype }), { restriction })).toEqual({
+        kind: 'invalid_type',
+      });
+    });
+
+    it('refuses an extension whose MIME type belongs to another allowed type', () => {
+      expect(validateFileType(XLSX, 'statement.pdf', restriction)).toBe('invalid_type');
+    });
+
+    it('refuses an .xlsm sent as application/vnd.ms-excel, which the general allowlist accepts', () => {
+      expect(validateFileType('application/vnd.ms-excel', 'statement.xlsm')).toBe('ok');
+      expect(validateFileType('application/vnd.ms-excel', 'statement.xlsm', restriction)).toBe('invalid_type');
+    });
+
+    it('refuses a blocked media file as the wrong type', () => {
+      expect(validateUploadedFile(file({ originalname: 'a.mp4', mimetype: 'video/mp4' }), { restriction })).toEqual({
+        kind: 'blocked_media',
+      });
+      expect(getUploadErrorKey({ kind: 'blocked_media' }, restriction).key).toBe(restriction.wrongTypeKey);
+    });
+
+    it('allows a file of exactly the limit and refuses one byte over', () => {
+      expect(validateUploadedFile(file({ size: 20 * MB }), { restriction })).toBeNull();
+      expect(validateUploadedFile(file({ size: 20 * MB + 1 }), { restriction })).toEqual({
+        kind: 'file_too_large',
+        maxBytes: 20 * MB,
+      });
+    });
+
+    it('still refuses a name that is too long', () => {
+      const originalname = `${'a'.repeat(UPLOAD_MAX_FILENAME_LENGTH)}.pdf`;
+      expect(validateFileType('application/pdf', originalname, restriction)).toBe('filename_too_long');
+    });
+
+    it('uses the restriction messages and its own size', () => {
+      expect(getUploadErrorKey({ kind: 'invalid_type' }, restriction)).toEqual({
+        key: 'errors.documentUpload.restrictedFileType',
+      });
+      expect(getUploadErrorKey({ kind: 'file_too_large', maxBytes: 20 * MB }, restriction)).toEqual({
+        key: 'errors.documentUpload.restrictedFileTooLarge',
+        params: { maxSize: '20MB' },
+      });
+    });
+
+    it('caps what the upload route accepts at the restriction size', () => {
+      expect(effectivePerFileByteLimit({ restriction })).toBe(20 * MB);
+      expect(effectivePerFileByteLimit(undefined)).toBe(UPLOAD_MAX_FILE_SIZE_BYTES);
+    });
+
+    it('leaves an unrestricted upload accepting .doc up to the general limit', () => {
+      expect(validateUploadedFile(file({ originalname: 'letter.doc', mimetype: 'application/msword' }), {})).toBeNull();
+      expect(
+        validateUploadedFile(file({ originalname: 'letter.doc', mimetype: 'application/msword', size: 21 * MB }), {})
+      ).toBeNull();
     });
   });
 });

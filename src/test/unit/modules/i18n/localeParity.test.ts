@@ -32,6 +32,10 @@ const UNTRANSLATED_ALLOWLIST = new Set([
   'respondToClaim/legalrep/tenancyDateDetails.json::question',
   'respondToClaim/legalrep/tenancyTypeDetails.json::tenancyTypeOther',
 
+  // Private landlord make a claim upload limits, awaiting the Welsh Language Unit
+  'common.json::errors.documentUpload.restrictedFileType',
+  'common.json::errors.documentUpload.restrictedFileTooLarge',
+
   // Private landlord claimant account page, behind private-landlord-make-a-claim-enabled
   'claimList.json::claimantHeading',
   'claimList.json::claimsMade.heading',

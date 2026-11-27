@@ -31,6 +31,7 @@
     }
   ],
   "uploadLabel": "Upload rent statement",
+  "uploadHint": "You can upload a PDF, Word (DOCX) or Excel (XLSX) file. Each file must be smaller than 20MB.",
   "uploadButton": "Upload file",
   "filesAddedHeading": "Files added",
   "deleteButton": "Remove",

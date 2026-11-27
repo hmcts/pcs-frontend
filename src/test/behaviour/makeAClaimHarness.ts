@@ -48,6 +48,8 @@ export const ccd = {
   cuiRaPayload: undefined as Record<string, unknown> | undefined,
   /** The status PCQ's health check answers with. */
   pcqStatus: 'UP',
+  /** Files CDAM was asked to store. */
+  cdamUploads: 0,
 };
 
 /** pcs-api's draft version: every save that names the stored version moves it on; a stale one is refused. */
@@ -172,6 +174,24 @@ function ccdStub(): Express {
     }
     res.json({ id: CASE_REFERENCE, state: ccd.stored.state, data: ccd.stored });
   });
+  stub.post('/cases/documents', (req: Request, res: Response) => {
+    req.on('data', () => undefined);
+    req.on('end', () => {
+      ccd.cdamUploads += 1;
+      const href = `http://cdam.test/documents/doc-${ccd.cdamUploads}`;
+      res.json({
+        documents: [
+          {
+            originalDocumentName: 'statement.pdf',
+            hashToken: 'hash',
+            mimeType: 'application/pdf',
+            size: 1,
+            _links: { self: { href }, binary: { href: `${href}/binary` } },
+          },
+        ],
+      });
+    });
+  });
   stub.post('/cases/:id/events', (req: Request, res: Response) => {
     ccd.submissions.push(req.body);
     if (ccd.refuseSubmit) {
@@ -228,6 +248,8 @@ export interface HttpResponse {
 export interface TestApp {
   get(path: string): Promise<HttpResponse>;
   post(path: string, body: Record<string, string | string[]>): Promise<HttpResponse>;
+  /** Posts one file as the browser does from an upload page: multipart, in the `documents` field. */
+  upload(path: string, file: { name: string; type: string; content: Buffer }): Promise<HttpResponse>;
   close(): Promise<void>;
 }
 
@@ -258,11 +280,13 @@ export async function bootMakeAClaim(
   ccd.cuiRaRequests = [];
   ccd.cuiRaPayload = undefined;
   ccd.pcqStatus = 'UP';
+  ccd.cdamUploads = 0;
   backend ??= await listen(ccdStub());
   const backendUrl = `http://127.0.0.1:${(backend.address() as AddressInfo).port}`;
   process.env.CCD_URL = backendUrl;
   process.env.PCS_API_URL = backendUrl;
   process.env.CUI_RA_URL = backendUrl;
+  process.env.CDAM_URL = backendUrl;
   process.env.PCQ_URL = `${backendUrl}/pcq`;
   process.env.PAYMENT_RETURN_URL = 'https://pcs.test/payment/return';
 
@@ -273,6 +297,7 @@ export async function bootMakeAClaim(
     { setupErrorHandlers },
     { registerAllJourneys },
     { default: makeAClaimRoutes },
+    { default: documentProxyRoutes },
     { default: paymentReturnRoutes },
     { default: claimListRoutes },
     { default: claimantDashboardRoutes },
@@ -287,6 +312,7 @@ export async function bootMakeAClaim(
     import('../../main/modules/error-handler'),
     import('../../main/routes/registerSteps'),
     import('../../main/routes/makeAClaim'),
+    import('../../main/routes/documentProxy'),
     import('../../main/routes/paymentReturn'),
     import('../../main/routes/claimList'),
     import('../../main/routes/claimantDashboard'),
@@ -335,6 +361,7 @@ export async function bootMakeAClaim(
   app.param('caseReference', middleware.caseReferenceParamMiddleware);
   registerAllJourneys(app);
   makeAClaimRoutes(app);
+  documentProxyRoutes(app);
   paymentReturnRoutes(app);
   claimListRoutes(app);
   claimantDashboardRoutes(app);
@@ -344,11 +371,16 @@ export async function bootMakeAClaim(
   const server = await listen(app);
   const baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
 
-  const request = (method: string, path: string, body?: string): Promise<HttpResponse> =>
+  const request = (
+    method: string,
+    path: string,
+    body?: string | Buffer,
+    contentType = 'application/x-www-form-urlencoded'
+  ): Promise<HttpResponse> =>
     new Promise((resolve, reject) => {
       const req = http.request(
         `${baseUrl}${path}`,
-        { method, agent: false, headers: body ? { 'content-type': 'application/x-www-form-urlencoded' } : {} },
+        { method, agent: false, headers: body ? { 'content-type': contentType } : {} },
         res => {
           let text = '';
           res.setEncoding('utf8');
@@ -373,6 +405,15 @@ export async function bootMakeAClaim(
   return {
     get: path => request('GET', path),
     post: (path, body) => request('POST', path, encode({ action: 'continue', ...body })),
+    upload: (path, file) => {
+      const boundary = '----pcs-test-boundary';
+      const head = Buffer.from(
+        `--${boundary}\r\nContent-Disposition: form-data; name="documents"; filename="${file.name}"\r\n` +
+          `Content-Type: ${file.type}\r\n\r\n`
+      );
+      const body = Buffer.concat([head, file.content, Buffer.from(`\r\n--${boundary}--\r\n`)]);
+      return request('POST', path, body, `multipart/form-data; boundary=${boundary}`);
+    },
     close: () => {
       server.closeAllConnections();
       return new Promise<void>(resolve => server.close(() => resolve()));

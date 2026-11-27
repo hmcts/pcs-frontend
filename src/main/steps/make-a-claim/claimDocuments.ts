@@ -13,7 +13,7 @@ import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.i
 import { ccdCaseService } from '@services/ccdCaseService';
 import type { CitizenPossessionClaim, ClaimDocuments } from '@services/citizenPossessionClaim.interface';
 import { toCaseReference16 } from '@utils/caseReference';
-import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
+import { type UploadRestriction, bytesToMb } from '@utils/documentUploadValidation';
 
 async function freshClaim(req: Request): Promise<{ caseId: string; claim: CitizenPossessionClaim }> {
   const caseId = toCaseReference16(req.params.caseReference);
@@ -66,14 +66,29 @@ export function claimDocumentStorage(
   };
 }
 
+/** What every make-a-claim upload takes: the other formats the general allowlist accepts can carry macros. */
+export const MAKE_A_CLAIM_UPLOAD: UploadRestriction = {
+  types: [
+    { extension: '.pdf', mimeType: 'application/pdf' },
+    {
+      extension: '.docx',
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    },
+    { extension: '.xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+  ],
+  maxBytes: 20 * 1024 * 1024,
+  wrongTypeKey: 'errors.documentUpload.restrictedFileType',
+  tooLargeKey: 'errors.documentUpload.restrictedFileTooLarge',
+};
+
 export function documentsField(required: boolean): FormFieldConfig {
   return {
     name: 'documents',
     type: 'file',
     required,
-    accept: ACCEPT_ATTRIBUTE_EXTENSIONS,
-    maxFileSize: UPLOAD_MAX_FILE_SIZE_MB,
+    accept: MAKE_A_CLAIM_UPLOAD.types.map(type => type.extension).join(','),
+    maxFileSize: bytesToMb(MAKE_A_CLAIM_UPLOAD.maxBytes),
     labelClasses: 'govuk-label--m',
-    translationKey: { label: 'uploadLabel' },
+    translationKey: { label: 'uploadLabel', hint: 'uploadHint' },
   };
 }

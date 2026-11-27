@@ -18,7 +18,7 @@ import type { BuiltFormContent, FormBuilderConfig } from '@modules/steps/formBui
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
-import { type UploadValidationOptions, bytesToMb } from '@utils/documentUploadValidation';
+import { type UploadValidationOptions, bytesToMb, formatSizeForDisplay } from '@utils/documentUploadValidation';
 import { RELEASE_1_4_ENABLED } from '@utils/featureFlags';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 
@@ -49,6 +49,13 @@ export function applyUploadValidationToComponent(
     component.errorFileTooLargeMedia = t('common:errors.documentUpload.fileTooLargeMedia', {
       maxSize: maxMediaMB,
     });
+  }
+  if (opts.restriction) {
+    const { types, maxBytes, wrongTypeKey, tooLargeKey } = opts.restriction;
+    component.allowedExtensions = types.map(type => type.extension).join(',');
+    component.maxFileSize = bytesToMb(maxBytes);
+    component.errorWrongType = t(`common:${wrongTypeKey}`);
+    component.errorFileTooLarge = t(`common:${tooLargeKey}`, { maxSize: formatSizeForDisplay(bytesToMb(maxBytes)) });
   }
 }
 

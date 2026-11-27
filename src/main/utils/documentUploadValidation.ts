@@ -80,7 +80,29 @@ function isUnknownMimeType(mime: string): boolean {
 
 export type FileValidationResult = 'ok' | 'blocked_media' | 'invalid_type' | 'filename_too_long';
 
-export function validateFileType(mimetype: string, originalname: string): FileValidationResult {
+export type AllowedUploadType = { extension: string; mimeType: string };
+
+/**
+ * Narrows an upload to listed types and a smaller size. The error keys name the messages shown in place of the
+ * general upload ones, in the common namespace the upload route and the page both translate from.
+ */
+export type UploadRestriction = {
+  types: readonly AllowedUploadType[];
+  maxBytes: number;
+  wrongTypeKey: string;
+  tooLargeKey: string;
+};
+
+function matchesRestriction(restriction: UploadRestriction, mime: string, ext: string): boolean {
+  const allowed = restriction.types.find(type => type.extension === ext);
+  return allowed !== undefined && (isUnknownMimeType(mime) || mime === allowed.mimeType);
+}
+
+export function validateFileType(
+  mimetype: string,
+  originalname: string,
+  restriction?: UploadRestriction
+): FileValidationResult {
   const ext = getFileExtensionLower(originalname);
   const mime = (mimetype || '').toLowerCase();
 
@@ -90,6 +112,10 @@ export function validateFileType(mimetype: string, originalname: string): FileVa
 
   if (originalname.length > UPLOAD_MAX_FILENAME_LENGTH) {
     return 'filename_too_long';
+  }
+
+  if (restriction) {
+    return matchesRestriction(restriction, mime, ext) ? 'ok' : 'invalid_type';
   }
 
   if (isAllowedMimeType(mime)) {
@@ -108,6 +134,7 @@ export type UploadValidationOptions = {
   maxDocumentBytes?: number;
   maxMediaBytes?: number;
   maxPerFileBytes?: number;
+  restriction?: UploadRestriction;
 };
 
 export type UploadValidationError =
@@ -128,7 +155,7 @@ export function validateUploadedFile(
   file: ValidatableFile,
   opts: UploadValidationOptions = {}
 ): UploadValidationError | null {
-  const typeResult = validateFileType(file.mimetype, file.originalname);
+  const typeResult = validateFileType(file.mimetype, file.originalname, opts.restriction);
   if (typeResult === 'blocked_media') {
     return { kind: 'blocked_media' };
   }
@@ -138,6 +165,12 @@ export function validateUploadedFile(
 
   if (opts.maxFilenameLength !== undefined && file.originalname.length > opts.maxFilenameLength) {
     return { kind: 'filename_too_long', maxLength: opts.maxFilenameLength };
+  }
+
+  if (opts.restriction) {
+    return file.size > opts.restriction.maxBytes
+      ? { kind: 'file_too_large', maxBytes: opts.restriction.maxBytes }
+      : null;
   }
 
   const isMedia = isMediaExtension(file.originalname);
@@ -167,6 +200,9 @@ export function bytesToMb(bytes: number): number {
 }
 
 export function effectivePerFileByteLimit(opts: UploadValidationOptions | undefined): number {
+  if (opts?.restriction) {
+    return opts.restriction.maxBytes;
+  }
   return Math.max(
     opts?.maxPerFileBytes ?? 0,
     opts?.maxDocumentBytes ?? 0,
@@ -175,7 +211,18 @@ export function effectivePerFileByteLimit(opts: UploadValidationOptions | undefi
   );
 }
 
-export function getUploadErrorKey(error: UploadValidationError): UploadErrorTranslation {
+export function getUploadErrorKey(
+  error: UploadValidationError,
+  restriction?: UploadRestriction
+): UploadErrorTranslation {
+  if (restriction) {
+    if (error.kind === 'blocked_media' || error.kind === 'invalid_type') {
+      return { key: restriction.wrongTypeKey };
+    }
+    if (error.kind === 'file_too_large') {
+      return { key: restriction.tooLargeKey, params: { maxSize: formatSizeForDisplay(bytesToMb(error.maxBytes)) } };
+    }
+  }
   switch (error.kind) {
     case 'blocked_media':
     case 'invalid_type':

@@ -1,6 +1,11 @@
 import { MultiFileUpload } from '@ministryofjustice/frontend';
 
-import { isAllowedExtension, isBlockedExtension, isMediaExtension } from '@utils/fileExtensionValidation';
+import {
+  getFileExtensionLower,
+  isAllowedExtension,
+  isBlockedExtension,
+  isMediaExtension,
+} from '@utils/fileExtensionValidation';
 
 const uploadInstances = new WeakMap<HTMLElement, MultiFileUpload>();
 
@@ -234,6 +239,7 @@ function initContainer(container: HTMLElement): void {
   const maxMediaMb = Number.parseInt(container.dataset.maxMediaMb || '0', 10);
   const maxMediaBytes = maxMediaMb > 0 ? maxMediaMb * 1024 * 1024 : 0;
   const maxFilenameLength = Number.parseInt(container.dataset.maxFilenameLength || '0', 10);
+  const allowedExtensions = (container.dataset.allowedExtensions || '').split(',').filter(Boolean);
   const wrongTypeMessage = container.dataset.errorWrongType || '';
   const tooLargeMessage = container.dataset.errorFileTooLarge || '';
   const tooLargeMediaMessage = container.dataset.errorFileTooLargeMedia || tooLargeMessage;
@@ -278,7 +284,11 @@ function initContainer(container: HTMLElement): void {
           showErrorSummary(container, filenameTooLongMessage, errorSummaryTitle);
           throw new Error('filename_too_long');
         }
-        if (!isAllowedExtension(file.name)) {
+        const typeAllowed =
+          allowedExtensions.length > 0
+            ? allowedExtensions.includes(getFileExtensionLower(file.name))
+            : isAllowedExtension(file.name);
+        if (!typeAllowed) {
           showErrorSummary(container, wrongTypeMessage, errorSummaryTitle);
           throw new Error('invalid_type');
         }

@@ -22,6 +22,10 @@ jest.mock('@ministryofjustice/frontend', () => ({
 }));
 
 jest.mock('@utils/fileExtensionValidation', () => ({
+  getFileExtensionLower: jest.fn((filename: string) => {
+    const i = filename.lastIndexOf('.');
+    return i >= 0 ? filename.slice(i).toLowerCase() : '';
+  }),
   isBlockedExtension: jest.fn((filename: string) => filename.endsWith('.mp4') || filename.endsWith('.mp3')),
   isAllowedExtension: jest.fn(
     (filename: string) =>
@@ -234,6 +238,29 @@ describe('multi-file-upload', () => {
       expect(inlineError.querySelector('.govuk-visually-hidden')!.textContent).toBe('Gwall:');
       expect(inlineError.textContent).toContain('Wrong file type');
       expect(inlineError.textContent).not.toContain('Error:');
+    });
+  });
+
+  describe('entryHook with allowed extensions', () => {
+    beforeEach(() => {
+      setupDOM();
+      getContainer().dataset.allowedExtensions = '.pdf,.docx,.xlsx';
+      getContainer().dataset.maxFileSizeMb = '20';
+      initMultiFileUpload();
+    });
+
+    it.each(['a.pdf', 'a.DOCX', 'a.xlsx'])('allows %s', name => {
+      expect(() => capturedHooks.entryHook(null, { name, size: 1024 })).not.toThrow();
+    });
+
+    it.each(['a.doc', 'a.xlsm', 'a.docm', 'a.csv', 'a.jpg', 'a'])('refuses %s as the wrong type', name => {
+      expect(() => capturedHooks.entryHook(null, { name, size: 1024 })).toThrow('invalid_type');
+      expect(document.querySelector('.govuk-error-summary')!.textContent).toContain('Wrong file type');
+    });
+
+    it('refuses a file over the limit and allows one at it', () => {
+      expect(() => capturedHooks.entryHook(null, { name: 'a.pdf', size: 20 * 1024 * 1024 })).not.toThrow();
+      expect(() => capturedHooks.entryHook(null, { name: 'a.pdf', size: 20 * 1024 * 1024 + 1 })).toThrow('too_large');
     });
   });
 
