@@ -181,8 +181,10 @@ def handleEnvironmentSetting() {
 }
 
 def setFunctionalTestEnvVars() {
-  env.PCS_API_URL = "http://pcs-api-${env.ENVIRONMENT}.service.core-compute-${env.ENVIRONMENT}.internal"
-  env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-${env.ENVIRONMENT}.service.core-compute-${env.ENVIRONMENT}.internal"
+  env.PCS_API_URL = internalUrl('pcs-api', env.ENVIRONMENT)
+  env.DATA_STORE_URL_BASE = internalUrl('ccd-data-store-api', env.ENVIRONMENT)
+  env.CDAM_URL = env.CDAM_URL ?: internalUrl('ccd-case-document-am-api', env.ENVIRONMENT)
+  env.S2S_URL = env.S2S_URL ?: internalUrl('rpe-service-auth-provider', env.ENVIRONMENT, '/testing-support/lease')
   env.SAUCE_GREP = (params.SAUCE_GREP?.trim()) ?: '@crossbrowser'
   env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = params.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS
   env.ENABLE_AXE_AUDIT = params.ENABLE_AXE_AUDIT
@@ -270,4 +272,10 @@ def isWeeklyEmvSchedule() {
     cal.get(Calendar.HOUR_OF_DAY) == 10 &&
     cal.get(Calendar.MINUTE) >= 45 &&
     cal.get(Calendar.MINUTE) < 55
+}
+
+// Internal service URLs are built here rather than written out in full (ITHC HDPI-8694).
+// The parameter is not called "env", which would shadow the pipeline's env global.
+String internalUrl(String svc, String envName, String path = '') {
+  "http://${svc}-${envName}.service.core-compute-${envName}.internal${path}"
 }

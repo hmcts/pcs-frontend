@@ -27,7 +27,7 @@ export const submitCaseApiDataWales = {
     isClaimantNameCorrect: 'YES',
     claimantNamePossessiveForm: "Possession Claims Solicitor Org's",
 
-    claimantContactEmail: 'pcs-solicitor1@test.com',
+    claimantContactEmail: 'claimant-contact@example.com',
     isCorrectClaimantContactEmail: 'YES',
 
     orgNameFound: 'YES',
@@ -593,7 +593,7 @@ export const submitCaseApiDataWales = {
     },
     claimAgainstTrespassers: 'NO',
     isExemptLandlord: 'NO',
-    claimantContactEmail: 'pcs-solicitor1@test.com',
+    claimantContactEmail: 'claimant-contact@example.com',
     isCorrectClaimantContactEmail: 'YES',
     orgAddressFound: 'Yes',
     organisationAddress: {
