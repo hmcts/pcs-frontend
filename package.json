@@ -29,7 +29,6 @@
     "test:coverage": "jest --projects jest.config.js jest.behaviour.config.js --coverage",
     "test:routes": "jest -c jest.routes.config.ts",
     "test:a11y": "echo 'Accessibility tests implemented later in the pipeline'",
-    "test:login-compatibility": "playwright test --config src/test/ui/loginCompatibility/playwright.config.ts",
     "test:smoke": "yarn playwright install && E2E_SPEC= E2E_TEST_SCOPE= yarn playwright test --project chrome --grep \"@sanity\"; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:functional": "yarn playwright install && yarn playwright test --project chrome --grep \"${E2E_TEST_SCOPE:-@regression}\"; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",
     "test:fullfunctional": "yarn playwright install && E2E_SPEC= E2E_TEST_SCOPE= yarn playwright test --project chrome; EXIT_CODE=$?; allure generate --clean; ts-node src/test/ui/config/clean-attachments.config.ts; exit $EXIT_CODE",

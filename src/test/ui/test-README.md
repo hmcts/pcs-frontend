@@ -164,15 +164,6 @@ Changing `IDAM_WEB_URL` in the test process alone does not switch browser sign-i
 that variable is used by the API helpers. Keep those API URLs pointing at the
 corresponding IDAM backend and testing-support service.
 
-Run the isolated login helper browser checks without service credentials:
-
-```bash
-yarn playwright install chromium
-yarn test:login-compatibility
-```
-
-These checks cover the legacy form, the HMCTS Access email/landing/password entry
-points, submit-button fallbacks and unexpected pages using local page responses. They do not replace a smoke run against each deployed integration.
 MFA and external-provider sign-in are outside this password-login helper's scope.
 
 ### PFT test-env debug logging
