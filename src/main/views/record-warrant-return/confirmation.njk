@@ -1,11 +1,23 @@
-{% extends "record-warrant-return/_layout.njk" %}
+{% extends "xui-layout.njk" %}
 
-{% from "macros/csrf.njk" import csrfProtection %}
-{% import "macros/xuiButtons.njk" as buttons with context %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/caseTitle.njk" import caseTitle %}
+{% from "macros/xuiConfirmationPanel.njk" import xuiConfirmationPanel %}
 
-{% set pageHeading = "Confirmation" %}
+{% set pageHeading = title %}
 
-{% block page %}
-  <p>Confirmation Placeholder</p>
+{% block content %}
+  {{ caseTitle({
+    eventName: "Record warrant return",
+    caseReference: caseReferenceDisplay,
+    propertyAddress: propertyAddressDisplay,
+    caseName: caseName
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ xuiConfirmationPanel({ title: title, bodyLines: bodyLines }) }}
+      {{ govukButton({ text: "Close and return to case summary", href: closeUrl }) }}
+    </div>
+  </div>
 {% endblock %}

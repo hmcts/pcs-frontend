@@ -7,6 +7,7 @@ import * as manageCaseRedirect from '@utils/manageCaseRedirect';
 import {
   ValidationIssue,
   errorSummary,
+  formatDateTime,
   manageCaseDetailsUrl,
   mapXuiValidation,
   refusedXuiEvent,
@@ -219,6 +220,20 @@ describe('xuiUtils', () => {
 
       expect(headerModel.theme.key).toBe('judicial');
       expect(headerModel.title.text).toBe('Judicial Case Manager');
+    });
+  });
+
+  describe('formatDateTime', () => {
+    it.each([
+      ['2026-07-01T13:05:00.000', '1 Jul 2026, 1:05:00 PM'],
+      ['2026-09-01T13:05:00.000', '1 Sep 2026, 1:05:00 PM'],
+      ['2026-01-15T13:05:00.000', '15 Jan 2026, 1:05:00 PM'],
+      ['2026-03-01T00:00:00.000', '1 Mar 2026, 12:00:00 AM'],
+      ['2026-01-15T12:30:00.000', '15 Jan 2026, 12:30:00 PM'],
+      [undefined, ''],
+      ['not a date', ''],
+    ])('formats dateTime %s', (dateTime, expected) => {
+      expect(formatDateTime(dateTime)).toBe(expected);
     });
   });
 });
