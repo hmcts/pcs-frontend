@@ -6,23 +6,12 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
-{% import "confirm-order-review/_order-panel.njk" as orderPanel %}
 
 {% set pageHeading = "Review the order" %}
 {% set orderPreviewHeading = "Order to issue" %}
 
 {% block page %}
   <div class="pcs-review-page">
-    {# The submitted order remains read only while the caseworker edits the order to issue. #}
-    {% call orderPanel.panel("Order the Judge submitted", sticky=false) %}
-      {% if edits.added or edits.changed %}
-        <p class="govuk-body-s" id="judge-changes-key">
-          Clauses the Judge added are highlighted in green. Generated clauses they changed are highlighted in blue.
-        </p>
-      {% endif %}
-      {% include "confirm-order-review/_order-preview.njk" %}
-    {% endcall %}
-
     <form method="post" action="{{ formAction }}" novalidate id="review-order-form">
       {{ csrfProtection(csrfToken) }}
       <input type="hidden" name="reviewOrderId" value="{{ reviewOrderId }}">

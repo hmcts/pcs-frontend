@@ -1,10 +1,11 @@
 {#
-  The collapsible order above the questions court staff answer from it. Where sticky, it stays in view at desktop
-  sizes and the order scrolls on its own. An optional message from the Judge sits beside it.
+  The order across the top of a page, above the questions court staff answer from it, as the Judge's case facts sit
+  above their form. At desktop sizes it stays in view as the page scrolls, up to a share of the screen, with the
+  order scrolling on its own, and staff can hide it to a line; on smaller screens, or zoomed in, it is part of the
+  page. The Judge's message to court staff, which is often what to do with the order, sits beside it.
 #}
-{% macro panel(heading, staffMessage, sticky=true) %}
-  <section class="pcs-order-panel{% if sticky %} pcs-order-panel--sticky{% endif %}"
-           aria-labelledby="order-panel-heading" data-order-panel>
+{% macro panel(heading, staffMessage) %}
+  <section class="pcs-order-panel" aria-labelledby="order-panel-heading" data-order-panel>
     <div class="pcs-order-panel__header">
       <h2 class="govuk-heading-s" id="order-panel-heading">{{ heading }}</h2>
       <button type="button" class="pcs-order-panel__toggle" aria-expanded="true" aria-controls="order-panel-content"
@@ -18,7 +19,8 @@
           <p class="govuk-body-s pcs-preserve-lines govuk-!-margin-bottom-0">{{ staffMessage }}</p>
         </div>
       {% endif %}
-      <div class="pcs-order-panel__order"{% if sticky %} tabindex="0" role="region" aria-label="{{ heading }}"{% endif %}>
+      {# Scrolls on its own, so it takes keyboard focus to scroll by keyboard. #}
+      <div class="pcs-order-panel__order" tabindex="0" role="region" aria-label="{{ heading }}">
         {{ caller() }}
       </div>
     </div>

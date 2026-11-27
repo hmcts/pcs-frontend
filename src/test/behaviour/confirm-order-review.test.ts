@@ -233,12 +233,6 @@ describe('confirm order review', () => {
       );
       const page = await openReview(app);
 
-      // The judge's order as submitted.
-      const preview = document.querySelector('[data-order-preview]')!;
-      expect(preview.textContent).toContain("The defendant's application dated 19 October 2026 is dismissed.");
-      expect(preview.textContent).toContain("The claimant's application dated 21 October 2026 is dismissed.");
-      expect(preview.textContent).not.toContain('possession');
-
       expect(document.querySelector('[name="claim-order"], #order-type, [name$="-decision"]')).toBeNull();
       const lines = page.documentText().split('\n');
       expect(lines.slice(lines.indexOf('IT IS ORDERED THAT:'))).toEqual([
@@ -371,9 +365,9 @@ describe('confirm order review', () => {
       await openReview(app);
 
       expect(document.querySelector('#judge-message')?.textContent).toContain('Please list for a review in 28 days.');
-      expect(document.querySelector('[data-order-preview]')?.textContent).toContain('IT IS ORDERED THAT');
+      expect(document.querySelector('#order-editor')?.textContent).toContain('IT IS ORDERED THAT');
       expect(document.querySelector('#judge-edits')).toBeNull();
-      expect(document.querySelector('[data-order-preview] .docweave-clause')).toBeNull();
+      expect(document.querySelector('[data-order-panel]')).toBeNull();
     });
 
     it('warns of what the judge added and changed, and shows their wording for the caseworker to edit', async () => {
@@ -395,16 +389,14 @@ describe('confirm order review', () => {
       expect(document.querySelector('#judge-edits')?.nextElementSibling?.id).toBe('judge-message');
       expect(document.querySelector('#judge-message')?.textContent).toContain('Please review the additional clause.');
       // Docweave marks the clauses the judge added and changed as its editor showed them.
-      const preview = document.querySelector('[data-order-preview]')!;
-      expect(preview.querySelector('.docweave-clause--inserted')?.textContent).toContain(
+      const editor = document.querySelector('#order-editor')!;
+      expect(editor.querySelector('.docweave-clause--inserted')?.textContent).toContain(
         'The defendant may apply to vary this order.'
       );
-      expect(preview.querySelector('.docweave-clause--modified')?.textContent).toContain('Wording the judge rewrote');
-      expect(document.querySelector('#judge-changes-key')).not.toBeNull();
+      expect(editor.querySelector('.docweave-clause--modified')?.textContent).toContain('Wording the judge rewrote');
       expect(document.querySelector('input[name$="-attendance"]')).toBeNull();
       expect(page.documentText()).toContain('Alex Example did not attend the hearing');
       expect(page.documentText()).toContain('Wording the judge rewrote');
-      expect(document.querySelector('#order-editor')?.textContent).toContain('Wording the judge rewrote');
     });
 
     it("keeps the caseworker's wording edits after going back from record or refreshing", async () => {
@@ -421,9 +413,9 @@ describe('confirm order review', () => {
 
       const again = await openPage((await app.get(REVIEW)).text);
       expect(again.documentText()).toContain('The Court heard from the claimant.');
-      const submitted = document.querySelector('[data-order-preview]')?.textContent;
-      expect(submitted).toContain('The Court heard fom the claimant.');
-      expect(submitted).not.toContain('The Court heard from the claimant.');
+      control<HTMLButtonElement>('#restore-judge-wording').click();
+      expect(again.documentText()).toContain('The Court heard fom the claimant.');
+      expect(again.documentText()).not.toContain('The Court heard from the claimant.');
     });
 
     it("restores the Judge's wording over the caseworker's edits", async () => {

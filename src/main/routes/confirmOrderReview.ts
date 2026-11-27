@@ -167,20 +167,6 @@ function judgeEdits(snapshot: DocWeaveSnapshot | null | undefined) {
   return { added: changes.inserted > 0, changed: changes.modified > 0 };
 }
 
-/**
- * The judge's order as the review pages show it: its preview, with the clauses they added and changed marked
- * as Docweave's editor showed them, and how the judge changed it.
- */
-function orderModel(review: OrderReviewSession) {
-  const snapshot = review.order.docweaveSnapshot;
-  return {
-    freeForm: review.order.orderType === 'FREE_FORM',
-    edits: judgeEdits(snapshot),
-    staffMessage: staffMessage(review.order.formData),
-    orderPreviewHtml: snapshot ? renderHtml(snapshot, { changes: true }) : undefined,
-  };
-}
-
 /** The review dates on the page, as many as it showed. */
 function postedReviewDates(body: Record<string, unknown>, shown: number): ReviewDateAnswer[] {
   return Array.from({ length: shown }, (_, index) => {
@@ -352,7 +338,9 @@ function judgmentModel(
 /** What each page shows besides the case and any errors. */
 const VIEWS = {
   review: (_req: Request, review: OrderReviewSession) => ({
-    ...orderModel(review),
+    freeForm: review.order.orderType === 'FREE_FORM',
+    edits: judgeEdits(review.order.docweaveSnapshot),
+    staffMessage: staffMessage(review.order.formData),
     orderDocumentJson:
       review.answers.orderDocumentJson ??
       (review.order.docweaveSnapshot ? JSON.stringify(review.order.docweaveSnapshot) : ''),
