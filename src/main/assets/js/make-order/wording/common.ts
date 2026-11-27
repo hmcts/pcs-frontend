@@ -186,14 +186,15 @@ function addAttendance(order: DocBuilder, data: OrderData): void {
 
 export function addPreamble(order: DocBuilder, data: OrderData): void {
   const { judge, court, date: madeOn } = data.before;
-  order.paragraph('before', content =>
+  // Older drafts put the court fact before the date. Docweave needs new IDs when facts change order.
+  order.paragraph('order-opening', content =>
     content
       .text('This order is made by ')
-      .fact('before-judge', judge)
+      .fact('order-opening-judge', judge)
       .text(' on ')
-      .fact('before-date', madeOn)
+      .fact('order-opening-date', madeOn)
       .text(' at the ')
-      .fact('before-court', court)
+      .fact('order-opening-court', court)
       .text('.')
   );
   if (data.withoutHearing) {

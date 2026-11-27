@@ -1,3 +1,5 @@
+import { buildDoc, createDocEditor } from '@hmcts-cft/docweave';
+
 import { BEFORE_HEARING, CASE_REFERENCE, type TestApp, beforeToday, bootApp, openPage } from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
@@ -10,6 +12,33 @@ describe('make an order: before whom, where and when it was made', () => {
     app = await bootApp();
     const page = await openPage((await app.get(PAGE)).text);
     expect(page.openingText()).toBe(BEFORE_HEARING);
+  });
+
+  it('opens a draft saved with the court before the date and keeps the judge’s clauses', async () => {
+    const editor = createDocEditor({ mount: document.createElement('div'), label: 'Order' });
+    editor.render(
+      buildDoc(order => {
+        order.paragraph('before', content =>
+          content
+            .text('This order is made by ')
+            .fact('before-judge', 'District Judge Sam Judge')
+            .text(' at the ')
+            .fact('before-court', 'County Court at Bristol')
+            .text(' on ')
+            .fact('before-date', '13 October 2026')
+            .text('.')
+        );
+        order.paragraph('ordered-that', 'IT IS ORDERED THAT:');
+      })
+    );
+    editor.insert(['The parties may apply to vary this order.'], { at: 'end' });
+    const docweaveSnapshot = editor.getSnapshot();
+    editor.destroy();
+
+    app = await bootApp({ order: { id: 'draft-order', orderType: 'FREE_FORM', docweaveSnapshot } });
+    const page = await openPage((await app.get(PAGE)).text);
+    expect(document.querySelector('#order-editor')?.textContent).toContain(BEFORE_HEARING);
+    expect(page.documentText()).toContain('The parties may apply to vary this order.');
   });
 
   it('gives today for an order made without a hearing', async () => {
