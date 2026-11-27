@@ -1,7 +1,6 @@
 import { buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
 import config from 'config';
 import type { NextFunction, Request, Response } from 'express';
-import { DateTime } from 'luxon';
 
 import { CallbackRejectedError, HTTPError } from '../HttpError';
 import { linkSignOutToLogout } from '../middleware/legalRepresentativeHeaders';
@@ -62,15 +61,6 @@ export function manageCaseDetailsUrl(caseReference: string): string {
     throw new HTTPError('The Manage Case return URL is not configured', 500);
   }
   return url;
-}
-
-/**
- * Formats date time in XUI format
- * @param dateTime user input in UK time
- */
-export function formatDateTime(dateTime: string | undefined): string {
-  const parsed = dateTime ? DateTime.fromISO(dateTime, { zone: 'Europe/London' }) : undefined;
-  return parsed?.isValid ? parsed.setLocale('en-US').toFormat('d MMM yyyy, h:mm:ss a') : '';
 }
 
 /**

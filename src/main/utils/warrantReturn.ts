@@ -200,20 +200,6 @@ export const interimReturnTypeList: { value: InterimReturnName | string; text: s
   },
 ];
 
-export function returnNameLabel({ returnType, evictionOutcome, returnName }: WarrantReturn): string {
-  let returnNames: { value: string; text: string }[];
-  if (returnType === WarrantReturnType.INTERIM) {
-    returnNames = interimReturnTypeList;
-  } else if (evictionOutcome === EvictionOutcome.SUCCESSFUL) {
-    returnNames = evictionSuccessfulReturnTypeList;
-  } else if (evictionOutcome === EvictionOutcome.UNSUCCESSFUL || evictionOutcome === EvictionOutcome.CANCELLED) {
-    returnNames = evictionUnsuccessfulReturnTypeList;
-  } else {
-    return '';
-  }
-  return (returnName && returnNames.find(item => item.value === returnName)?.text) || '';
-}
-
 export function formatDefendants(ccdCase: CcdCaseData): string {
   const allDefendants: CcdCollectionItem<CcdParty>[] | undefined = ccdCase.allDefendants;
   let hasUnknownDefendants: boolean = false;
