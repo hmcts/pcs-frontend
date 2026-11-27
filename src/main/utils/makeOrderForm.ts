@@ -471,6 +471,10 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
           : 'without-notice',
     // A date to apply by is a working day, as are the page's quick dates for it.
     ownInitiativeApplyBy: daysFromToday(OWN_INITIATIVE_APPLY_BY_DAYS, DateTime.now(), start.bankHolidays),
+    // A draft with no wording has nothing to add to the order.
+    drafts: (caseContext.drafts ?? [])
+      .filter(filed => filed.wording.replace(/<[^>]*>/g, '').trim())
+      .map(filed => ({ ...filed, submittedAtDisplay: displayDate(filed.submittedAt) })),
     hearingRecords: recording.map(choice => hearingModel(choice, choice === hearing)),
     caseBundle: caseContext.caseBundle ? caseBundleModel(caseContext.caseBundle, caseContext.caseReference) : undefined,
   };

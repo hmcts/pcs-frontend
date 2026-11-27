@@ -337,6 +337,8 @@ export async function bootApp(
     order?: Partial<Envelope['order']>;
     /** The case's open applications, any of which the order can decide. */
     applications?: (Record<string, unknown> & { id: string })[];
+    /** The draft orders the parties have filed, newest first, as pcs-api sends them; none when not given. */
+    drafts?: { id: string; party: string; submittedAt: string; wording: string }[];
     /** The application the judge's task, from court staff's message, asks them to decide, without a hearing. */
     application?: Record<string, unknown> & { id: string };
     /** The hearing pcs-api starts the event for, over the default one, or null for an order made without one. */
@@ -375,6 +377,9 @@ export async function bootApp(
     ...(options.application ? [options.application] : []),
     ...(options.applications ?? []),
   ];
+  if (options.drafts) {
+    envelope.caseContext.drafts = options.drafts;
+  }
   if (options.application) {
     envelope.taskGenAppId = options.application.id;
     envelope.hearing = null;
