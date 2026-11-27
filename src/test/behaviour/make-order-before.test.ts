@@ -21,14 +21,14 @@ describe('make an order: before whom, where and when it was made', () => {
   it('names the judge and court as pcs-api does, placeholders for the judge to fill in included', async () => {
     app = await bootApp({ judge: '[judge’s name and title]', court: '[court]' });
     expect((await openPage((await app.get(PAGE)).text)).openingText()).toBe(
-      'Before [judge’s name and title] sitting at the [court] on 13 October 2026'
+      'This order is made by [judge’s name and title] at the [court] on 13 October 2026.'
     );
   });
 
   it('gives the case’s facts as they are, even text that would end the script the page sends them in', async () => {
     app = await bootApp({ judge: 'District Judge Sam </script><b>Judge</b> & Co' });
     expect((await openPage((await app.get(PAGE)).text)).openingText()).toBe(
-      'Before District Judge Sam </script><b>Judge</b> & Co sitting at the County Court at Bristol on 13 October 2026'
+      'This order is made by District Judge Sam </script><b>Judge</b> & Co at the County Court at Bristol on 13 October 2026.'
     );
   });
 });

@@ -24,8 +24,11 @@ describe('make an order: free form and strike out', () => {
     selectTab('tab-free-form');
     expect(document.querySelector('#tab-free-form textarea')).toBeNull();
     check('recitals', 'yes');
+    expect(page.orderText()).toBe(['The Court records that:', 'IT IS ORDERED THAT:'].join('\n'));
     type('recitals-text', 'UPON hearing the parties');
-    expect(page.orderText()).toBe(['UPON hearing the parties', 'IT IS ORDERED THAT:'].join('\n'));
+    expect(page.orderText()).toBe(
+      ['The Court records that:', 'UPON hearing the parties', 'IT IS ORDERED THAT:'].join('\n')
+    );
 
     // Nothing needs writing before review; the caseworker reviews what the judge wrote.
     recordAttendance();
@@ -55,10 +58,7 @@ describe('make an order: free form and strike out', () => {
     check('costs-choice', 'def-pay-cl-fixed');
     type('costs-def-pay-cl-fixed-amount', '250');
     expect(page.orderText()).toBe(
-      [
-        'IT IS ORDERED THAT:',
-        "The defendant shall pay the claimant's costs of the claim in the fixed sum of £250.00.",
-      ].join('\n')
+      ['IT IS ORDERED THAT:', "The Defendant shall pay the Claimant's fixed costs of £250.00."].join('\n')
     );
     expect(page.documentText()).toBe(page.orderText());
 
@@ -112,7 +112,9 @@ describe('make an order: free form and strike out', () => {
     check('strike-counterclaim-outcome', 'dismissed');
     expect(document.querySelector('[name="strike-subjects"][value="application"]')).toBeNull();
     expect(page.orderText()).toBe(
-      ['IT IS ORDERED THAT:', 'The claim is struck out.', 'The counterclaim is dismissed.'].join('\n')
+      ['IT IS ORDERED THAT:', 'The Claimant’s claim is struck out.', 'The Defendant’s counterclaim is dismissed.'].join(
+        '\n'
+      )
     );
 
     uncheck('strike-subjects', 'claim');
@@ -130,14 +132,16 @@ describe('make an order: free form and strike out', () => {
     check('strike-claim-outcome', 'dismissed');
     check('costs', 'yes');
     check('costs-choice', 'reserved');
-    expect(page.orderText()).toBe(['IT IS ORDERED THAT:', 'The claim is dismissed.', 'Costs reserved.'].join('\n'));
+    expect(page.orderText()).toBe(
+      ['IT IS ORDERED THAT:', 'The Claimant’s claim is dismissed.', 'Costs reserved.'].join('\n')
+    );
 
     const body = page.body();
     body.set('action', 'SAVE_DRAFT');
     expect((await app.post(PAGE, body)).status).toBe(302);
     const reopened = await openPage((await app.get(PAGE)).text);
     expect(reopened.documentText()).toBe(
-      ['IT IS ORDERED THAT:', 'The claim is dismissed.', 'Costs reserved.'].join('\n')
+      ['IT IS ORDERED THAT:', 'The Claimant’s claim is dismissed.', 'Costs reserved.'].join('\n')
     );
 
     recordAttendance();

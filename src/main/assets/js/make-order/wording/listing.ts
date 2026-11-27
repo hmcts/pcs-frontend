@@ -7,9 +7,15 @@ import { date, partyLabels, sentenceCase, value, values } from './common';
 
 /** When the hearing is, after what the order says happens to its subject. */
 const WHEN: Record<string, string> = {
-  'next-list': ' on the next available possession list after ',
-  'next-date': ' on the next available date (non-possession list) after ',
-  specific: ' on ',
+  'next-list': 'the next available possession list after ',
+  'next-date': 'the next available date after ',
+  specific: '',
+};
+
+const HEARING_FORMATS: Record<string, string> = {
+  'in-person': 'in person',
+  video: 'by video hearing',
+  telephone: 'by telephone',
 };
 
 const DIRECTIONS: Record<string, { party: 'claimant' | 'defendant'; text: string }> = {
@@ -44,9 +50,11 @@ export function addListing(
   const labels = partyLabels(data);
   const when = value(data, `${prefix}-when`) || 'next-list';
   list.item(`${ids}-listing`, content => {
-    content.text(`${happens}${WHEN[when]}`).fact(`${ids}-hearing-date`, date(data, `${prefix}-hearing-date-${when}`), {
-      sourceId: `${prefix}-hearing-date-${when}`,
-    });
+    content
+      .text(`${happens} ${prefix === 'adj' ? 'to' : 'on'} ${WHEN[when]}`)
+      .fact(`${ids}-hearing-date`, date(data, `${prefix}-hearing-date-${when}`), {
+        sourceId: `${prefix}-hearing-date-${when}`,
+      });
     if (when === 'specific') {
       const time = parseTime(value(data, `${prefix}-specific-time`));
       content.text(' at ').fact(`${ids}-hearing-time`, time ? formatTime(time) : '[hearing time not provided]', {
@@ -57,6 +65,14 @@ export function addListing(
       .text(' with a time estimate of ')
       .fact(`${ids}-time-estimate`, timeEstimate(data, prefix), { sourceId: `${prefix}-time-estimate-group` })
       .text(when === 'specific' ? '.' : '. Further details of the hearing will be provided by the court.');
+    if (prefix === 'adj') {
+      const formats = values(data, `${prefix}-format`)
+        .map(format => HEARING_FORMATS[format])
+        .filter(Boolean);
+      if (formats.length) {
+        content.text(` The hearing will be ${formats.join(' or ')}.`);
+      }
+    }
   });
   const directions = values(data, `${prefix}-directions`);
   for (const [direction, { party, text }] of Object.entries(DIRECTIONS)) {

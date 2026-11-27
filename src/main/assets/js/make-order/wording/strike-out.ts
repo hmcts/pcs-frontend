@@ -17,9 +17,13 @@ export function addStrikeOutDismissalClauses(list: OrderedListBuilder, data: Ord
 
   for (const { subject, field } of outcomes) {
     list.item(`${subject}-outcome`, content => {
-      content.fact('outcome', `The ${subject} is ${OUTCOMES[value(data, field)]}.`, {
-        sourceId: selectedControlId(data, field),
-      });
+      content.fact(
+        'outcome',
+        `The ${subject === 'claim' ? 'Claimant’s' : 'Defendant’s'} ${subject} is ${OUTCOMES[value(data, field)]}.`,
+        {
+          sourceId: selectedControlId(data, field),
+        }
+      );
     });
   }
 }

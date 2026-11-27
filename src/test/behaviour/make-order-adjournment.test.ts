@@ -54,7 +54,7 @@ describe('make an order: adjournment', () => {
     typeDate('adj-gen-restore-date', '1', '3', '2027');
     const order = page.orderText();
     expect(order).toContain('The counterclaim is adjourned generally on condition that');
-    expect(order).toContain('The claimant may apply to restore the counterclaim if there is a breach');
+    expect(order).toContain('The Claimant may apply to restore the counterclaim if there is a breach');
     expect(order).toContain(
       'If no application to restore the counterclaim is made by 1 March 2027 the counterclaim shall stand as struck out'
     );
@@ -80,8 +80,8 @@ describe('make an order: adjournment', () => {
     expect(page.orderText()).toBe(
       [
         'IT IS ORDERED THAT:',
-        'The claim shall be adjourned to be heard on 1 October 2026 at 10:30am with a time estimate of 3 days, 4 hours and 30 minutes.',
-        'The defendant must by 4pm on 15 September 2026 submit to the court and all other parties a defence.',
+        'The hearing is adjourned to 1 October 2026 at 10:30am with a time estimate of 3 days, 4 hours and 30 minutes. The hearing will be in person.',
+        'The Defendant must by 4pm on 15 September 2026 submit to the court and all other parties a defence.',
       ].join('\n')
     );
 
@@ -108,7 +108,7 @@ describe('make an order: adjournment', () => {
     typeDate('adj-hearing-date-specific', '1', '10', '2026');
     const heardAt = (time: string): string => {
       type('adj-specific-time', time);
-      return /on 1 October 2026 at (.+?) with/.exec(page.orderText())![1];
+      return /to 1 October 2026 at (.+?) with/.exec(page.orderText())![1];
     };
     expect(heardAt('14:30')).toBe('2:30pm');
     expect(heardAt('09.05')).toBe('9:05am');
@@ -128,8 +128,8 @@ describe('make an order: adjournment', () => {
     typeDate('adj-gen-payments-date', '1', '10', '2026');
     expect(page.orderText()).toContain(
       [
-        'The claim is adjourned generally on condition that the defendant makes the following payments towards any arrears:',
-        'instalment payments to the claimant of £100.00 every month, the first instalment to be paid on or before 1 October 2026;',
+        'The claim is adjourned generally on condition that the Defendant makes the following payments towards any arrears:',
+        'instalment payments to the Claimant of £100.00 every month, the first instalment to be paid on or before 1 October 2026;',
       ].join('\n')
     );
 
@@ -138,7 +138,7 @@ describe('make an order: adjournment', () => {
     type('adj-gen-oneoff-amount', '500');
     typeDate('adj-gen-oneoff-date', '1', '10', '2026');
     expect(page.orderText()).toContain(
-      'The claim is adjourned generally on condition that the defendant makes the following payments towards any arrears:'
+      'The claim is adjourned generally on condition that the Defendant makes the following payments towards any arrears:'
     );
     expect(page.orderText()).not.toContain('current rent');
   });
@@ -156,9 +156,9 @@ describe('make an order: adjournment', () => {
     expect(page.orderText()).toBe(
       [
         'IT IS ORDERED THAT:',
-        'The claim is adjourned generally on condition that the defendant makes payment of current rent as it falls due together with the following payments towards any arrears:',
-        'instalment payments to the claimant of £50.00 every month, the first instalment to be paid on or before 1 October 2026;',
-        'The claimant may apply to restore the claim if there is a breach of such condition or conditions. This application shall be made on notice to all parties. The claimant shall set out in such application details of the alleged breach or breaches and attach any evidence relied upon in support.',
+        'The claim is adjourned generally on condition that the Defendant makes payment of current rent as it falls due together with the following payments towards any arrears:',
+        'instalment payments to the Claimant of £50.00 every month, the first instalment to be paid on or before 1 October 2026;',
+        'The Claimant may apply to restore the claim if there is a breach of such condition or conditions. This application shall be made on notice to all parties. The Claimant shall set out in such application details of the alleged breach or breaches and attach any evidence relied upon in support.',
         'If no application to restore the claim is made by 1 March 2027 the claim shall stand as struck out without further application or order of the court.',
       ].join('\n')
     );

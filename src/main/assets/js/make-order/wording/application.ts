@@ -2,11 +2,9 @@ import { type DocBuilder, type OrderedListBuilder } from '@hmcts-cft/docweave';
 
 import { type OrderApplication, type OrderData } from '../data';
 
-import { sentenceCase, value } from './common';
+import { partyReference, sentenceCase, value } from './common';
 import { addListing } from './listing';
 import { addPaymentConditions } from './payment-conditions';
-
-const ORDINALS = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth'];
 
 /** The applications the order decides: those the judge has not left as they are. */
 export function decidedApplications(data: OrderData): OrderApplication[] {
@@ -23,11 +21,8 @@ export function describeApplication(data: OrderData, application: OrderApplicati
   if (!role) {
     return `the application of ${application.applicant}${dated}`;
   }
-  const kind = role[1].toLowerCase();
-  const rank = Number(role[2] ?? 1);
-  const several = (kind === 'claimant' ? data.claimants : data.defendants).length > 1;
-  const ordinal = several ? `${ORDINALS[rank - 1] ?? `${rank}th`} ` : '';
-  return `the ${ordinal}${kind}'s application${dated}`;
+  const kind = role[1] === 'Claimant' ? 'claimant' : 'defendant';
+  return `${partyReference(data, kind, Number(role[2] ?? 1) - 1)}'s application${dated}`;
 }
 
 /** Adjourning the hearing an application to adjourn asks about: to a further hearing, or generally. */

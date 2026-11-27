@@ -64,9 +64,13 @@ describe('make an order: outright possession', () => {
     check('outright-mj-sections', 'arrears');
     type('outright-mj-arrears', '500');
     type('outright-mj-interest', '2,000,000,000');
-    expect(page.orderText()).toContain('Judgment for the claimant(s) in the total sum of £[amount not provided].');
+    expect(page.orderText()).toContain(
+      'There is judgment for the Claimant against the Defendant in the sum of £[amount not provided].'
+    );
     type('outright-mj-interest', '');
-    expect(page.orderText()).toContain('Judgment for the claimant(s) in the sum of £500.00.');
+    expect(page.orderText()).toContain(
+      'There is judgment for the Claimant against the Defendant in the sum of £500.00.'
+    );
   });
 
   it('takes the arrears from arrears today until the judge enters their own', async () => {
@@ -78,7 +82,9 @@ describe('make an order: outright possession', () => {
     const arrearsToday = control('[name="hearing-1-arrears-today"]');
     arrearsToday.value = '5000';
     arrearsToday.dispatchEvent(new Event('input', { bubbles: true }));
-    expect(page.documentText()).toContain('Judgment for the claimant(s) in the sum of £5,000.00.');
+    expect(page.documentText()).toContain(
+      'There is judgment for the Claimant against the Defendant in the sum of £5,000.00.'
+    );
     expect(control('[name="suspended-arrears"]').value).toBe('5000');
 
     type('outright-mj-arrears', '4000');
@@ -115,7 +121,7 @@ describe('make an order: outright possession', () => {
     const page = await openPage((await app.get(PAGE)).text);
     expect(page.orderText()).toBe('IT IS ORDERED THAT:');
     check('outright-possession', 'forthwith');
-    expect(page.orderText()).toContain('to the claimant(s) forthwith.');
+    expect(page.orderText()).toContain('to the Claimant immediately.');
     expect(page.orderText()).not.toContain('grounds');
     check('outright-grounds-type', 'mandatory');
     expect(page.orderText()).toContain('This order for possession was made on mandatory grounds.');
@@ -199,14 +205,14 @@ describe('make an order: outright possession', () => {
 
     expect(page.orderText()).toBe(
       [
-        'The Court heard from Sam Solicitor, solicitor for the claimant.',
-        'Alex Example did not attend the hearing, but the Court was satisfied they had received notice of the hearing, and it was reasonable to proceed in their absence.',
+        'The Court heard from Sam Solicitor, solicitor for the Claimant.',
+        'The Defendant did not attend.',
         'IT IS ORDERED THAT:',
-        'The defendant(s) must give up possession of 10 Test Street, Bristol, BS1 1AA to the claimant(s) on or before 4pm on 1 October 2026.',
+        'The Defendant must leave and give up possession of 10 Test Street, Bristol, BS1 1AA to the Claimant on or before 4pm on 1 October 2026.',
         'This order for possession was made on mandatory grounds, namely Ground 8.',
-        'Judgment for the claimant(s) in the total sum of £2,500.00.',
-        "The defendant(s) must pay the claimant(s)' fixed costs of £300.00.",
-        'The above sums must be paid by the defendant(s) to the claimant(s) by instalment payments of £50.00 every week, the first instalment to be paid on or before 8 October 2026.',
+        'There is judgment for the Claimant against the Defendant in the sum of £2,500.00.',
+        "The Defendant shall pay the Claimant's fixed costs of £300.00.",
+        'The judgment is to be paid by the Defendant to the Claimant by instalment payments of £50.00 every week, the first instalment to be paid on or before 8 October 2026.',
       ].join('\n')
     );
 

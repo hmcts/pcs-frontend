@@ -9,35 +9,21 @@ import {
   addCosts,
   addPaymentTerm,
   addPossessionDeadline,
+  caseManCosts,
   date,
   hasCosts,
   money,
-  partyNames,
+  partyLabels,
   selected,
+  sentenceCase,
   value,
   values,
 } from './common';
 
-const OUTRIGHT_COSTS: CostsWording = {
-  amounts: {
-    'def-pay-cl-fixed': "The defendant(s) must pay the claimant(s)' fixed costs of £",
-    'def-pay-cl-summary': "The defendant(s) must pay the claimant(s)' costs, summarily assessed at £",
-    'cl-pay-def-summary': "The claimant(s) must pay the defendant(s)' costs, summarily assessed at £",
-  },
-  fixed: {
-    'in-case': 'Costs in the case.',
-    reserved: 'Costs reserved.',
-    'no-order': 'There is no order as to costs.',
-    'public-funding':
-      "The defendant(s)' costs are to be subject to detailed assessment under the public funding regulations.",
-  },
-  missing: '[costs order not provided]',
-};
-
 export function addOutrightClauses(list: OrderedListBuilder, data: OrderData): void {
   const address = data.propertyAddress || '[property address not provided]';
-  const claimants = partyNames(data.claimants, 'the claimant(s)');
-  const defendants = partyNames(data.defendants, 'the defendant(s)');
+  const { claimant, defendant } = partyLabels(data);
+  const costs: CostsWording = { ...caseManCosts(claimant, defendant), missing: '[costs order not provided]' };
   const options = values(data, 'outright-options');
   const sections = options.includes('money-judgment') ? values(data, 'outright-mj-sections') : [];
   const plans = sections.includes('payment-plan') ? values(data, 'outright-mj-plan') : [];
@@ -46,11 +32,11 @@ export function addOutrightClauses(list: OrderedListBuilder, data: OrderData): v
   if (possession) {
     list.item('possession', content => {
       content
-        .text('The defendant(s) must give up possession of ')
+        .text(`${sentenceCase(defendant)} must leave and give up possession of `)
         .fact('address', address)
-        .text(' to the claimant(s) ');
+        .text(` to ${claimant} `);
       if (possession === 'forthwith') {
-        content.fact('deadline', 'forthwith', { sourceId: 'outright-possession' });
+        content.fact('deadline', 'immediately', { sourceId: 'outright-possession' });
       } else {
         content.text('on or before ');
         addPossessionDeadline(content, data, 'deadline', 'outright-by-date', 'outright-by-time');
@@ -83,7 +69,7 @@ export function addOutrightClauses(list: OrderedListBuilder, data: OrderData): v
           ? formatMoney(arrears + (interest ?? 0))
           : AMOUNT_NOT_PROVIDED;
       content
-        .text(`Judgment for the claimant(s) in the ${interestText ? 'total ' : ''}sum of £`)
+        .text(`There is judgment for ${claimant} against ${defendant} in the sum of £`)
         .fact('amount', total, { sourceId: 'outright-mj-amounts' })
         .text('.');
     });
@@ -91,26 +77,26 @@ export function addOutrightClauses(list: OrderedListBuilder, data: OrderData): v
   if (options.includes('use-occupation')) {
     list.item('use-occupation', content => {
       content
-        .fact('defendants', defendants)
+        .fact('defendants', sentenceCase(defendant))
         .text(' must pay to ')
-        .fact('claimants', claimants)
+        .fact('claimants', claimant)
         .text(' £')
         .fact('rate', money(value(data, 'outright-use-occupation-rate')), {
           sourceId: 'outright-use-occupation-rate',
         })
-        .text(' per day for damages for unlawful occupation from ')
+        .text(' per day for damages for use and occupation from ')
         .fact('date', date(data, 'outright-use-occupation-from-date'), {
           sourceId: 'outright-use-occupation-from-date',
         })
-        .text(` until possession of the property is given to ${claimants}.`);
+        .text(` until possession of the property is given to ${claimant}.`);
     });
   }
-  if (hasCosts(data, OUTRIGHT_COSTS)) {
-    list.item('costs', content => addCosts(content, data, OUTRIGHT_COSTS));
+  if (hasCosts(data, costs)) {
+    list.item('costs', content => addCosts(content, data, costs));
   }
   if (plans.includes('lump') || plans.includes('instalments')) {
     list.item('payment-terms', content => {
-      content.text('The above sums must be paid by the defendant(s) to the claimant(s) ');
+      content.text(`The judgment is to be paid by ${defendant} to ${claimant} `);
       if (plans.includes('lump')) {
         addPaymentTerm(content, data, {
           kind: 'one-off',

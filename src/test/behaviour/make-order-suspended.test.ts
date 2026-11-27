@@ -61,13 +61,13 @@ describe('make an order: suspended possession', () => {
     expect(page.orderText()).toBe(
       [
         'IT IS ORDERED THAT:',
-        'The defendant must give up possession of 10 Test Street, Bristol, BS1 1AA to the claimant on or before 4pm on 1 December 2026.',
-        'Judgment for the claimant in the sum of £1,200.00.',
-        "The defendant shall pay the claimant's costs of the claim in the fixed sum of £250.00.",
-        'Execution of the order for possession, enforcement of the money judgment and enforcement of any order for costs are suspended as long as the defendant pays (i) the rent as it falls due plus (ii) the arrears of £1,200.00 by payments of £100.00 to the claimant every month, the first instalment to be paid on or before 1 November 2026.',
-        'Payment of the above instalments made to the claimant shall be applied first to any arrears prior to any order for costs.',
-        'This order shall not be enforceable once the total of the sums awarded above have been paid.',
-        'Any application for a warrant of possession must be heard on notice to all parties unless the court orders otherwise.',
+        'The Defendant must leave and give up possession of 10 Test Street, Bristol, BS1 1AA to the Claimant on or before 4pm on 1 December 2026.',
+        'Judgment is entered for the Claimant against the Defendant in the sum of £1,200.00.',
+        "The Defendant shall pay the Claimant's costs of the claim in the fixed sum of £250.00.",
+        'The Claimant may not enforce the possession order, the money judgment and any costs order if the Defendant pays (i) the rent as it falls due plus (ii) the arrears of £1,200.00 by payments of £100.00 to the Claimant every month, the first instalment to be paid on or before 1 November 2026.',
+        'Payment of the above instalments made to the Claimant shall be applied first to any arrears prior to any order for costs.',
+        'Once the Defendant has paid all the sums ordered, the Claimant may no longer enforce this order.',
+        'Any application for a warrant of possession must be heard on notice to all parties unless the Court orders otherwise.',
       ].join('\n')
     );
 
@@ -87,8 +87,8 @@ describe('make an order: suspended possession', () => {
     expect(page.orderText()).toContain(
       [
         'the arrears of £1,200.00 by:',
-        'payment of £500.00 to the claimant by 1 October 2026;',
-        'payments of £100.00 to the claimant every month, the first instalment to be paid on or before 1 November 2026;',
+        'payment of £500.00 to the Claimant by 1 October 2026;',
+        'payments of £100.00 to the Claimant every month, the first instalment to be paid on or before 1 November 2026;',
       ].join('\n')
     );
 
@@ -112,7 +112,7 @@ describe('make an order: suspended possession', () => {
     ).toEqual(['Weekly', 'Fortnightly', 'Monthly']);
 
     type('suspended-instalment-frequency', 'fortnightly');
-    expect(page.orderText()).toContain('by payments of £100.00 to the claimant every fortnight, the first instalment');
+    expect(page.orderText()).toContain('by payments of £100.00 to the Claimant every fortnight, the first instalment');
 
     recordAttendance();
     const body = page.body();

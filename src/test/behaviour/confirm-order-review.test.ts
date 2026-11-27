@@ -252,8 +252,8 @@ describe('confirm order review', () => {
 
       // The judge's order as submitted.
       const preview = document.querySelector('[data-order-preview]')!;
-      expect(preview.textContent).toContain("The defendant's application dated 19 October 2026 is dismissed.");
-      expect(preview.textContent).toContain("The claimant's application dated 21 October 2026 is dismissed.");
+      expect(preview.textContent).toContain("The Defendant's application dated 19 October 2026 is dismissed.");
+      expect(preview.textContent).toContain("The Claimant's application dated 21 October 2026 is dismissed.");
       expect(preview.textContent).not.toContain('possession');
 
       // Below it, the same screen the judge had: applications first, the claim behind its unticked box.
@@ -265,8 +265,8 @@ describe('confirm order review', () => {
       const lines = page.documentText().split('\n');
       expect(lines.slice(lines.indexOf('IT IS ORDERED THAT:'))).toEqual([
         'IT IS ORDERED THAT:',
-        "The defendant's application dated 19 October 2026 is dismissed.",
-        "The claimant's application dated 21 October 2026 is dismissed.",
+        "The Defendant's application dated 19 October 2026 is dismissed.",
+        "The Claimant's application dated 21 October 2026 is dismissed.",
       ]);
 
       // The caseworker can go on to issue it as it is.
@@ -294,7 +294,7 @@ describe('confirm order review', () => {
 
       expect(control('[name="app-gen-app-2-list-at"][value="7"]').checked).toBe(true);
       expect(page.documentText()).toContain(
-        "The claimant's application dated 21 October 2026 shall be heard at the hearing on 22 September 2026 at 10:00am."
+        "The Claimant's application dated 21 October 2026 shall be heard at the hearing on 22 September 2026 at 10:00am."
       );
       expect(errors((await app.post(REVIEW, page.body('ISSUE'))).text)).toEqual([
         'The hearing application GA2 is listed at has passed. Select another hearing',

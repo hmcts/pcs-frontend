@@ -4,16 +4,12 @@
 #}
 {% import "make-order/_compact.njk" as compact with context %}
 
-{#
-  An order on the court's own initiative starts with 7 days to apply by, as the judges asked, which the judge may
-  change. One without notice has no default. Either date filled in quickly is a working day.
-#}
-{% macro applyBy(prefix, default) %}
+{% macro applyBy(prefix) %}
   {{ compact.date({
     id: prefix,
     legend: "Application to be made by 4pm on",
-    default: default,
-    pills: [7, 14, 28],
+    default: noticeApplyBy,
+    pills: [10, 14, 28],
     workingDays: true
   }) }}
 {% endmacro %}
@@ -25,7 +21,7 @@
   classes: "govuk-radios--small",
   default: orderNoticeDefault,
   items: [
-    { value: "own-initiative", text: "Order on court's own initiative", conditional: { html: applyBy("own-initiative-by", ownInitiativeApplyBy) } },
+    { value: "own-initiative", text: "Order on court's own initiative", conditional: { html: applyBy("own-initiative-by") } },
     { value: "without-notice", text: "Order without notice", conditional: { html: applyBy("without-notice-by") } },
     { value: "none", text: "Neither" }
   ]

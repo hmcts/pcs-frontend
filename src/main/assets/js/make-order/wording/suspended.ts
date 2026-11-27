@@ -26,7 +26,7 @@ export function addSuspendedClauses(list: OrderedListBuilder, data: OrderData): 
 
   list.item('suspended-possession', content => {
     content
-      .text(`${sentenceCase(defendant)} must give up possession of `)
+      .text(`${sentenceCase(defendant)} must leave and give up possession of `)
       .fact('suspended-address', address)
       .text(` to ${claimant} on or before `);
     addPossessionDeadline(content, data, 'suspended-deadline', 'suspended-by-date', 'suspended-by-time');
@@ -38,7 +38,7 @@ export function addSuspendedClauses(list: OrderedListBuilder, data: OrderData): 
   } else if (options.includes('money-judgment-arrears')) {
     list.item('suspended-money-judgment', content => {
       content
-        .text('Judgment for the claimant in the sum of £')
+        .text(`Judgment is entered for ${claimant} against ${defendant} in the sum of £`)
         .fact('suspended-money-judgment-amount', money(value(data, 'suspended-arrears')), {
           sourceId: 'suspended-arrears',
         })
@@ -50,27 +50,22 @@ export function addSuspendedClauses(list: OrderedListBuilder, data: OrderData): 
     list.item('costs', content => addCosts(content, data, costs));
   }
 
-  const suspended = ['Execution of the order for possession'];
+  const suspended = ['the possession order'];
   if (options.includes('money-judgment-arrears') && selected(data, 'suspended-mj-same-terms', 'yes')) {
-    suspended.push('enforcement of the money judgment');
+    suspended.push('the money judgment');
   }
   if (selected(data, 'costs', 'yes') && SAME_TERMS_COSTS.has(value(data, 'costs-choice'))) {
-    suspended.push('enforcement of any order for costs');
+    suspended.push('any costs order');
   }
-  addPaymentConditions(
-    list,
-    data,
-    'suspended',
-    `${joinList(suspended)} ${suspended.length === 1 ? 'is' : 'are'} suspended as long as`
-  );
+  addPaymentConditions(list, data, 'suspended', `${sentenceCase(claimant)} may not enforce ${joinList(suspended)} if`);
   list.item(
     'suspended-paid-in-full',
-    'This order shall not be enforceable once the total of the sums awarded above have been paid.'
+    `Once ${defendant} ${data.defendants.length > 1 ? 'have' : 'has'} paid all the sums ordered, ${claimant} may no longer enforce this order.`
   );
   if (options.includes('warrant-on-notice')) {
     list.item(
       'suspended-warrant-on-notice',
-      'Any application for a warrant of possession must be heard on notice to all parties unless the court orders otherwise.'
+      'Any application for a warrant of possession must be heard on notice to all parties unless the Court orders otherwise.'
     );
   }
 }
