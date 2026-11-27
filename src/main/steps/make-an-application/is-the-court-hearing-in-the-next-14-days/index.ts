@@ -1,7 +1,8 @@
-import { createFormStep } from '../../../modules/steps';
+import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { isGenAppCuiSetAsideEnabled } from '@utils/isGenAppCuiSetAsideEnabled';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'is-the-court-hearing-in-the-next-14-days',
@@ -29,9 +30,21 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+  extendGetContent: (req, content) => {
+    const genAppCuiSetAsideEnabled = isGenAppCuiSetAsideEnabled(req);
+    const field = content.fields.find(item => item.componentType === 'radios');
+    if (field?.component) {
+      field.component.hint = {
+        text: getTranslationFunction(req)(genAppCuiSetAsideEnabled ? 'genAppCuiSetAside.hintText' : 'hintText'),
+      };
+    }
+    return { genAppCuiSetAsideEnabled };
+  },
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
+    otherParties: 'otherParties',
+    everyOtherPartyWillNeedToAgree: 'everyOtherPartyWillNeedToAgree',
   },
 });
