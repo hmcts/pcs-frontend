@@ -1,0 +1,31 @@
+{% extends "schedule-eviction/_layout.njk" %}
+
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% import "macros/xuiButtons.njk" as buttons with context %}
+
+{% set pageHeading = "Check your answers" %}
+
+{% block page %}
+  <form method="post" action="{{ formAction }}" novalidate>
+    {{ csrfProtection(csrfToken) }}
+
+    {{ govukSummaryList({
+      attributes: { id: "schedule-eviction-answers" },
+      rows: [
+        {
+          key: { text: "Has the court given permission to dispense with service?" },
+          value: { text: dispenseWithService },
+          actions: { items: [{ href: changeUrl + "#dispense-with-service", text: "Change", visuallyHiddenText: "whether the court has given permission to dispense with service" }] }
+        },
+        {
+          key: { text: "Scheduled eviction date" },
+          value: { text: scheduledEviction },
+          actions: { items: [{ href: changeUrl + "#eviction-date-day", text: "Change", visuallyHiddenText: "scheduled eviction date" }] }
+        }
+      ]
+    }) }}
+
+    {{ buttons.eventButtons("Submit") }}
+  </form>
+{% endblock %}

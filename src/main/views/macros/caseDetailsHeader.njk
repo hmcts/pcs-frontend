@@ -1,0 +1,10 @@
+{#
+  The heading and case details at the top of an XUI event page, as the enforcement designs show them:
+  the page heading, then the case number, property address and case name.
+#}
+{% macro caseDetailsHeader(params) %}
+  <h1 class="govuk-heading-l">{{ params.heading }}</h1>
+  <p class="govuk-body-l govuk-!-margin-bottom-0">Case number: {{ params.caseNumber }}</p>
+  <p class="govuk-body-l govuk-!-margin-bottom-0">Property address: {{ params.propertyAddress }}</p>
+  <p class="govuk-body-l">{{ params.caseName }}</p>
+{% endmacro %}

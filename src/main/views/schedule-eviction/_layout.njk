@@ -1,0 +1,23 @@
+{% extends "xui-layout.njk" %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/caseDetailsHeader.njk" import caseDetailsHeader %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errorSummary %}
+        {{ govukErrorSummary(errorSummary) }}
+      {% endif %}
+
+      {{ caseDetailsHeader({
+        heading: pageHeading,
+        caseNumber: caseNumber,
+        propertyAddress: propertyAddress,
+        caseName: caseName
+      }) }}
+
+      {% block page %}{% endblock %}
+    </div>
+  </div>
+{% endblock %}

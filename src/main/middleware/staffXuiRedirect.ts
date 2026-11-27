@@ -23,6 +23,10 @@ const FLAGGED_STAFF_JOURNEYS: readonly { flag: string; paths: readonly RegExp[] 
     flag: 'record-warrant-return-enabled',
     paths: [/^\/cases\/\d+\/event\/ext:recordWarrantReturn$/, /^\/case\/\d+\/record-warrant-return(?:\/.*)?$/],
   },
+  {
+    flag: 'eviction-scheduling-enabled',
+    paths: [/^\/cases\/\d+\/event\/ext:scheduleEviction$/, /^\/case\/\d+\/schedule-eviction(?:\/.*)?$/],
+  },
 ];
 
 const NON_PAGE_PATHS = [

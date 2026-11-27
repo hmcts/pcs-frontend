@@ -1,0 +1,43 @@
+{% extends "xui-layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "macros/caseDetailsHeader.njk" import caseDetailsHeader %}
+
+{% set pageHeading = "Schedule eviction" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ caseDetailsHeader({
+        heading: pageHeading,
+        caseNumber: caseNumber,
+        propertyAddress: propertyAddress,
+        caseName: caseName
+      }) }}
+
+      {{ govukPanel({ titleText: title, classes: "pcs-eviction-panel" }) }}
+
+      {# TODO HDPI-7344: the warrant number once there is one. #}
+      <p class="govuk-body">We've sent an email to the claimant with the eviction date.</p>
+      <p class="govuk-body">We will send you a new work task when they either:</p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>confirm the eviction date, or</li>
+        <li>decline the eviction date, if they cannot attend</li>
+      </ul>
+
+      <h2 class="govuk-heading-m">What you need to do next</h2>
+      <p class="govuk-body">You need to:</p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>
+          <a class="govuk-link" href="{{ caseFileViewUrl }}" target="_blank" rel="noopener noreferrer">go to Case File View (same service, opens in a new tab)</a>
+        </li>
+        <li>print the 'notice of eviction' (form N54)</li>
+        <li>deliver the completed form to the defendants</li>
+        <li>return to this service and mark the 'notice of eviction' as served</li>
+      </ul>
+
+      {{ govukButton({ text: "Close and return to case summary", href: closeUrl }) }}
+    </div>
+  </div>
+{% endblock %}

@@ -14,6 +14,7 @@ const HANDED_OVER_PARAMS = new Map<unknown, readonly string[]>([
   ['ext:makeOrder', ['orderId', 'taskId', 'genAppId', 'hearingId']],
   ['ext:confirmOrderReview', ['orderId', 'taskId']],
   ['ext:recordWarrantReturn', []],
+  ['ext:scheduleEviction', []],
 ]);
 
 // Ids only, which the redirect passes on unchanged.
