@@ -61,6 +61,8 @@ export interface OrderApplication {
   withoutNotice?: 'YES' | 'NO' | null;
   withoutNoticeReason?: string | null;
   whatOrderWanted?: string | null;
+  /** The applicant's draft order as rich text (HTML), cleaned by pcs-api when stored. */
+  draftOrderWording?: string | null;
   documents: { id: string; fileName: string }[];
 }
 
