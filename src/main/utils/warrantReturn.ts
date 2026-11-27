@@ -315,6 +315,22 @@ const EVICTION_DATE_INPUT_IDS = [
   'eviction-date-minute',
 ];
 
+const RETURN_DATE_FINAL_INPUT_IDS = [
+  'return-date-final-day',
+  'return-date-final-month',
+  'return-date-final-year',
+  'return-date-final-hour',
+  'return-date-final-minute',
+];
+
+const RETURN_DATE_INPUT_INTERIM_IDS = [
+  'return-date-interim-day',
+  'return-date-interim-month',
+  'return-date-interim-year',
+  'return-date-interim-hour',
+  'return-date-interim-minute',
+];
+
 export function initWarrantReturn(): void {
   const returnTypeList = document.querySelector<HTMLSelectElement>('select#return-type');
   if (!returnTypeList) {
@@ -351,12 +367,23 @@ function updateWarrantReturnVisibility(): void {
 
   const isEvictionUnsuccessfulOrCancelled =
     isFinal && (finalOutcome === EvictionOutcome.UNSUCCESSFUL || finalOutcome === EvictionOutcome.CANCELLED);
-  setSectionVisible('eviction-unsuccessful-cancelled', isEvictionUnsuccessfulOrCancelled, () =>
-    resetSelect('eviction-unsuccessful-return-name')
-  );
+  setSectionVisible('eviction-unsuccessful-cancelled', isEvictionUnsuccessfulOrCancelled, () => {
+    resetSelect('eviction-unsuccessful-return-name');
+    RETURN_DATE_FINAL_INPUT_IDS.forEach(resetInput);
+  });
 
   const isInterim = returnType === WarrantReturnType.INTERIM;
-  setSectionVisible('interim', isInterim, () => resetSelect('interim-return-name'));
+  setSectionVisible('interim', isInterim, () => {
+    resetSelect('interim-return-name');
+    RETURN_DATE_INPUT_INTERIM_IDS.forEach(resetInput);
+  });
+
+  setSectionVisible('return-type-conditional', isInterim || isFinal, () => undefined);
+  setSectionVisible(
+    'final-outcome-conditional',
+    isEvictionSuccessful || isEvictionUnsuccessfulOrCancelled,
+    () => undefined
+  );
 
   updateAdditionalDetailsLabel();
 }
