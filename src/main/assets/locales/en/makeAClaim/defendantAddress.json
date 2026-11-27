@@ -1,0 +1,21 @@
+{
+  "pageTitle": "Defendant’s address for service",
+  "question": "Is {{defendantName}}’s address for service {{propertyAddress}}?",
+  "finder": {
+    "label": "What is their address for service?",
+    "enterManually": "Enter an address manually"
+  },
+  "theDefendant": "the defendant",
+  "hint": "An address for service is where someone will receive court documents about the claim by post. If you’re not sure where a defendant is living, you should provide their last known address.",
+  "options": {
+    "yes": "Yes",
+    "no": "No, they have a different address for service"
+  },
+  "errors": {
+    "sameAsProperty": "Select whether this is the defendant’s address for service",
+    "defendant-addressLine1": "Enter the first line of the defendant’s address",
+    "defendant-town": "Enter the town or city of the defendant’s address",
+    "defendant-postcode": "Enter the postcode of the defendant’s address",
+    "postcodeInvalid": "Enter a real postcode, like LU1 1AB"
+  }
+}

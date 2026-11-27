@@ -1,0 +1,34 @@
+{% extends "make-a-claim/templates/question.njk" %}
+{% from "make-a-claim/templates/fields.njk" import formField, addressFinder %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+{% block formFields %}
+  {% if addressQuestion %}
+    {% set finderHtml %}{{ addressFinder(addressPrefix, fields, addressLabels, addressOpen) }}{% endset %}
+    {% for field in fields %}
+      {% if field.name == addressQuestion %}
+        {% set items = [] %}
+        {% for item in field.component.items %}
+          {% if item.value == 'no' %}
+            {% set items = (items.push({ value: item.value, text: item.text, checked: item.checked, conditional: { html: finderHtml } }), items) %}
+          {% else %}
+            {% set items = (items.push(item), items) %}
+          {% endif %}
+        {% endfor %}
+        {{ govukRadios({
+          name: field.component.name,
+          idPrefix: field.component.idPrefix or field.component.name,
+          fieldset: field.component.fieldset,
+          hint: field.component.hint,
+          errorMessage: field.component.errorMessage,
+          items: items
+        }) }}
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    {% if addressHeading %}
+      <h2 class="govuk-heading-s">{{ addressHeading }}</h2>
+    {% endif %}
+    {{ addressFinder(addressPrefix, fields, addressLabels, addressOpen) }}
+  {% endif %}
+{% endblock %}

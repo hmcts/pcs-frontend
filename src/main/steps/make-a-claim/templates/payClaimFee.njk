@@ -1,0 +1,19 @@
+{% extends "make-a-claim/templates/layout.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% block mainContent %}
+  {% if paymentProblem %}
+    {{ govukErrorSummary({ titleText: problemTitle, descriptionText: paymentProblem }) }}
+  {% endif %}
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+  <h2 class="govuk-heading-s">{{ makePaymentHeading }}</h2>
+  <p class="govuk-body">{{ payIntro }}</p>
+  {{ govukTable({
+    firstCellIsHeader: false,
+    head: [{ text: feeHeading }, { text: amountHeading, format: 'numeric' }],
+    rows: [[{ text: feeName }, { text: feeAmount, format: 'numeric' }]]
+  }) }}
+  {{ govukButton({ text: payButton, href: payUrl }) }}
+{% endblock %}

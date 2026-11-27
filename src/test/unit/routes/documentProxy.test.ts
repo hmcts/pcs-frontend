@@ -225,6 +225,30 @@ describe('documentProxyRoutes', () => {
       expect(cb).toHaveBeenCalledWith(null, true);
     });
 
+    it('accepts a .doc for a step with no restriction, as respond to claim does', () => {
+      const cb = jest.fn();
+      const file = { mimetype: 'application/msword', originalname: 'letter.doc' } as Express.Multer.File;
+      fileFilter({ uploadValidation: { maxFilenameLength: 255 } } as unknown as Request, file, cb);
+      expect(cb).toHaveBeenCalledWith(null, true);
+    });
+
+    it('rejects a .doc for a step with a restriction, and accepts a PDF', () => {
+      const restriction = {
+        types: [{ extension: '.pdf', mimeType: 'application/pdf' }],
+        maxBytes: 20 * 1024 * 1024,
+        wrongTypeKey: 'errors.documentUpload.restrictedFileType',
+        tooLargeKey: 'errors.documentUpload.restrictedFileTooLarge',
+      };
+      const req = { uploadValidation: { restriction } } as unknown as Request;
+      const refused = jest.fn();
+      fileFilter(req, { mimetype: 'application/msword', originalname: 'letter.doc' } as Express.Multer.File, refused);
+      expect(refused.mock.calls[0][0]).toBeInstanceOf(UploadValidationFailure);
+      expect(refused.mock.calls[0][0].validationError).toEqual({ kind: 'invalid_type' });
+      const accepted = jest.fn();
+      fileFilter(req, { mimetype: 'application/pdf', originalname: 'letter.pdf' } as Express.Multer.File, accepted);
+      expect(accepted).toHaveBeenCalledWith(null, true);
+    });
+
     it('rejects blocked media with UploadValidationFailure(blocked_media)', () => {
       const cb = jest.fn();
       const file = { mimetype: 'video/mp4', originalname: 'video.mp4' } as Express.Multer.File;

@@ -1,0 +1,10 @@
+{
+  "pageTitle": "cyWhich date of the month is rent due?",
+  "question": "cyWhich date of the month is rent due?",
+  "hint": "cyFor example, if rent is due on the 28th of each month, enter ‘28’",
+  "errors": {
+    "rentDueDay": "cyEnter the date of the month rent is due",
+    "rentDueDayInvalid": "cyEnter a date of the month from 1 to 31",
+    "tooManyPeriods": "cyThe rent statement would then cover more than {{limit}} rent periods. Change the statement period to a shorter one first"
+  }
+}

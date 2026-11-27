@@ -1,0 +1,15 @@
+{
+  "pageTitle": "cyCan you upload a copy of the notice you served?",
+  "question": "cyCan you upload a copy of the notice you served?",
+  "hint": "cyIf you served more than one notice, you should only upload one now. You can upload any other notices later on.",
+  "labels": {
+    "noticeUnavailableReason": "cyWhy can you not upload a copy of the notice you served?"
+  },
+  "errors": {
+    "noticeAvailable": "cySelect whether you can upload a copy of the notice",
+    "noticeUnavailableReason": "cyExplain why you cannot upload a copy of the notice"
+  },
+  "fieldNames": {
+    "noticeUnavailableReason": "cyYour reason for not uploading the notice"
+  }
+}

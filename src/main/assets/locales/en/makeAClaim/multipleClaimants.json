@@ -1,0 +1,8 @@
+{
+  "pageTitle": "Do you want to add another claimant to this claim?",
+  "question": "Do you want to add another claimant to this claim?",
+  "hint": "As you are making this claim, you are a claimant. Other claimants might be people who share ownership of the property with you.",
+  "errors": {
+    "multipleClaimants": "Select whether you want to add another claimant"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "pageTitle": "cyWhat is their email address?",
+  "question": "cyWhat is their email address?",
+  "hint": "cyImportant documents like orders will always be sent by post",
+  "errors": {
+    "emailAddressInvalid": "cyEnter an email address in the correct format, like name@example.com"
+  }
+}

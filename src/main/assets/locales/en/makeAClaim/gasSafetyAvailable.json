@@ -1,0 +1,14 @@
+{
+  "pageTitle": "Can you upload a copy of the current gas safety report?",
+  "question": "Can you upload a copy of the current gas safety report?",
+  "labels": {
+    "noGasSafetyReportReason": "Explain why you cannot upload a copy of the current gas safety report."
+  },
+  "errors": {
+    "hasGasSafetyReport": "Select whether you can upload a copy of the current gas safety report",
+    "noGasSafetyReportReason": "Explain why you cannot upload a copy of the current gas safety report"
+  },
+  "fieldNames": {
+    "noGasSafetyReportReason": "Your reason for not uploading the current gas safety report"
+  }
+}

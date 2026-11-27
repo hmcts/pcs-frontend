@@ -1,0 +1,12 @@
+{
+  "pageTitle": "cyDo they want to be contacted by text message?",
+  "question": "cyDo they want to be contacted by text message?",
+  "hint": "cyWe might also send them updates about their case by text message",
+  "labels": {
+    "textMessageNumber": "cyMobile phone number"
+  },
+  "errors": {
+    "contactByText": "cySelect whether they want to be contacted by text message",
+    "textMessageNumber": "cyEnter a mobile phone number"
+  }
+}

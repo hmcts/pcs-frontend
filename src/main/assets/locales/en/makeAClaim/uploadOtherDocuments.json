@@ -1,0 +1,14 @@
+{
+  "pageTitle": "Upload files (optional)",
+  "heading": "Upload files (optional)",
+  "paragraphs": [
+    "You can upload any files that you believe are relevant to your claim or that a judge should be aware of."
+  ],
+  "beforeUploadHeading": "Before you upload your files",
+  "beforeUploadText": "Give each file a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
+  "uploadLabel": "Upload files",
+  "uploadHint": "You can upload a PDF, Word (DOCX) or Excel (XLSX) file. Each file must be smaller than 20MB.",
+  "uploadButton": "Upload file",
+  "filesAddedHeading": "Files added",
+  "deleteButton": "Remove"
+}

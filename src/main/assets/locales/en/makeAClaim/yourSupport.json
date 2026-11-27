@@ -1,0 +1,62 @@
+{
+  "pageTitle": "Tell us if you need support",
+  "heading": "Tell us if you need support",
+  "continueButton": "Continue to the questions",
+  "skipButton": "I do not need any support at this time",
+  "contentBlocks": [
+    {
+      "heading": "Asking for a reasonable adjustment"
+    },
+    {
+      "text": "Some people need support to access information and use our services. We call this a reasonable adjustment."
+    },
+    {
+      "text": "Examples:"
+    },
+    {
+      "bullets": [
+        "step-free access to the court",
+        "bringing support with you to the hearing, like an assistance dog",
+        "documents in an alternative format, like large print",
+        "regular breaks during a hearing to make you feel more comfortable"
+      ]
+    },
+    {
+      "text": "You can ask for a reasonable adjustment now by selecting ‘Continue to the questions’, or at any time during your case by selecting ‘Your support’ from your case overview."
+    },
+    {
+      "text": "Once you’ve submitted your request for support, it’ll be reviewed by the court or a judge. We’ll keep you updated on the status of the request in your account. If we need more information we’ll contact you by the preferred method you’ve already chosen."
+    },
+    {
+      "heading": "Asking for something else"
+    },
+    {
+      "text": "You must contact the court directly to ask for something else for you or someone else who’s coming to court to support you."
+    },
+    {
+      "text": "Other support includes:"
+    },
+    {
+      "bullets": [
+        "communication and documents in Welsh or to speak Welsh at your hearing",
+        "a language interpreter",
+        "special measures, like giving evidence in private, because you’re vulnerable"
+      ]
+    },
+    {
+      "heading": "Contact the court by email"
+    },
+    {
+      "text": "Use the <a class=\"govuk-link\" href=\"https://www.gov.uk/find-court-tribunal\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address. If you do not know the name of your local court, select the ‘Money’ category and then the ‘Housing’ category to find it."
+    },
+    {
+      "heading": "Contact the court by telephone"
+    },
+    {
+      "text": "0300 123 7050<br>Monday to Friday, 8.30am to 5pm"
+    },
+    {
+      "text": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
+    }
+  ]
+}

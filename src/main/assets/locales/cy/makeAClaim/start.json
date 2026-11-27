@@ -1,0 +1,24 @@
+{
+  "pageTitle": "cyMake a property possession claim online",
+  "heading": "cyMake a property possession claim online",
+  "feeKnown": "cyIt costs {{fee}} to make a claim. You can pay using a debit or credit card.",
+  "feeUnknown": "cyThere is a fee to make a claim. You can pay using a debit or credit card.",
+  "paragraphs": [
+    "cyIf you’re on a low income, have limited savings or are claiming benefits, you may be able to get help with your fee. If you meet the criteria, you may get support to pay some or all of the fee. <a class=\"govuk-link\" href=\"https://www.gov.uk/get-help-with-court-fees\" target=\"_blank\" rel=\"noopener noreferrer\">Check if you can get help with fees (opens in new tab)</a>."
+  ],
+  "welshAvailable": "cyThis service is also available <a class=\"govuk-link\" href=\"?lang=cy\">in Welsh (Cymraeg)</a>.",
+  "eligibilityHeading": "cyCompleting your claim",
+  "eligibilityIntro": "cyYou can use this service if the following apply:",
+  "bullets": [
+    "cyyou’re a private landlord",
+    "cyyou’re claiming possession of a property in England or Wales",
+    "cyyou’re over 18"
+  ],
+  "afterBullets": [
+    "cyWe’ll ask some questions to check you’re eligible to use this service.",
+    "cyYou cannot take court action to repossess a property if you’re told that someone is temporarily protected from creditors through the ‘Breathing Space’ scheme. Find out <a class=\"govuk-link\" href=\"https://www.gov.uk/guidance/debt-respite-breathing-space-scheme-creditors-responsibilities-to-the-court\" target=\"_blank\" rel=\"noopener noreferrer\">what to do when someone is using the ‘Breathing Space’ scheme (opens in new tab)</a>."
+  ],
+  "afterClaimHeading": "cyWhat happens after",
+  "afterClaimText": "cyA court hearing will be scheduled where a judge will make a decision about your possession claim.",
+  "startButton": "cyStart now"
+}

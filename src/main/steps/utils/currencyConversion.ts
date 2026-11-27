@@ -61,3 +61,22 @@ export function poundsToPence(pounds: string | undefined): string | undefined {
   const pence = Math.round(poundsValue * 100);
   return String(pence);
 }
+
+const STRICT_AMOUNT = /^\d{1,10}(?:\.\d{1,2})?$/;
+
+/**
+ * Converts pounds as typed to pence, refusing anything that is not plainly an amount: up to 2 decimal places, with
+ * commas and a leading £ allowed. Unlike {@link poundsToPence} it never reads a number out of other text, so
+ * '12abc' or '1.234' give undefined.
+ * @example
+ * strictPoundsToPence('£1,250.5') // returns '125050'
+ * strictPoundsToPence('12abc')    // returns undefined
+ */
+export function strictPoundsToPence(value: unknown): string | undefined {
+  const amount = typeof value === 'string' ? value.trim().replace(/,/g, '').replace(/^£/, '') : '';
+  if (!STRICT_AMOUNT.test(amount)) {
+    return undefined;
+  }
+  const [pounds, pennies = ''] = amount.split('.');
+  return String(Number(pounds) * 100 + Number(pennies.padEnd(2, '0')));
+}

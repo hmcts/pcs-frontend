@@ -18,6 +18,23 @@ const STATUS_TAG_CLASSES: Partial<Record<SectionStatus, string>> = {
   NOT_AVAILABLE_YET: 'govuk-tag govuk-tag--grey',
 };
 
+/** How a journey's sections are confirmed on their check your answers pages. */
+export interface SectionConfirmation {
+  /** Whether the section ends at check your answers pages the citizen continues from. */
+  hasCya: (section: SectionConfig) => boolean;
+  /** Whether the citizen has continued from every one of them since last changing the section's answers. */
+  isConfirmed: (section: SectionConfig, req: Request) => boolean;
+  /** Whether a confirmed section is done even with a question unanswered. */
+  confirmationCompletes: boolean;
+}
+
+/** Respond to a claim's sections: confirmation is the citizen's explicit "I'm done" and overrides per-step scoring. */
+export const respondToClaimSectionConfirmation: SectionConfirmation = {
+  hasCya: sectionHasCya,
+  isConfirmed: userHasCompletedSectionViaCya,
+  confirmationCompletes: true,
+};
+
 export const getStatusTagClasses = (status: SectionStatus): string | undefined => STATUS_TAG_CLASSES[status];
 
 export function getFirstVisibleStep(
@@ -31,7 +48,8 @@ export function getFirstVisibleStep(
 export async function getAllSectionStatuses(
   flowConfig: JourneyFlowConfig,
   stepRegistry: Record<string, StepDefinition>,
-  req: Request
+  req: Request,
+  confirmation: SectionConfirmation = respondToClaimSectionConfirmation
 ): Promise<Map<string, SectionStatus>> {
   if (!flowConfig.sections) {
     throw new Error(
@@ -44,7 +62,7 @@ export async function getAllSectionStatuses(
   // Declaration order is topological — validateSectionConfig enforces it at startup.
   const statuses = new Map<string, SectionStatus>();
   for (const section of flowConfig.sections) {
-    const status = await getSectionStatus(section, flowConfig, stepRegistry, req, statuses);
+    const status = await getSectionStatus(section, flowConfig, stepRegistry, req, statuses, confirmation);
     statuses.set(section.id, status);
   }
 
@@ -56,7 +74,8 @@ export async function getSectionStatus(
   flowConfig: JourneyFlowConfig,
   stepRegistry: Record<string, StepDefinition>,
   req: Request,
-  allStatuses: ReadonlyMap<string, SectionStatus>
+  allStatuses: ReadonlyMap<string, SectionStatus>,
+  confirmation: SectionConfirmation = respondToClaimSectionConfirmation
 ): Promise<SectionStatus> {
   assertSectionalisedFlow(flowConfig, section.id);
 
@@ -67,26 +86,27 @@ export async function getSectionStatus(
     return 'NOT_AVAILABLE_YET';
   }
 
-  // CYA confirmation is the citizen's explicit "I'm done" — it overrides per-step scoring.
-  // Edits revoke it via clearSectionCompletionOnEdit (buildDraftDefendantResponse), so the
-  // section auto-drops back to whatever scoreAnsweredness reports.
-  if (sectionHasCya(section) && userHasCompletedSectionViaCya(section, req)) {
+  // Edits revoke confirmation (respond to a claim: clearSectionCompletionOnEdit in
+  // buildDraftDefendantResponse; make a claim: confirmationsAfterSave), so the section drops back
+  // to whatever scoreAnsweredness reports.
+  const hasCya = confirmation.hasCya(section);
+  const confirmed = hasCya && confirmation.isConfirmed(section, req);
+  if (confirmed && confirmation.confirmationCompletes) {
     return 'DONE';
   }
 
   const questionSteps = visibleQuestionSteps(section, stepRegistry, flowConfig, req);
   if (questionSteps.length === 0) {
-    // No countable question steps. If the section has a CYA the citizen still has to walk to,
-    // status is gated purely on completedSections — handled above for DONE. Otherwise AVAILABLE.
-    if (sectionHasCya(section)) {
-      return 'AVAILABLE';
+    // No countable question steps: a section with a CYA is gated purely on its confirmation.
+    if (hasCya) {
+      return confirmed ? 'DONE' : 'AVAILABLE';
     }
     return 'NOT_APPLICABLE';
   }
 
   const raw = scoreAnsweredness(questionSteps, req);
   if (raw === 'DONE') {
-    return sectionHasCya(section) ? 'IN_PROGRESS' : 'DONE';
+    return hasCya && !confirmed ? 'IN_PROGRESS' : 'DONE';
   }
   return raw;
 }
@@ -184,7 +204,7 @@ function scoreAnsweredness(questionSteps: RegisteredStep[], req: Request): Secti
   return 'DONE';
 }
 
-function isStepVisible(stepName: string, flowConfig: JourneyFlowConfig, req: Request): boolean {
+export function isStepVisible(stepName: string, flowConfig: JourneyFlowConfig, req: Request): boolean {
   const stepConfig = flowConfig.steps[stepName];
   if (!stepConfig?.showCondition) {
     return true;

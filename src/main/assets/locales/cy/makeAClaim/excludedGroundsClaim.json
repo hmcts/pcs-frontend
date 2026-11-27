@@ -1,0 +1,14 @@
+{
+  "pageTitle": "cyGrounds for possession",
+  "heading": "cyGrounds for possession",
+  "paragraphs": [
+    "cyIn some cases, you can make a possession claim without relying on a specific ground. If your claim meets these requirements, you can select that you have no grounds for possession.",
+    "cyYou may have already given the defendants notice of your intention to begin possession proceedings.",
+    "cyIf you have, you should have written the grounds you’re making your claim under. You should select these grounds here and any extra grounds you’d like to add to your claim, if you need to.",
+    "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/government/publications/grounds-for-possession-guidance-for-landlords-and-letting-agents\" target=\"_blank\" rel=\"noopener noreferrer\">More information about possession grounds (opens in new tab)</a>"
+  ],
+  "question": "cyDo you have grounds for possession?",
+  "errors": {
+    "hasExcludedGrounds": "cySelect whether you have grounds for possession"
+  }
+}

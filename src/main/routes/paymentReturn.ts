@@ -4,7 +4,7 @@ import { oidcMiddleware } from '../middleware/oidc';
 
 import { Logger } from '@modules/logger';
 import { clearPaymentReferenceOnly, retainPaymentReferenceOnly } from '@services/paymentSessionService';
-import { getPaymentOutcome, paymentService } from '@services/pcsApi/paymentService';
+import { getPaymentOutcome, isDeclinedPaymentStatus, paymentService } from '@services/pcsApi/paymentService';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('paymentReturn');
@@ -45,7 +45,8 @@ async function handlePaymentReturnConfirmation(req: Request, res: Response): Pro
       redirectTarget = successRedirectUrl;
       await retainPaymentReferenceOnly(req);
     } else if (outcome === 'failure') {
-      redirectTarget = failureRedirectUrl;
+      redirectTarget =
+        (isDeclinedPaymentStatus(statusResponse.status) && paymentSession.declinedRedirectUrl) || failureRedirectUrl;
       await clearPaymentReferenceOnly(req);
     } else {
       await retainPaymentReferenceOnly(req);

@@ -1,0 +1,8 @@
+{
+  "pageTitle": "What is their email address?",
+  "question": "What is their email address?",
+  "hint": "Important documents like orders will always be sent by post",
+  "errors": {
+    "emailAddressInvalid": "Enter an email address in the correct format, like name@example.com"
+  }
+}

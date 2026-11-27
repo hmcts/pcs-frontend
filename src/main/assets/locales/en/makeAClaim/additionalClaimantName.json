@@ -1,0 +1,13 @@
+{
+  "pageTitle": "What is their name?",
+  "heading": "What is their name?",
+  "labels": {
+    "firstName": "First name",
+    "lastName": "Last name"
+  },
+  "errors": {
+    "firstName": "Enter their first name",
+    "lastName": "Enter their last name",
+    "nameTooLong": "Their first and last name together must be 60 characters or fewer, including the space between them"
+  }
+}

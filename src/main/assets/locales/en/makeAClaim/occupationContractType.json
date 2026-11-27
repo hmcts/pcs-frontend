@@ -1,0 +1,19 @@
+{
+  "pageTitle": "What type of occupation contract or licence is in place, or was in place?",
+  "question": "What type of occupation contract or licence is in place, or was in place?",
+  "options": {
+    "STANDARD_CONTRACT": "Standard contract",
+    "SECURE_CONTRACT": "Secure contract",
+    "OTHER": "Other"
+  },
+  "labels": {
+    "otherOccupationContractDetails": "Give details of the type of occupation contract or licence"
+  },
+  "errors": {
+    "occupationContractType": "Select the type of occupation contract or licence",
+    "otherOccupationContractDetails": "Enter the type of occupation contract or licence"
+  },
+  "fieldNames": {
+    "otherOccupationContractDetails": "The type of occupation contract or licence"
+  }
+}

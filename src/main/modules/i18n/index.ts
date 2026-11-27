@@ -192,6 +192,9 @@ function createI18nextConfig(localesDir: string, namespaces: string[]): InitOpti
 export class I18n {
   private readonly logger = Logger.getLogger('i18n');
 
+  /** Settles once the translation resources for every namespace and language are loaded. */
+  public ready: Promise<void> = Promise.resolve();
+
   public enableFor(app: Express): void {
     const candidates = [
       process.env.LOCALES_DIR || '',
@@ -215,16 +218,19 @@ export class I18n {
     const ns = localesDir ? discoverNamespaces(localesDir, 'en') : ['common'];
     const i18nextConfig = createI18nextConfig(localesDir || '', ns);
 
-    i18next
-      .use(Backend)
-      .use(LanguageDetector)
-      .init(i18nextConfig, err => {
-        if (err) {
-          this.logger.error('[i18n] init error', err);
-        } else {
-          this.logger.info('[i18n] initialised OK');
-        }
-      });
+    this.ready = new Promise<void>(resolve => {
+      i18next
+        .use(Backend)
+        .use(LanguageDetector)
+        .init(i18nextConfig, err => {
+          if (err) {
+            this.logger.error('[i18n] init error', err);
+          } else {
+            this.logger.info('[i18n] initialised OK');
+          }
+          resolve();
+        });
+    });
 
     pluralPossessive(i18next);
     ordinalDate(i18next);

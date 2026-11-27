@@ -1,0 +1,11 @@
+{
+  "pageTitle": "About the defendants",
+  "heading": "About the defendants",
+  "paragraphs": [
+    "You must now provide details of the person or people you’re making the claim against. This could be your tenant, licensee or occupation contract holder.",
+    "You do not need to include anyone under the age of 18 living in the property.",
+    "They will be known as the ‘defendants’.",
+    "We’ll ask for:"
+  ],
+  "bullets": ["their name", "their address for service (the address where they should receive post)"]
+}

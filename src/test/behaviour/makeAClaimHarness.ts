@@ -1,0 +1,446 @@
+/**
+ * Runs the private landlord make a claim journey as the application does: real routes, middleware, templates and
+ * translations. Only the boundary is faked: CCD and pcs-api are tiny HTTP servers, LaunchDarkly answers as the Test
+ * environment is configured to, and the signed-in citizen is placed on the session.
+ */
+import * as http from 'node:http';
+import { type AddressInfo } from 'node:net';
+
+import express, { type Express, type Request, type Response } from 'express';
+
+export const CASE_REFERENCE = '1777027600017761';
+
+export interface StoredCase {
+  state?: string;
+  propertyAddress?: Record<string, string>;
+  citizenPossessionClaim?: Record<string, unknown>;
+}
+
+/** What CCD holds and what it was asked, for a test to set up and inspect. */
+export const ccd = {
+  stored: undefined as StoredCase | undefined,
+  createRequests: [] as Record<string, unknown>[],
+  draftSaves: [] as Record<string, unknown>[],
+  submissions: [] as Record<string, unknown>[],
+  cardPayments: [] as Record<string, unknown>[],
+  refuseCreate: undefined as string | undefined,
+  refuseSubmit: undefined as string[] | undefined,
+  changeDraftBeforeNextSave: false,
+  cardPaymentStatus: 'Success',
+  /** pcs-api's answer to the property eligibility check, or an HTTP error code it fails with. */
+  propertyEligibility: { status: 'ELIGIBLE', legislativeCountry: 'England' } as Record<string, string> | number,
+  eligibilityChecks: [] as Record<string, unknown>[],
+  /** pcs-api's answer to the claim issue fee lookup, or an HTTP error code it fails with. */
+  claimIssueFee: { amount: '404.00', code: 'FEE0412', version: 4 } as Record<string, unknown> | number,
+  /** The service tokens the claim issue fee was asked with. */
+  claimIssueFeeRequests: [] as (string | undefined)[],
+  searches: [] as Record<string, unknown>[],
+  /** Whether CCD's case search fails rather than answering. */
+  searchFails: false,
+  /** The claims made against the signed-in citizen, as pcs-api lists them. */
+  claimsAgainst: [] as Record<string, unknown>[],
+  /** Whether pcs-api fails listing the claims the citizen made. */
+  asClaimantFails: false,
+  /** Whether the stored case is one the signed-in citizen created as claimant. */
+  storedCaseIsTheirs: true,
+  /** What Your Support (cui-ra) was asked, and what it returns for a payload id. */
+  cuiRaRequests: [] as Record<string, unknown>[],
+  cuiRaPayload: undefined as Record<string, unknown> | undefined,
+  /** The status PCQ's health check answers with. */
+  pcqStatus: 'UP',
+  /** Files CDAM was asked to store. */
+  cdamUploads: 0,
+};
+
+/** pcs-api's draft version: every save that names the stored version moves it on; a stale one is refused. */
+function draftVersion(): number {
+  return Number(ccd.stored?.citizenPossessionClaim?.draftVersion ?? 0);
+}
+
+function jwt(claims: Record<string, unknown>): string {
+  const encode = (value: unknown): string => Buffer.from(JSON.stringify(value)).toString('base64url');
+  return `${encode({ alg: 'none' })}.${encode(claims)}.`;
+}
+
+function ccdStub(): Express {
+  const stub = express();
+  stub.use(express.json({ limit: '10mb' }));
+  stub.get('/cases/citizen-claims/property-eligibility', (req: Request, res: Response) => {
+    ccd.eligibilityChecks.push(req.query);
+    return typeof ccd.propertyEligibility === 'number'
+      ? res.status(ccd.propertyEligibility).json({ message: 'Unavailable' })
+      : res.json(ccd.propertyEligibility);
+  });
+  stub.get('/fees/claim-issue', (req: Request, res: Response) => {
+    ccd.claimIssueFeeRequests.push(req.header('ServiceAuthorization'));
+    return typeof ccd.claimIssueFee === 'number'
+      ? res.status(ccd.claimIssueFee).json({ message: 'Unavailable' })
+      : res.json(ccd.claimIssueFee);
+  });
+  stub.get('/cases/citizen-claims', (_req: Request, res: Response) => {
+    res.json(ccd.claimsAgainst);
+  });
+  stub.get('/cases/citizen-claims/as-claimant', (_req: Request, res: Response) => {
+    if (ccd.asClaimantFails) {
+      return res.status(500).json({ message: 'Unavailable' });
+    }
+    const address = ccd.stored?.citizenPossessionClaim?.propertyAddress as Record<string, string> | undefined;
+    res.json(
+      ccd.stored && ccd.storedCaseIsTheirs
+        ? [
+            {
+              caseReference: CASE_REFERENCE,
+              state: ccd.stored.state,
+              paymentStatus:
+                (ccd.stored.citizenPossessionClaim?.submission as Record<string, string> | undefined)?.paymentStatus ??
+                null,
+              propertyAddress: address && {
+                addressLine1: address.AddressLine1,
+                postTown: address.PostTown,
+                postcode: address.PostCode,
+              },
+            },
+          ]
+        : []
+    );
+  });
+  stub.get('/case-types/:caseType/event-triggers/citizenCreatePossessionClaim', (_req, res) => {
+    res.json({ token: 'create-token' });
+  });
+  stub.post('/searchCases', (req: Request, res: Response) => {
+    ccd.searches.push({ ctid: req.query.ctid, ...req.body });
+    if (ccd.searchFails) {
+      return res.status(500).json({ message: 'Search unavailable' });
+    }
+    const state = req.body?.query?.bool?.filter?.[0]?.match?.state;
+    const cases =
+      ccd.stored && ccd.stored.state === state ? [{ id: Number(CASE_REFERENCE), state: ccd.stored.state }] : [];
+    res.json({ total: cases.length, cases });
+  });
+  stub.post('/case-types/:caseType/cases', (req: Request, res: Response) => {
+    ccd.createRequests.push(req.body);
+    const countryGiven = Boolean(req.body.data.citizenPossessionClaim.eligibility?.legislativeCountry);
+    if (ccd.refuseCreate && !(ccd.refuseCreate === 'LEGISLATIVE_COUNTRY_REQUIRED' && countryGiven)) {
+      return res.status(422).json({ callbackErrors: [ccd.refuseCreate] });
+    }
+    const sent = req.body.data.citizenPossessionClaim;
+    // As pcs-api does, the claim keeps the country the property is in: the one chosen, or the one its postcode is in
+    const legislativeCountry =
+      sent.eligibility?.legislativeCountry ??
+      (typeof ccd.propertyEligibility === 'number' ? undefined : ccd.propertyEligibility.legislativeCountry) ??
+      'England';
+    ccd.stored = {
+      state: 'AWAITING_SUBMISSION_TO_HMCTS',
+      citizenPossessionClaim: { ...sent, eligibility: { ...sent.eligibility, legislativeCountry }, draftVersion: 1 },
+    };
+    res.status(201).json({ id: Number(CASE_REFERENCE), data: {} });
+  });
+  stub.post('/case-types/:caseType/validate', (req: Request, res: Response) => {
+    ccd.draftSaves.push({ pageId: req.query.pageId, ...req.body });
+    if (!ccd.stored) {
+      return res.status(404).json({ message: 'No case' });
+    }
+    const sent = req.body.event_data.citizenPossessionClaim;
+    if (ccd.changeDraftBeforeNextSave) {
+      ccd.changeDraftBeforeNextSave = false;
+      ccd.stored.citizenPossessionClaim = {
+        ...ccd.stored.citizenPossessionClaim,
+        otherInformation: { languageUsed: 'WELSH' },
+        draftVersion: draftVersion() + 1,
+      };
+    }
+    if (sent.draftVersion !== undefined && sent.draftVersion !== draftVersion()) {
+      return res.status(422).json({ callbackErrors: ['DRAFT_CHANGED'] });
+    }
+    ccd.stored.citizenPossessionClaim = {
+      ...sent,
+      propertyAddress: ccd.stored.citizenPossessionClaim?.propertyAddress,
+      draftVersion: draftVersion() + 1,
+    };
+    res.json({ data: { citizenPossessionClaim: ccd.stored.citizenPossessionClaim } });
+  });
+  stub.get('/cases/:id/event-triggers/:event', (req: Request, res: Response) => {
+    if (!ccd.stored || req.params.id !== CASE_REFERENCE) {
+      return res.status(404).json({ message: 'Case not found' });
+    }
+    if (req.params.event === 'citizenMakePossessionClaim' && ccd.stored.state !== 'AWAITING_SUBMISSION_TO_HMCTS') {
+      return res.status(422).json({ message: 'The case status did not qualify for the event' });
+    }
+    res.json({ token: `${req.params.event}-token`, case_details: { case_data: ccd.stored } });
+  });
+  stub.get('/cases/:id', (req: Request, res: Response) => {
+    if (!ccd.stored || req.params.id !== CASE_REFERENCE) {
+      return res.status(404).json({ message: 'Case not found' });
+    }
+    res.json({ id: CASE_REFERENCE, state: ccd.stored.state, data: ccd.stored });
+  });
+  stub.post('/cases/documents', (req: Request, res: Response) => {
+    req.on('data', () => undefined);
+    req.on('end', () => {
+      ccd.cdamUploads += 1;
+      const href = `http://cdam.test/documents/doc-${ccd.cdamUploads}`;
+      res.json({
+        documents: [
+          {
+            originalDocumentName: 'statement.pdf',
+            hashToken: 'hash',
+            mimeType: 'application/pdf',
+            size: 1,
+            _links: { self: { href }, binary: { href: `${href}/binary` } },
+          },
+        ],
+      });
+    });
+  });
+  stub.post('/cases/:id/events', (req: Request, res: Response) => {
+    ccd.submissions.push(req.body);
+    if (ccd.refuseSubmit) {
+      return res.status(422).json({ callbackErrors: ccd.refuseSubmit });
+    }
+    if (req.body.data?.citizenPossessionClaim?.draftVersion !== draftVersion()) {
+      return res.status(422).json({ callbackErrors: ['DRAFT_CHANGED'] });
+    }
+    const draft = ccd.stored?.citizenPossessionClaim ?? {};
+    const fee = { serviceRequestReference: '2026-1777027600017', feeAmount: '40400' };
+    ccd.stored = {
+      ...ccd.stored,
+      state: 'PENDING_CASE_ISSUED',
+      citizenPossessionClaim: { ...draft, submission: { ...(draft.submission as object), ...fee } },
+    };
+    res.json({
+      id: CASE_REFERENCE,
+      data: {},
+      after_submit_callback_response: { confirmation_body: JSON.stringify(fee) },
+    });
+  });
+  stub.post('/api/payload', (req: Request, res: Response) => {
+    ccd.cuiRaRequests.push(req.body);
+    res.json({ url: 'https://cui-ra.test/start' });
+  });
+  stub.get('/api/payload/:id', (_req: Request, res: Response) => {
+    res.json(ccd.cuiRaPayload ?? { action: 'cancel', correlationId: CASE_REFERENCE });
+  });
+  stub.get('/pcq/health', (_req: Request, res: Response) => {
+    res.json({ status: ccd.pcqStatus });
+  });
+  stub.get('/payment/card-payment/:reference/status', (_req: Request, res: Response) => {
+    res.json({ status: ccd.cardPaymentStatus });
+  });
+  stub.post('/payment/service-request/:reference/card-payment', (req: Request, res: Response) => {
+    ccd.cardPayments.push({ reference: req.params.reference, ...req.body });
+    res.json({ paymentReference: 'RC-1111', status: 'Initiated', nextUrl: 'https://card.payments.test/pay/1' });
+  });
+  return stub;
+}
+
+function listen(app: Express): Promise<http.Server> {
+  return new Promise(resolve => {
+    const server = app.listen(0, '127.0.0.1', () => resolve(server));
+  });
+}
+
+export interface HttpResponse {
+  status: number;
+  location?: string;
+  text: string;
+}
+
+export interface TestApp {
+  get(path: string): Promise<HttpResponse>;
+  post(path: string, body: Record<string, string | string[]>): Promise<HttpResponse>;
+  /** Posts one file as the browser does from an upload page: multipart, in the `documents` field. */
+  upload(path: string, file: { name: string; type: string; content: Buffer }): Promise<HttpResponse>;
+  close(): Promise<void>;
+}
+
+let backend: http.Server | undefined;
+afterAll(() => backend?.close());
+
+export async function bootMakeAClaim(
+  options: { enabled?: boolean; email?: string; signedIn?: boolean; flags?: Record<string, boolean> } = {}
+): Promise<TestApp> {
+  ccd.stored = undefined;
+  ccd.createRequests = [];
+  ccd.draftSaves = [];
+  ccd.submissions = [];
+  ccd.cardPayments = [];
+  ccd.refuseCreate = undefined;
+  ccd.refuseSubmit = undefined;
+  ccd.changeDraftBeforeNextSave = false;
+  ccd.cardPaymentStatus = 'Success';
+  ccd.propertyEligibility = { status: 'ELIGIBLE', legislativeCountry: 'England' };
+  ccd.eligibilityChecks = [];
+  ccd.claimIssueFee = { amount: '404.00', code: 'FEE0412', version: 4 };
+  ccd.claimIssueFeeRequests = [];
+  ccd.searches = [];
+  ccd.searchFails = false;
+  ccd.claimsAgainst = [];
+  ccd.storedCaseIsTheirs = true;
+  ccd.asClaimantFails = false;
+  ccd.cuiRaRequests = [];
+  ccd.cuiRaPayload = undefined;
+  ccd.pcqStatus = 'UP';
+  ccd.cdamUploads = 0;
+  backend ??= await listen(ccdStub());
+  const backendUrl = `http://127.0.0.1:${(backend.address() as AddressInfo).port}`;
+  process.env.CCD_URL = backendUrl;
+  process.env.PCS_API_URL = backendUrl;
+  process.env.CUI_RA_URL = backendUrl;
+  process.env.CDAM_URL = backendUrl;
+  process.env.PCQ_URL = `${backendUrl}/pcq`;
+  process.env.PAYMENT_RETURN_URL = 'https://pcs.test/payment/return';
+
+  const [
+    { Nunjucks },
+    { I18n },
+    { http: httpService },
+    { setupErrorHandlers },
+    { registerAllJourneys },
+    { default: makeAClaimRoutes },
+    { default: documentProxyRoutes },
+    { default: paymentReturnRoutes },
+    { default: claimListRoutes },
+    { default: claimantDashboardRoutes },
+    { default: viewDocumentsRoutes },
+    { default: reasonableAdjustmentsCallbackRoutes },
+    middleware,
+    { clearClaimIssueFeeCache },
+  ] = await Promise.all([
+    import('../../main/modules/nunjucks'),
+    import('../../main/modules/i18n'),
+    import('../../main/modules/http'),
+    import('../../main/modules/error-handler'),
+    import('../../main/routes/registerSteps'),
+    import('../../main/routes/makeAClaim'),
+    import('../../main/routes/documentProxy'),
+    import('../../main/routes/paymentReturn'),
+    import('../../main/routes/claimList'),
+    import('../../main/routes/claimantDashboard'),
+    import('../../main/routes/viewDocuments'),
+    import('../../main/routes/makeAClaimReasonableAdjustmentsCallback'),
+    import('../../main/middleware'),
+    import('../../main/steps/make-a-claim/start/claimFee'),
+  ]);
+  clearClaimIssueFeeCache();
+  httpService.setToken('s2s-token', Date.now() + 60 * 60 * 1000);
+
+  const app = express();
+  app.use(middleware.formBodyMiddleware);
+  new Nunjucks(false).enableFor(app);
+  app.locals.nunjucksEnv.addGlobal('sessionTimeout', {});
+  const i18n = new I18n();
+  i18n.enableFor(app);
+  await i18n.ready;
+  // LaunchDarkly as the Test environment is set up: the journey on.
+  app.locals.launchDarklyClient = {
+    variation: async (flag: string, _context: unknown, fallback: unknown) =>
+      flag === 'private-landlord-make-a-claim-enabled'
+        ? (options.enabled ?? true)
+        : (options.flags?.[flag] ?? fallback),
+  };
+
+  const user = {
+    uid: 'landlord-uid',
+    sub: 'landlord-uid',
+    email: options.email ?? 'pl-0001@example.test',
+    roles: ['citizen'],
+  };
+  const session: Record<string, unknown> = {
+    save: (callback?: () => void) => callback?.(),
+    ...(options.signedIn === false
+      ? {}
+      : { user: { ...user, accessToken: jwt({ ...user, exp: Math.floor(Date.now() / 1000) + 3600 }) } }),
+  };
+  app.use((req: Request, res: Response, next) => {
+    Object.assign(req, { session });
+    res.locals.csrfToken = 'csrf-test';
+    next();
+  });
+  app.get('/login', (_req, res) => res.status(200).send('IDAM sign in'));
+  app.use(middleware.makeAClaimPathsFeatureMiddleware);
+  app.param('caseReference', middleware.caseReferenceParamMiddleware);
+  registerAllJourneys(app);
+  makeAClaimRoutes(app);
+  documentProxyRoutes(app);
+  paymentReturnRoutes(app);
+  claimListRoutes(app);
+  claimantDashboardRoutes(app);
+  viewDocumentsRoutes(app);
+  reasonableAdjustmentsCallbackRoutes(app);
+  setupErrorHandlers(app, 'test');
+  const server = await listen(app);
+  const baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+
+  const request = (
+    method: string,
+    path: string,
+    body?: string | Buffer,
+    contentType = 'application/x-www-form-urlencoded'
+  ): Promise<HttpResponse> =>
+    new Promise((resolve, reject) => {
+      const req = http.request(
+        `${baseUrl}${path}`,
+        { method, agent: false, headers: body ? { 'content-type': contentType } : {} },
+        res => {
+          let text = '';
+          res.setEncoding('utf8');
+          res.on('data', chunk => (text += chunk));
+          res.on('end', () => resolve({ status: res.statusCode ?? 0, location: res.headers.location, text }));
+        }
+      );
+      req.on('error', reject);
+      req.end(body);
+    });
+
+  const encode = (body: Record<string, string | string[]>): string => {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(body)) {
+      for (const item of Array.isArray(value) ? value : [value]) {
+        params.append(key, item);
+      }
+    }
+    return params.toString();
+  };
+
+  return {
+    get: path => request('GET', path),
+    post: (path, body) => request('POST', path, encode({ action: 'continue', ...body })),
+    upload: (path, file) => {
+      const boundary = '----pcs-test-boundary';
+      const head = Buffer.from(
+        `--${boundary}\r\nContent-Disposition: form-data; name="documents"; filename="${file.name}"\r\n` +
+          `Content-Type: ${file.type}\r\n\r\n`
+      );
+      const body = Buffer.concat([head, file.content, Buffer.from(`\r\n--${boundary}--\r\n`)]);
+      return request('POST', path, body, `multipart/form-data; boundary=${boundary}`);
+    },
+    close: () => {
+      server.closeAllConnections();
+      return new Promise<void>(resolve => server.close(() => resolve()));
+    },
+  };
+}
+
+/** The journey's page for a case path, e.g. claimPath('task-list'). */
+export function claimPath(step: string): string {
+  return `/case/${CASE_REFERENCE}/make-a-claim/${step}`;
+}
+
+/** The claim as the last draft save or submission left it in CCD. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- tests read nested answers without restating the DTO
+export function storedClaim(): Record<string, any> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (ccd.stored?.citizenPossessionClaim ?? {}) as Record<string, any>;
+}
+
+/** Puts a case with this claim in CCD, as if the claimant had already answered these questions. */
+export function givenClaim(claim: Record<string, unknown>, state = 'AWAITING_SUBMISSION_TO_HMCTS'): void {
+  ccd.stored = {
+    state,
+    citizenPossessionClaim: {
+      propertyAddress: { AddressLine1: '15 Garden Drive', PostTown: 'Luton', PostCode: 'LU1 1AB' },
+      draftVersion: 1,
+      ...claim,
+    },
+  };
+}

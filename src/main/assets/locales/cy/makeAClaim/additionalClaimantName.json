@@ -1,0 +1,13 @@
+{
+  "pageTitle": "cyWhat is their name?",
+  "heading": "cyWhat is their name?",
+  "labels": {
+    "firstName": "cyFirst name",
+    "lastName": "cyLast name"
+  },
+  "errors": {
+    "firstName": "cyEnter their first name",
+    "lastName": "cyEnter their last name",
+    "nameTooLong": "cyTheir first and last name together must be 60 characters or fewer, including the space between them"
+  }
+}

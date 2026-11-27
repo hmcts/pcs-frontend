@@ -1,11 +1,10 @@
 {% extends "template.njk" %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% block pageTitle %}{{ t('claimList:pageTitle') }} - GOV.UK{% endblock %}
+{% block pageTitle %}{{ t('claimList:claimantHeading' if claimantAccount else 'claimList:pageTitle') }} - GOV.UK{% endblock %}
 
-{% block content %}
-  <h1 class="govuk-heading-l">{{ t('claimList:heading') }}</h1>
-
+{% macro claimsAgainstSection(tableRows, t) %}
   <p class="govuk-body">{{ t('claimList:accessYourCase') | safe }}</p>
 
   <h2 class="govuk-heading-m">{{ t('claimList:claimsMadeAgainstYou') }}</h2>
@@ -22,5 +21,50 @@
     }) }}
   {% else %}
     <p class="govuk-body">{{ t('claimList:noClaimsFound') }}</p>
+  {% endif %}
+{% endmacro %}
+
+{% block content %}
+  {% if claimantAccount %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">{{ t('claimList:claimantHeading') }}</h1>
+
+        <h2 class="govuk-heading-m">{{ t('claimList:claimsMade.heading') }}</h2>
+
+        {% if claimsMadeUnavailable %}
+          <p class="govuk-body">{{ t('claimList:claimsMade.unavailable') }}</p>
+        {% elif claimsMadeRows.length %}
+          {{ govukTable({
+            head: [
+              { text: t('claimList:claimsMade.claimState') },
+              { text: t('claimList:claimsMade.claimNumber') }
+            ],
+            rows: claimsMadeRows
+          }) }}
+        {% else %}
+          <p class="govuk-body">{{ t('claimList:claimsMade.noClaims') }}</p>
+        {% endif %}
+
+        {{ govukButton({
+          text: t('claimList:claimsMade.makeAClaim'),
+          href: makeAClaimUrl
+        }) }}
+
+        {% if tableRows.length %}
+          {{ claimsAgainstSection(tableRows, t) }}
+        {% endif %}
+      </div>
+
+      <div class="govuk-grid-column-one-third">
+        <aside class="app-related-items" aria-label="{{ t('supportAndContactInformation') }}">
+          {% include "components/contact-us-details.njk" %}
+        </aside>
+      </div>
+    </div>
+  {% else %}
+    <h1 class="govuk-heading-l">{{ t('claimList:heading') }}</h1>
+
+    {{ claimsAgainstSection(tableRows, t) }}
   {% endif %}
 {% endblock %}

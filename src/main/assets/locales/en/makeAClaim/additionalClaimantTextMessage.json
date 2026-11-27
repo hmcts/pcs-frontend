@@ -1,0 +1,12 @@
+{
+  "pageTitle": "Do they want to be contacted by text message?",
+  "question": "Do they want to be contacted by text message?",
+  "hint": "We might also send them updates about their case by text message",
+  "labels": {
+    "textMessageNumber": "Mobile phone number"
+  },
+  "errors": {
+    "contactByText": "Select whether they want to be contacted by text message",
+    "textMessageNumber": "Enter a mobile phone number"
+  }
+}

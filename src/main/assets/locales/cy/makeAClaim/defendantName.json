@@ -1,0 +1,16 @@
+{
+  "pageTitle": "cyDo you know the defendant’s name?",
+  "question": "cyDo you know the {{next}}defendant’s name?",
+  "nextDefendant": "cynext ",
+  "hint": "cyIf you do not know their name, the claim will be made against ‘persons unknown’.",
+  "labels": {
+    "firstName": "cyFirst name",
+    "lastName": "cyLast name"
+  },
+  "errors": {
+    "nameKnown": "cySelect whether you know the defendant’s name",
+    "firstName": "cyEnter the defendant’s first name",
+    "lastName": "cyEnter the defendant’s last name"
+  },
+  "nextPageTitle": "cyDo you know the next defendant’s name?"
+}

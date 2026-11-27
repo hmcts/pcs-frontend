@@ -1,0 +1,15 @@
+{
+  "pageTitle": "cyOther information about the claim",
+  "heading": "cyOther information about the claim",
+  "paragraphs": ["cyYou will now be asked some final questions about your claim, including:"],
+  "bullets": [
+    "cyto provide any other information about your reasons for possession",
+    "cywhether you intend to make a general application with this claim",
+    "cywhether you need any support to use this service or come to court",
+    "cywhich language you completed this claim in"
+  ],
+  "afterBullets": [
+    "cyYou will also be asked if you want to answer optional questions to make sure we’re treating everyone fairly.",
+    "cyYou can then review your answers and submit and pay for your claim."
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "pageTitle": "cyEquality and diversity questions",
+  "heading": "cyEquality and diversity questions",
+  "continueButton": "cyContinue to the questions",
+  "skipButton": "cyI do not want to answer these questions",
+  "paragraphs": [
+    "cyThese are optional questions about you",
+    "cyYour answers won’t affect your application",
+    "cyThey won’t be shared with anyone involved in your case",
+    "cyYour answers will help us check we are treating people fairly and equally.",
+    "cyFind out how we use this information in our <a class=\"govuk-link\" href=\"/privacy-policy\" target=\"_blank\" rel=\"noopener noreferrer\">privacy policy (opens in new tab)</a>"
+  ]
+}

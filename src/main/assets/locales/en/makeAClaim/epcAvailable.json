@@ -1,0 +1,14 @@
+{
+  "pageTitle": "Can you upload a copy of the energy performance certificate?",
+  "question": "Can you upload a copy of the energy performance certificate?",
+  "labels": {
+    "noEnergyPerformanceCertificateReason": "Explain why you cannot upload a copy of the energy performance certificate."
+  },
+  "errors": {
+    "hasEnergyPerformanceCertificate": "Select whether you can upload a copy of the energy performance certificate",
+    "noEnergyPerformanceCertificateReason": "Explain why you cannot upload a copy of the energy performance certificate"
+  },
+  "fieldNames": {
+    "noEnergyPerformanceCertificateReason": "Your reason for not uploading the energy performance certificate"
+  }
+}

@@ -1,0 +1,175 @@
+import { step as additionalClaimantAddress } from './additional-claimant-address';
+import { step as additionalClaimantEmail } from './additional-claimant-email';
+import { step as additionalClaimantName } from './additional-claimant-name';
+import { step as additionalClaimantOrganisationName } from './additional-claimant-organisation-name';
+import { step as additionalClaimantPhone } from './additional-claimant-phone';
+import { step as additionalClaimantTextMessage } from './additional-claimant-text-message';
+import { step as additionalClaimantType } from './additional-claimant-type';
+import { step as additionalDefendants } from './additional-defendants';
+import { step as arrearsAtNotice } from './arrears-at-notice';
+import { step as arrearsCya } from './arrears-cya';
+import { step as arrearsProof } from './arrears-proof';
+import { step as checkYourAnswers } from './check-your-answers';
+import { step as circumstances } from './circumstances';
+import { step as claimantAddress } from './claimant-address';
+import { step as claimantCircumstances } from './claimant-circumstances';
+import { step as claimantCya } from './claimant-cya';
+import { step as claimantEmail } from './claimant-email';
+import { step as claimantName } from './claimant-name';
+import { step as claimantPhone } from './claimant-phone';
+import { step as claimantTextMessage } from './claimant-text-message';
+import { step as currentArrears } from './current-arrears';
+import { step as defendantAddress } from './defendant-address';
+import { step as defendantCircumstances } from './defendant-circumstances';
+import { step as defendantCya } from './defendant-cya';
+import { step as defendantDetails } from './defendant-details';
+import { step as defendantName } from './defendant-name';
+import { step as eicrAvailable } from './eicr-available';
+import { step as eligible } from './eligible';
+import { step as epcAvailable } from './epc-available';
+import { step as equalityAndDiversity } from './equality-and-diversity';
+import { step as excludedGrounds } from './excluded-grounds';
+import { step as excludedGroundsClaim } from './excluded-grounds-claim';
+import { step as excludedReason } from './excluded-reason';
+import { step as gasSafetyAvailable } from './gas-safety-available';
+import { step as generalApplication } from './general-application';
+import { step as groundReason } from './ground-reason';
+import { step as individualOrOrganisation } from './individual-or-organisation';
+import { step as languageUsed } from './language-used';
+import { step as mandatoryDocuments } from './mandatory-documents';
+import { step as moneyJudgment } from './money-judgment';
+import { step as multipleClaimants } from './multiple-claimants';
+import { step as noticeAvailable } from './notice-available';
+import { step as noticeCya } from './notice-cya';
+import { step as noticeDetails } from './notice-details';
+import { step as noticeMethod } from './notice-method';
+import { step as noticeServed } from './notice-served';
+import { step as noticeType } from './notice-type';
+import { step as occupationContractAgreement } from './occupation-contract-agreement';
+import { step as occupationContractStartDate } from './occupation-contract-start-date';
+import { step as occupationContractType } from './occupation-contract-type';
+import { step as organisationName } from './organisation-name';
+import { step as otherGrounds } from './other-grounds';
+import { step as otherGroundsClaim } from './other-grounds-claim';
+import { step as otherInformation } from './other-information';
+import { step as otherReasons } from './other-reasons';
+import { step as recoverySteps } from './recovery-steps';
+import { step as removeClaimant } from './remove-claimant';
+import { step as removeDefendant } from './remove-defendant';
+import { step as rentAmount } from './rent-amount';
+import { step as rentArrears } from './rent-arrears';
+import { step as rentArrearsClaim } from './rent-arrears-claim';
+import { step as rentArrearsGrounds } from './rent-arrears-grounds';
+import { step as rentDueDay } from './rent-due-day';
+import { step as rentFrequency } from './rent-frequency';
+import { step as rentStatement } from './rent-statement';
+import { step as rentStatementPayment } from './rent-statement-payment';
+import { step as situationCya } from './situation-cya';
+import { step as statementPeriod } from './statement-period';
+import { step as taskList } from './task-list';
+import { step as tenancyAgreement } from './tenancy-agreement';
+import { step as tenancyCya } from './tenancy-cya';
+import { step as tenancyDetails } from './tenancy-details';
+import { step as tenancyStartDate } from './tenancy-start-date';
+import { step as tenancyType } from './tenancy-type';
+import { step as uploadEicr } from './upload-eicr';
+import { step as uploadEpc } from './upload-epc';
+import { step as uploadGasSafety } from './upload-gas-safety';
+import { step as uploadNotice } from './upload-notice';
+import { step as uploadOccupationContract } from './upload-occupation-contract';
+import { step as uploadOtherDocuments } from './upload-other-documents';
+import { step as uploadRentStatement } from './upload-rent-statement';
+import { step as uploadTenancyAgreement } from './upload-tenancy-agreement';
+import { step as walesGrounds } from './wales-grounds';
+import { step as yourDetails } from './your-details';
+import { step as yourSupport } from './your-support';
+
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+
+export const stepRegistry: Record<string, StepDefinition> = {
+  'your-details': yourDetails,
+  'individual-or-organisation': individualOrOrganisation,
+  'claimant-name': claimantName,
+  'organisation-name': organisationName,
+  'claimant-address': claimantAddress,
+  'claimant-email': claimantEmail,
+  'claimant-phone': claimantPhone,
+  'claimant-text-message': claimantTextMessage,
+  'multiple-claimants': multipleClaimants,
+  'additional-claimant-type': additionalClaimantType,
+  'additional-claimant-name': additionalClaimantName,
+  'additional-claimant-organisation-name': additionalClaimantOrganisationName,
+  'additional-claimant-address': additionalClaimantAddress,
+  'additional-claimant-email': additionalClaimantEmail,
+  'additional-claimant-phone': additionalClaimantPhone,
+  'additional-claimant-text-message': additionalClaimantTextMessage,
+  'claimant-cya': claimantCya,
+  'defendant-details': defendantDetails,
+  'defendant-name': defendantName,
+  'defendant-address': defendantAddress,
+  'additional-defendants': additionalDefendants,
+  'defendant-cya': defendantCya,
+  'tenancy-details': tenancyDetails,
+  'tenancy-type': tenancyType,
+  'tenancy-start-date': tenancyStartDate,
+  'tenancy-agreement': tenancyAgreement,
+  'upload-tenancy-agreement': uploadTenancyAgreement,
+  'occupation-contract-type': occupationContractType,
+  'occupation-contract-start-date': occupationContractStartDate,
+  'occupation-contract-agreement': occupationContractAgreement,
+  'upload-occupation-contract': uploadOccupationContract,
+  'excluded-grounds-claim': excludedGroundsClaim,
+  'excluded-grounds': excludedGrounds,
+  'excluded-reason': excludedReason,
+  'rent-arrears-claim': rentArrearsClaim,
+  'rent-arrears-grounds': rentArrearsGrounds,
+  'other-grounds-claim': otherGroundsClaim,
+  'other-grounds': otherGrounds,
+  'eicr-available': eicrAvailable,
+  'epc-available': epcAvailable,
+  'gas-safety-available': gasSafetyAvailable,
+  'mandatory-documents': mandatoryDocuments,
+  'upload-eicr': uploadEicr,
+  'upload-epc': uploadEpc,
+  'upload-gas-safety': uploadGasSafety,
+  'wales-grounds': walesGrounds,
+  'ground-reason': groundReason,
+  'tenancy-cya': tenancyCya,
+  'notice-details': noticeDetails,
+  'notice-served': noticeServed,
+  'notice-type': noticeType,
+  'notice-method': noticeMethod,
+  'notice-available': noticeAvailable,
+  'upload-notice': uploadNotice,
+  'notice-cya': noticeCya,
+  'rent-arrears': rentArrears,
+  'rent-amount': rentAmount,
+  'rent-frequency': rentFrequency,
+  'rent-due-day': rentDueDay,
+  'arrears-at-notice': arrearsAtNotice,
+  'current-arrears': currentArrears,
+  'arrears-proof': arrearsProof,
+  'upload-rent-statement': uploadRentStatement,
+  'statement-period': statementPeriod,
+  'rent-statement': rentStatement,
+  'rent-statement-payment': rentStatementPayment,
+  'money-judgment': moneyJudgment,
+  'recovery-steps': recoverySteps,
+  'arrears-cya': arrearsCya,
+  circumstances,
+  'defendant-circumstances': defendantCircumstances,
+  'claimant-circumstances': claimantCircumstances,
+  'situation-cya': situationCya,
+  'other-information': otherInformation,
+  'upload-other-documents': uploadOtherDocuments,
+  'other-reasons': otherReasons,
+  'general-application': generalApplication,
+  'your-support': yourSupport,
+  'equality-and-diversity': equalityAndDiversity,
+  'language-used': languageUsed,
+  'check-your-answers': checkYourAnswers,
+  eligible,
+  'task-list': taskList,
+  'remove-claimant': removeClaimant,
+  'remove-defendant': removeDefendant,
+};

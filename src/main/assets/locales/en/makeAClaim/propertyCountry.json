@@ -1,0 +1,12 @@
+{
+  "pageTitle": "Is the property in England or Wales?",
+  "question": "Is the property in England or Wales?",
+  "hint": "The postcode you gave covers an area on both sides of the border",
+  "options": {
+    "England": "England",
+    "Wales": "Wales"
+  },
+  "errors": {
+    "legislativeCountry": "Select whether the property is in England or Wales"
+  }
+}

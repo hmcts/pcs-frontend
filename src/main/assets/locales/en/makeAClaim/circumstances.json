@@ -1,0 +1,10 @@
+{
+  "pageTitle": "Circumstances",
+  "heading": "Circumstances",
+  "paragraphs": ["You will now be asked questions about:"],
+  "bullets": ["the defendants’ circumstances", "your circumstances"],
+  "afterBullets": [
+    "This information will be used by the judge to understand each party’s financial and personal situation.",
+    "The defendants will be able to see your answers."
+  ]
+}

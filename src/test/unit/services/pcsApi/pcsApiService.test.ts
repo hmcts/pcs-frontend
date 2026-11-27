@@ -1,6 +1,12 @@
 import config from 'config';
 
-import { getCitizenClaims, getRootGreeting, validateAccessCode } from '@services/pcsApi/pcsApiService';
+import {
+  getCitizenClaims,
+  getClaimIssueFee,
+  getPropertyEligibility,
+  getRootGreeting,
+  validateAccessCode,
+} from '@services/pcsApi/pcsApiService';
 
 jest.mock('config', () => ({
   get: jest.fn(),
@@ -117,6 +123,69 @@ describe('pcsApiService', () => {
     test('throws when response data is not an array', async () => {
       mockHttp.get.mockResolvedValue({ data: null });
       await expect(getCitizenClaims(accessToken)).rejects.toThrow('Unexpected response from citizen-claims endpoint');
+    });
+  });
+
+  describe('getPropertyEligibility', () => {
+    test('asks about the postcode as the citizen, with the country when given', async () => {
+      mockHttp.get.mockResolvedValue({ data: { status: 'NOT_ENGLAND_OR_WALES' } });
+      await expect(getPropertyEligibility('token', 'LU1 1AB', 'England')).resolves.toEqual({
+        status: 'NOT_ENGLAND_OR_WALES',
+      });
+      expect(mockHttp.get).toHaveBeenCalledWith(`${testApiBase}/cases/citizen-claims/property-eligibility`, {
+        headers: { Authorization: 'Bearer token' },
+        params: { postcode: 'LU1 1AB', legislativeCountry: 'England' },
+      });
+    });
+
+    test('sends only the postcode when no country is given', async () => {
+      mockHttp.get.mockResolvedValue({ data: { status: 'ELIGIBLE', legislativeCountry: 'England' } });
+      await getPropertyEligibility('token', 'LU1 1AB');
+      expect(mockHttp.get.mock.calls[0][1].params).toEqual({ postcode: 'LU1 1AB' });
+    });
+
+    test.each(['England', 'Wales'])('gives the country an eligible property is in: %s', async country => {
+      mockHttp.get.mockResolvedValue({ data: { status: 'ELIGIBLE', legislativeCountry: country } });
+      await expect(getPropertyEligibility('token', 'LU1 1AB')).resolves.toEqual({
+        status: 'ELIGIBLE',
+        legislativeCountry: country,
+      });
+    });
+
+    test('throws on an eligible property without a country it knows', async () => {
+      mockHttp.get.mockResolvedValue({ data: { status: 'ELIGIBLE', legislativeCountry: 'Scotland' } });
+      await expect(getPropertyEligibility('token', 'LU1 1AB')).rejects.toThrow(
+        'Unexpected response from property-eligibility endpoint'
+      );
+    });
+
+    test('throws on a status it does not know', async () => {
+      mockHttp.get.mockResolvedValue({ data: { status: 'MAYBE' } });
+      await expect(getPropertyEligibility('token', 'LU1 1AB')).rejects.toThrow(
+        'Unexpected response from property-eligibility endpoint'
+      );
+    });
+  });
+
+  describe('getClaimIssueFee', () => {
+    test('reads the fee from pcs-api with no user token', async () => {
+      mockHttp.get.mockResolvedValue({ data: { amount: '404.00', code: 'FEE0412', version: 4 } });
+
+      await expect(getClaimIssueFee()).resolves.toEqual({ amount: '404.00', code: 'FEE0412', version: 4 });
+      expect(mockHttp.get).toHaveBeenCalledWith(`${testApiBase}/fees/claim-issue`);
+    });
+
+    test.each([[{}], [{ amount: 404, code: 'FEE0412', version: 4 }], [{ amount: 'free', code: 'FEE0412' }]])(
+      'refuses the response %o',
+      async data => {
+        mockHttp.get.mockResolvedValue({ data });
+        await expect(getClaimIssueFee()).rejects.toThrow('Unexpected response from claim-issue fee endpoint');
+      }
+    );
+
+    test('lets a failed request through', async () => {
+      mockHttp.get.mockRejectedValue(new Error('Network error'));
+      await expect(getClaimIssueFee()).rejects.toThrow('Network error');
     });
   });
 });

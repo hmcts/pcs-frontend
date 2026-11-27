@@ -1,0 +1,10 @@
+{
+  "pageTitle": "cyWhat is your postal address?",
+  "heading": "cyWhat is your postal address?",
+  "errors": {
+    "claimant-addressLine1": "cyEnter the first line of your address",
+    "claimant-town": "cyEnter the town or city of your address",
+    "claimant-postcode": "cyEnter the postcode of your address",
+    "postcodeInvalid": "cyEnter a real postcode, like LU1 1AB"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "pageTitle": "What type of tenancy or licence is in place, or was in place?",
+  "question": "What type of tenancy or licence is in place, or was in place?",
+  "hint": "If you’re not sure what type of tenancy or licence is in place, this should be written on the tenancy or licence agreement you gave to the defendants.",
+  "options": {
+    "ASSURED": "Assured or assured periodic tenancy",
+    "EXCLUDED": "Excluded tenancy or licence",
+    "REGULATED": "Regulated tenancy",
+    "OTHER": "Other"
+  },
+  "labels": {
+    "otherTenancyTypeDetails": "Give details of the type of tenancy or licence"
+  },
+  "errors": {
+    "tenancyType": "Select the type of tenancy or licence",
+    "otherTenancyTypeDetails": "Enter the type of tenancy or licence"
+  },
+  "fieldNames": {
+    "otherTenancyTypeDetails": "The type of tenancy or licence"
+  }
+}

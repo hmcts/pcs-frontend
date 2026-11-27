@@ -1,0 +1,12 @@
+{
+  "pageTitle": "cyIs your claim against trespassers?",
+  "question": "cyIs your claim against trespassers?",
+  "hint": "cyA trespasser is someone who entered or stayed in your property or land without your permission. Someone is not usually a trespasser if they had your permission to live there, even if you now want them to leave. For example, a tenant, contract holder or licensee.",
+  "options": {
+    "yes": "cyYes – my claim is against a trespasser who entered or stayed in my property or land without my permission",
+    "no": "cyNo – my claim is against a tenant, contract holder or licensee"
+  },
+  "errors": {
+    "isTrespass": "cySelect whether your claim is against trespassers"
+  }
+}

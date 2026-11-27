@@ -1,0 +1,9 @@
+{
+  "pageTitle": "Do you need to add another defendant?",
+  "listHeading": "Defendants you’ve added",
+  "question": "Do you need to add another defendant?",
+  "hint": "You do not need to include anyone under the age of 18 living in the property.",
+  "errors": {
+    "additionalDefendants": "Select whether you need to add another defendant"
+  }
+}

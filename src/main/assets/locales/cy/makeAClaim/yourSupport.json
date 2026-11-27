@@ -1,0 +1,62 @@
+{
+  "pageTitle": "cyTell us if you need support",
+  "heading": "cyTell us if you need support",
+  "continueButton": "cyContinue to the questions",
+  "skipButton": "cyI do not need any support at this time",
+  "contentBlocks": [
+    {
+      "heading": "cyAsking for a reasonable adjustment"
+    },
+    {
+      "text": "cySome people need support to access information and use our services. We call this a reasonable adjustment."
+    },
+    {
+      "text": "cyExamples:"
+    },
+    {
+      "bullets": [
+        "cystep-free access to the court",
+        "cybringing support with you to the hearing, like an assistance dog",
+        "cydocuments in an alternative format, like large print",
+        "cyregular breaks during a hearing to make you feel more comfortable"
+      ]
+    },
+    {
+      "text": "cyYou can ask for a reasonable adjustment now by selecting ‘Continue to the questions’, or at any time during your case by selecting ‘Your support’ from your case overview."
+    },
+    {
+      "text": "cyOnce you’ve submitted your request for support, it’ll be reviewed by the court or a judge. We’ll keep you updated on the status of the request in your account. If we need more information we’ll contact you by the preferred method you’ve already chosen."
+    },
+    {
+      "heading": "cyAsking for something else"
+    },
+    {
+      "text": "cyYou must contact the court directly to ask for something else for you or someone else who’s coming to court to support you."
+    },
+    {
+      "text": "cyOther support includes:"
+    },
+    {
+      "bullets": [
+        "cycommunication and documents in Welsh or to speak Welsh at your hearing",
+        "cya language interpreter",
+        "cyspecial measures, like giving evidence in private, because you’re vulnerable"
+      ]
+    },
+    {
+      "heading": "cyContact the court by email"
+    },
+    {
+      "text": "cyUse the <a class=\"govuk-link\" href=\"https://www.gov.uk/find-court-tribunal\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address. If you do not know the name of your local court, select the ‘Money’ category and then the ‘Housing’ category to find it."
+    },
+    {
+      "heading": "cyContact the court by telephone"
+    },
+    {
+      "text": "cy0300 123 7050<br>Monday to Friday, 8.30am to 5pm"
+    },
+    {
+      "text": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
+    }
+  ]
+}

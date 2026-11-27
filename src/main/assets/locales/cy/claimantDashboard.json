@@ -1,0 +1,31 @@
+{
+  "pageTitle": "cyYour property possession claim",
+  "home": "cyHome",
+  "caseNumberLabel": "cyCase number:",
+  "claimMade": {
+    "title": "cyYou’ve made a property possession claim",
+    "text": "cyThe court will schedule a hearing and contact you with the details."
+  },
+  "groups": {
+    "claim": "cyThe claim",
+    "documents": "cyDocuments"
+  },
+  "tasks": {
+    "viewClaimForm": "cyView the claim",
+    "viewDocuments": "cyView documents",
+    "payClaimFee": "cyPay the claim fee"
+  },
+  "tags": {
+    "available": "cyAvailable",
+    "notPaid": "cyNot paid"
+  },
+  "helpAndSupport": "cyHelp and support",
+  "links": {
+    "helpWithFees": "cyHelp with fees",
+    "mediation": "cyFind out about mediation",
+    "whatToExpectAtAHearing": "cyWhat to expect at a hearing",
+    "representMyselfAtAHearing": "cyRepresent myself at a hearing",
+    "findLegalAdvice": "cyFind legal advice",
+    "findInformationAboutMyCourt": "cyFind information about my court"
+  }
+}

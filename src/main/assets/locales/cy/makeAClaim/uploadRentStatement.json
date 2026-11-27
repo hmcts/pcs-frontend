@@ -1,0 +1,41 @@
+{
+  "pageTitle": "cyUpload rent statement",
+  "heading": "cyUpload rent statement",
+  "contentBlocks": [
+    {
+      "text": "cyYou must upload a rent statement so the court and the defendant can see the amount of rent arrears you are claiming"
+    },
+    {
+      "text": "cyThe rent statement must show:"
+    },
+    {
+      "bullets": ["cythe dates and amounts of all missed payments", "cya running total of the rent arrears"]
+    },
+    {
+      "text": "cyYou must upload 2 rent statements"
+    },
+    {
+      "text": "<strong>cy1. Upload your rent statement now:</strong> cyUpload the rent statement that is up to date today."
+    },
+    {
+      "text": "<strong>cy2. Upload an updated statement:</strong> cyYou must upload an updated rent statement the day before the hearing. It must include any new payments or arrears that have happened since your first statement."
+    },
+    {
+      "text": "cyThe court will use your updated statement to make sure it has the most up to date information about the rent arrears you are claiming."
+    },
+    {
+      "heading": "cyBefore you upload your documents"
+    },
+    {
+      "text": "cyGive your document a name that explains what it is. For example, ‘Rent statement up to 16 May 2025’."
+    }
+  ],
+  "uploadLabel": "cyUpload rent statement",
+  "uploadHint": "cyYou can upload a PDF, Word (DOCX) or Excel (XLSX) file. Each file must be smaller than 20MB.",
+  "uploadButton": "cyUpload file",
+  "filesAddedHeading": "cyFiles added",
+  "deleteButton": "cyRemove",
+  "errors": {
+    "documents": "cyUpload a rent statement"
+  }
+}

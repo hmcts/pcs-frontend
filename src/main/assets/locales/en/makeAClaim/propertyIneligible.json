@@ -1,0 +1,9 @@
+{
+  "pageTitle": "You cannot use this service",
+  "heading": "You cannot use this service",
+  "paragraphs": [
+    "You can only make a possession claim against a property in England or Wales using this service.",
+    "If your property is in Scotland you can use <a class=\"govuk-link\" href=\"https://www.scotcourts.gov.uk/home\" target=\"_blank\" rel=\"noopener noreferrer\">your local sheriff court (opens in new tab)</a>. There’s <a class=\"govuk-link\" href=\"https://www.nidirect.gov.uk/articles/enforcement-civil-court-orders-northern-ireland\" target=\"_blank\" rel=\"noopener noreferrer\">a different process in Northern Ireland (opens in new tab)</a>."
+  ],
+  "exitText": "Close and return to the GOV.UK homepage"
+}

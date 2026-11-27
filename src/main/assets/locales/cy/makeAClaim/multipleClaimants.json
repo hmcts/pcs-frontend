@@ -1,0 +1,8 @@
+{
+  "pageTitle": "cyDo you want to add another claimant to this claim?",
+  "question": "cyDo you want to add another claimant to this claim?",
+  "hint": "cyAs you are making this claim, you are a claimant. Other claimants might be people who share ownership of the property with you.",
+  "errors": {
+    "multipleClaimants": "cySelect whether you want to add another claimant"
+  }
+}

@@ -1,5 +1,6 @@
 import type { RespondToClaimSectionEnum } from '../steps/respond-to-claim/sections.config';
 
+import type { CitizenPossessionClaim } from './citizenPossessionClaim.interface';
 import type { CcdFlags } from './cuiRa/cuiRa.interface';
 
 export type YesNoValue = 'YES' | 'NO' | null;
@@ -334,6 +335,7 @@ export interface CcdCaseData {
   otherLicenceTypeDetails?: string;
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
+  citizenPossessionClaim?: CitizenPossessionClaim;
   // Narrowed by pcs-api to the defendant parties the logged-in user owns (requestSupport START).
   partySupport?: CcdPartySupportEntry[];
   submitDraftAnswers?: string;
@@ -386,6 +388,7 @@ export interface RelatedApplicationOption {
 export interface CcdCase {
   id: string;
   data: CcdCaseData;
+  state?: string;
   after_submit_callback_response?: {
     confirmation_header?: string | null;
     confirmation_body?: string | null;
@@ -491,6 +494,22 @@ export interface ClaimSummary {
   caseReference?: string;
   claimantName?: string;
   propertyPostcode?: string;
+}
+
+export interface ClaimantClaimSummary {
+  caseReference?: string;
+  /** The CCD case state; AWAITING_SUBMISSION_TO_HMCTS while the claim is a draft. */
+  state?: string;
+  /** The claim fee's payment status; absent until a fee has been requested. */
+  paymentStatus?: string | null;
+  propertyAddress?: {
+    addressLine1?: string;
+    addressLine2?: string;
+    addressLine3?: string;
+    postTown?: string;
+    county?: string;
+    postcode?: string;
+  };
 }
 
 export enum GenAppState {

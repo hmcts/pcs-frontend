@@ -1,0 +1,14 @@
+{
+  "pageTitle": "cyUpload files (optional)",
+  "heading": "cyUpload files (optional)",
+  "paragraphs": [
+    "cyYou can upload any files that you believe are relevant to your claim or that a judge should be aware of."
+  ],
+  "beforeUploadHeading": "cyBefore you upload your files",
+  "beforeUploadText": "cyGive each file a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
+  "uploadLabel": "cyUpload files",
+  "uploadHint": "cyYou can upload a PDF, Word (DOCX) or Excel (XLSX) file. Each file must be smaller than 20MB.",
+  "uploadButton": "cyUpload file",
+  "filesAddedHeading": "cyFiles added",
+  "deleteButton": "cyRemove"
+}

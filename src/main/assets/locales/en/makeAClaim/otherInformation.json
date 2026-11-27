@@ -1,0 +1,15 @@
+{
+  "pageTitle": "Other information about the claim",
+  "heading": "Other information about the claim",
+  "paragraphs": ["You will now be asked some final questions about your claim, including:"],
+  "bullets": [
+    "to provide any other information about your reasons for possession",
+    "whether you intend to make a general application with this claim",
+    "whether you need any support to use this service or come to court",
+    "which language you completed this claim in"
+  ],
+  "afterBullets": [
+    "You will also be asked if you want to answer optional questions to make sure we’re treating everyone fairly.",
+    "You can then review your answers and submit and pay for your claim."
+  ]
+}

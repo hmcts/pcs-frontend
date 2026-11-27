@@ -1,0 +1,21 @@
+{
+  "pageTitle": "cyProof of rent arrears",
+  "heading": "cyProof of rent arrears",
+  "paragraphs": ["cyAs your claim is on the grounds of rent arrears, you must now answer questions about:"],
+  "bullets": [
+    "cyhow much the arrears were on the date you served notice, if you served notice",
+    "cyhow much the rent arrears are on today’s date",
+    "cyhow much the rent is and how frequently it should be paid"
+  ],
+  "contentBlocks": [
+    {
+      "text": "cyYou must also provide proof of how the rent arrears have built up over time. You can either:"
+    },
+    {
+      "bullets": ["cyupload a rent statement that follows specific guidelines", "cycreate your own rent statement"]
+    },
+    {
+      "text": "cyThe defendant will be able to see your answers and any documents you upload."
+    }
+  ]
+}

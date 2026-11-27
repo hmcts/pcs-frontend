@@ -21,6 +21,7 @@ import {
   UPLOAD_MAX_MEDIA_FILE_SIZE_MB,
   UPLOAD_MAX_TOTAL_SIZE_BYTES,
   UPLOAD_MAX_TOTAL_SIZE_MB,
+  type UploadRestriction,
   type UploadValidationError,
   type UploadValidationOptions,
   effectivePerFileByteLimit,
@@ -50,14 +51,14 @@ export function fileFilter(req: Request, file: Express.Multer.File, cb: multer.F
   // Size is unknown at fileFilter time; multer.limits.fileSize enforces the per-file byte cap during streaming.
   const error = validateUploadedFile(
     { originalname: file.originalname, mimetype: file.mimetype, size: 0 },
-    { maxFilenameLength: opts.maxFilenameLength }
+    { maxFilenameLength: opts.maxFilenameLength, restriction: opts.restriction }
   );
   if (error) {
     cb(new UploadValidationFailure(error));
     return;
   }
 
-  const result = validateFileType(file.mimetype, file.originalname);
+  const result = validateFileType(file.mimetype, file.originalname, opts.restriction);
   if (result === 'ok') {
     cb(null, true);
     return;
@@ -88,8 +89,8 @@ function getMulterForLimit(limitBytes: number): ReturnType<typeof multer> {
 
 type ErrorTranslations = ReturnType<typeof getErrorTranslations>;
 
-function translateValidationError(req: Request, error: UploadValidationError): string {
-  const { key, params } = getUploadErrorKey(error);
+function translateValidationError(req: Request, error: UploadValidationError, restriction?: UploadRestriction): string {
+  const { key, params } = getUploadErrorKey(error, restriction);
   return req.t(key, params);
 }
 
@@ -133,15 +134,17 @@ export function handleMulterError(
   const errors = getErrorTranslations(req);
   if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
     const opts = (req as RequestWithUploadValidation).uploadValidation;
-    const message = translateValidationError(req, {
-      kind: 'file_too_large',
-      maxBytes: effectivePerFileByteLimit(opts),
-    });
+    const message = translateValidationError(
+      req,
+      { kind: 'file_too_large', maxBytes: effectivePerFileByteLimit(opts) },
+      opts?.restriction
+    );
     res.status(400).json({ error: { message } });
     return;
   }
   if (err instanceof UploadValidationFailure) {
-    res.status(400).json({ error: { message: translateValidationError(req, err.validationError) } });
+    const restriction = (req as RequestWithUploadValidation).uploadValidation?.restriction;
+    res.status(400).json({ error: { message: translateValidationError(req, err.validationError, restriction) } });
     return;
   }
   if (err.message === 'FILENAME_TOO_LONG') {
@@ -384,7 +387,9 @@ export default function documentProxyRoutes(app: Application): void {
             opts
           );
           if (postUploadError) {
-            return res.status(400).json({ error: { message: translateValidationError(req, postUploadError) } });
+            return res
+              .status(400)
+              .json({ error: { message: translateValidationError(req, postUploadError, opts.restriction) } });
           }
         }
 

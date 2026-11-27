@@ -1,0 +1,23 @@
+{
+  "pageTitle": "cyYou’re eligible to use this service",
+  "heading": "cyYou’re eligible to use this service",
+  "paragraphs": [
+    "cyBased on the information you’ve provided, you’re eligible to use this service.",
+    "cyTo finish making your claim, you’ll need:"
+  ],
+  "bullets": [
+    "cythe address of the property you’re claiming possession of",
+    "cyinformation about the tenancy or licence",
+    "cyinformation about your grounds for possession",
+    "cydetails about the notice you served",
+    "cydetails of the people who are in possession of the property who you are making the claim against (the defendants)",
+    "cycopies of relevant documents, including the tenancy agreement, notice and a rent statement (if your claim is on the grounds of rent arrears)"
+  ],
+  "afterBullets": [
+    "cyThe defendants will be able to see your answers to the questions and any documents you upload.",
+    "cyYour claim will save as you go, so you can stop and return to it if you need to.",
+    "cyYou can review and edit your answers before you submit your claim.",
+    "cyYou must sign a statement of truth before you submit your claim. This certifies that you believe that the information you’re providing is true."
+  ],
+  "startNow": "cyStart now"
+}

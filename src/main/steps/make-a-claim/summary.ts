@@ -1,0 +1,608 @@
+import escapeHtml from 'escape-html';
+import type { Request } from 'express';
+import type { TFunction } from 'i18next';
+
+import { formatCcdAddress, formatCcdAddressLines } from '../utils/ccdAddress';
+
+import { readClaim } from './claimDraft';
+import { accountEmailOf, propertyAddressOf, usableAccountEmailOf } from './claimMapping';
+import { usesTable } from './conditions';
+import { formatClaimDate } from './dates';
+import { flowConfig } from './flow.config';
+import { formatPence } from './rentHistory';
+import { rentStatementTable } from './rentTables';
+import { makeAClaimSections } from './sections.config';
+
+import { getTranslationFunction } from '@modules/steps';
+import { getStepUrl } from '@modules/steps/flow';
+import type { CcdCaseAddress } from '@services/ccdCase.interface';
+import {
+  type CitizenAdditionalClaimant,
+  type CitizenDefendant,
+  type CitizenPossessionClaim,
+  type ClaimDocuments,
+  NOTICE_METHODS,
+  NOTICE_METHOD_DETAILS,
+  OTHER_GROUND,
+  type YesNo,
+  groundReasonsOf,
+  groundsNeedingReasons,
+} from '@services/citizenPossessionClaim.interface';
+
+type CitizenClaimant = NonNullable<CitizenPossessionClaim['claimant']>;
+type CitizenTenancy = NonNullable<CitizenPossessionClaim['tenancy']>;
+
+export interface SummaryRow {
+  key: { text: string };
+  value: { text?: string; html?: string };
+  actions?: { items: { href: string; text: string; visuallyHiddenText: string }[] };
+}
+
+export interface SummaryCard {
+  id: string;
+  title: string;
+  rows: SummaryRow[];
+  table?: Record<string, unknown>;
+  tableChange?: { href: string; text: string };
+}
+
+export function defendantDisplayName(defendant: CitizenDefendant | undefined, req: Request): string {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  if (defendant?.nameKnown === 'YES' && (defendant.firstName || defendant.lastName)) {
+    return [defendant.firstName, defendant.lastName].filter(Boolean).join(' ');
+  }
+  return t('makeAClaim:summary.personsUnknown');
+}
+
+function isStepShown(req: Request, stepName: string): boolean {
+  const showCondition = flowConfig.steps[stepName]?.showCondition;
+  return !showCondition || showCondition(req);
+}
+
+function linesHtml(lines: string[]): string {
+  return lines.map(line => escapeHtml(line)).join('<br>');
+}
+
+class CardBuilder {
+  private readonly rows: SummaryRow[] = [];
+
+  constructor(
+    private readonly req: Request,
+    private readonly t: TFunction
+  ) {}
+
+  /** Adds a row for an answer given on `stepName`, unless the claimant was not asked that question. */
+  add(stepName: string, labelKey: string, value: string | string[] | undefined, query = '', label?: string): this {
+    if (!isStepShown(this.req, stepName) && !query) {
+      return this;
+    }
+    const text = label ?? this.t(`makeAClaim:summary.labels.${labelKey}`);
+    const empty = this.t('makeAClaim:summary.notAnswered');
+    const href = `${getStepUrl(stepName, flowConfig, this.req.res?.locals.validatedCase?.id)}${query}`;
+    this.rows.push({
+      key: { text },
+      value: Array.isArray(value) ? { html: value.length ? linesHtml(value) : empty } : { text: value || empty },
+      actions: { items: [{ href, text: this.t('makeAClaim:summary.change'), visuallyHiddenText: text }] },
+    });
+    return this;
+  }
+
+  /** Adds another action, such as Remove, to the row added last. */
+  withAction(href: string, text: string, visuallyHiddenText: string): this {
+    this.rows[this.rows.length - 1]?.actions?.items.push({ href, text, visuallyHiddenText });
+    return this;
+  }
+
+  build(): SummaryRow[] {
+    return this.rows;
+  }
+}
+
+function yesNo(t: TFunction, value: YesNo | undefined): string | undefined {
+  return value ? t(`makeAClaim:options.${value === 'YES' ? 'yes' : 'no'}`) : undefined;
+}
+
+function withDetail(answer: string | undefined, detail: string | undefined): string | string[] | undefined {
+  return answer && detail ? [answer, detail] : answer;
+}
+
+function valueOf(t: TFunction, group: string, value: string | undefined): string | undefined {
+  return value ? t(`makeAClaim:values.${group}.${value}`) : undefined;
+}
+
+function address(value: CcdCaseAddress | undefined): string[] {
+  return formatCcdAddressLines(value);
+}
+
+function documents(value: ClaimDocuments | undefined): string[] {
+  return (value ?? []).map(item => item.value.document_filename);
+}
+
+/** "Yes" with the names of the uploaded files, or "No" with the reason. */
+function agreementValue(t: TFunction, tenancy: CitizenTenancy, withFiles: boolean): string | string[] | undefined {
+  if (withFiles && tenancy.tenancyAgreementAvailable === 'YES') {
+    return [yesNo(t, 'YES') ?? '', ...documents(tenancy.tenancyAgreementDocuments)];
+  }
+  return withDetail(yesNo(t, tenancy.tenancyAgreementAvailable), tenancy.noTenancyAgreementReason);
+}
+
+function money(value: string | undefined): string | undefined {
+  return value ? formatPence(value) : undefined;
+}
+
+/** The email question as the claimant saw it: the account email, or the plain question when it was too long to use. */
+function emailLabel(t: TFunction, req: Request): string {
+  const email = usableAccountEmailOf(req);
+  return email
+    ? t('makeAClaim:summary.labels.emailAddress', { accountEmail: email })
+    : t('makeAClaim:summary.labels.emailAddressOther');
+}
+
+function emailValue(t: TFunction, claimant: CitizenClaimant, req: Request): string | string[] | undefined {
+  if (claimant.contactByEmail === 'NO') {
+    return accountEmailOf(req) && !usableAccountEmailOf(req)
+      ? claimant.emailAddress
+      : [yesNo(t, 'NO') ?? '', claimant.emailAddress ?? ''];
+  }
+  return yesNo(t, claimant.contactByEmail);
+}
+
+export function aboutYouCard(req: Request): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const claimant = readClaim(req).claimant ?? {};
+  const rows = new CardBuilder(req, t)
+    .add(
+      'individual-or-organisation',
+      'individualOrOrganisation',
+      valueOf(t, 'individualOrOrganisation', claimant.individualOrOrganisation)
+    )
+    .add('claimant-name', 'claimantName', [claimant.firstName, claimant.lastName].filter(Boolean).join(' '))
+    .add('organisation-name', 'organisationName', claimant.organisationName)
+    .add('claimant-address', 'claimantAddress', address(claimant.address))
+    .add('claimant-email', 'emailAddress', emailValue(t, claimant, req), '', emailLabel(t, req))
+    .add(
+      'claimant-phone',
+      'contactByPhone',
+      claimant.contactByPhone === 'YES'
+        ? [yesNo(t, 'YES') ?? '', claimant.phoneNumber ?? '']
+        : yesNo(t, claimant.contactByPhone)
+    )
+    .add(
+      'claimant-text-message',
+      'contactByText',
+      claimant.textMessageNumber
+        ? [yesNo(t, claimant.contactByText) ?? '', claimant.textMessageNumber]
+        : yesNo(t, claimant.contactByText)
+    )
+    .build();
+  return { id: 'aboutYou', title: t('makeAClaim:summary.cards.aboutYou'), rows };
+}
+
+/** The name of an additional claimant, or their place in the list when they have none yet. */
+export function additionalClaimantDisplayName(
+  claimant: CitizenAdditionalClaimant | undefined,
+  index: number,
+  req: Request
+): string {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const name =
+    claimant?.individualOrOrganisation === 'ORGANISATION'
+      ? claimant.organisationName
+      : [claimant?.firstName, claimant?.lastName].filter(Boolean).join(' ');
+  return name || t('makeAClaim:summary.cards.additionalClaimant', { number: index + 1 });
+}
+
+/** One card for each claimant added after the first, with the answers asked for them. */
+export function additionalClaimantCards(req: Request): SummaryCard[] {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  return (readClaim(req).additionalClaimants ?? []).map((item, index) => {
+    const claimant = item.value;
+    const query = `?index=${index}`;
+    const builder = new CardBuilder(req, t).add(
+      'additional-claimant-type',
+      'additionalClaimantType',
+      valueOf(t, 'individualOrOrganisation', claimant.individualOrOrganisation),
+      query
+    );
+    builder.withAction(
+      `${getStepUrl('remove-claimant', flowConfig, req.res?.locals.validatedCase?.id)}?${item.id ? `id=${item.id}` : `index=${index}`}`,
+      t('makeAClaim:summary.remove'),
+      additionalClaimantDisplayName(claimant, index, req)
+    );
+    if (claimant.individualOrOrganisation === 'INDIVIDUAL') {
+      builder.add(
+        'additional-claimant-name',
+        'additionalClaimantName',
+        [claimant.firstName, claimant.lastName].filter(Boolean).join(' '),
+        query
+      );
+    } else if (claimant.individualOrOrganisation === 'ORGANISATION') {
+      builder.add(
+        'additional-claimant-organisation-name',
+        'additionalClaimantOrganisationName',
+        claimant.organisationName,
+        query
+      );
+    }
+    const rows = builder
+      .add('additional-claimant-address', 'additionalClaimantAddress', address(claimant.address), query)
+      .add(
+        'additional-claimant-email',
+        'additionalClaimantEmail',
+        claimant.emailAddress === '' ? t('makeAClaim:summary.notProvided') : claimant.emailAddress,
+        query
+      )
+      .add(
+        'additional-claimant-phone',
+        'additionalClaimantPhone',
+        claimant.contactByPhone === 'YES'
+          ? [yesNo(t, 'YES') ?? '', claimant.phoneNumber ?? '']
+          : yesNo(t, claimant.contactByPhone),
+        query
+      )
+      .add(
+        'additional-claimant-text-message',
+        'additionalClaimantTextMessage',
+        claimant.contactByText === 'YES'
+          ? [yesNo(t, 'YES') ?? '', claimant.textMessageNumber ?? '']
+          : yesNo(t, claimant.contactByText),
+        query
+      )
+      .build();
+    return {
+      id: `additionalClaimant${index + 1}`,
+      title: t('makeAClaim:summary.cards.additionalClaimant', { number: index + 1 }),
+      rows,
+    };
+  });
+}
+
+/** The defendants' card; the final check your answers page opens it with the statement about adults in possession. */
+export function defendantsCard(req: Request, opensWithAdultsStatement = false): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const claim = readClaim(req);
+  const defendants = claim.defendants ?? [];
+  const builder = new CardBuilder(req, t);
+  if (opensWithAdultsStatement && defendants.length > 0) {
+    builder.add('additional-defendants', 'moreThanOneAdult', yesNo(t, defendants.length > 1 ? 'YES' : 'NO'));
+  }
+  defendants.forEach((defendant, index) => {
+    const query = index > 0 ? `?index=${index}` : '';
+    const nameKnown = defendant.value.nameKnown === 'YES' && defendantDisplayName(defendant.value, req);
+    const nameLabel = t('makeAClaim:summary.labels.defendantName', {
+      next: index > 0 ? t('makeAClaim:summary.nextDefendant') : '',
+    });
+    const addressLabel = t('makeAClaim:summary.labels.defendantAddress', {
+      name: nameKnown || t('makeAClaim:summary.theDefendant'),
+      address: formatCcdAddress(propertyAddressOf(req)),
+    });
+    const { addressSameAsProperty, address: otherAddress } = defendant.value;
+    builder.add(
+      'defendant-name',
+      'defendantName',
+      defendant.value.nameKnown === 'YES' && nameKnown
+        ? `${yesNo(t, 'YES')}, ${nameKnown}`
+        : yesNo(t, defendant.value.nameKnown),
+      query,
+      nameLabel
+    );
+    if (index > 0) {
+      builder.withAction(
+        `${getStepUrl('remove-defendant', flowConfig, req.res?.locals.validatedCase?.id)}?${defendant.id ? `id=${defendant.id}` : `index=${index}`}`,
+        t('makeAClaim:summary.remove'),
+        t('makeAClaim:summary.removeDefendantHidden', {
+          number: index + 1,
+          name: defendantDisplayName(defendant.value, req),
+        })
+      );
+    }
+    builder.add(
+      'defendant-address',
+      'defendantAddress',
+      addressSameAsProperty === 'NO' && otherAddress
+        ? [yesNo(t, 'NO') ?? '', ...address(otherAddress)]
+        : (yesNo(t, addressSameAsProperty) ?? t('makeAClaim:summary.addressNotAnswered')),
+      query,
+      addressLabel
+    );
+  });
+  if (defendants.length > 0) {
+    builder.add('additional-defendants', 'additionalDefendants', yesNo(t, claim.additionalDefendants));
+  }
+  return { id: 'defendants', title: t('makeAClaim:summary.cards.defendants'), rows: builder.build() };
+}
+
+/** The grounds the grounds page words on its own. */
+const GROUNDS_ON_LIST: Record<string, true> = { GROUND_8: true, GROUND_10: true, GROUND_11: true, OTHER: true };
+
+/**
+ * The tenancy card. On the tenancy summary the uploaded agreement is listed under the question about it;
+ * on the final check your answers page it has a row of its own.
+ */
+export function tenancyCard(req: Request, agreementFilesOnQuestion = false): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const claim = readClaim(req);
+  const { tenancy = {}, grounds = {} } = claim;
+  const builder = new CardBuilder(req, t)
+    .add(
+      'tenancy-type',
+      'tenancyType',
+      tenancy.tenancyType === 'OTHER'
+        ? [valueOf(t, 'tenancyType', 'OTHER') ?? '', tenancy.otherTenancyTypeDetails ?? '']
+        : valueOf(t, 'tenancyType', tenancy.tenancyType)
+    )
+    .add('tenancy-start-date', 'tenancyStartDate', formatClaimDate(tenancy.tenancyStartDate, req))
+    .add('tenancy-agreement', 'tenancyAgreementAvailable', agreementValue(t, tenancy, agreementFilesOnQuestion));
+  if (!agreementFilesOnQuestion) {
+    builder.add('upload-tenancy-agreement', 'tenancyAgreementDocuments', documents(tenancy.tenancyAgreementDocuments));
+  }
+  builder
+    .add(
+      'occupation-contract-type',
+      'occupationContractType',
+      tenancy.occupationContractType === 'OTHER'
+        ? [valueOf(t, 'occupationContractType', 'OTHER') ?? '', tenancy.otherOccupationContractDetails ?? '']
+        : valueOf(t, 'occupationContractType', tenancy.occupationContractType)
+    )
+    .add(
+      'occupation-contract-start-date',
+      'occupationContractStartDate',
+      formatClaimDate(tenancy.tenancyStartDate, req)
+    )
+    .add(
+      'occupation-contract-agreement',
+      'occupationContractAgreementAvailable',
+      agreementValue(t, tenancy, agreementFilesOnQuestion)
+    );
+  if (!agreementFilesOnQuestion) {
+    builder.add(
+      'upload-occupation-contract',
+      'occupationContractDocuments',
+      documents(tenancy.tenancyAgreementDocuments)
+    );
+  }
+  builder
+    .add(
+      'epc-available',
+      'hasEnergyPerformanceCertificate',
+      withDetail(yesNo(t, tenancy.hasEnergyPerformanceCertificate), tenancy.noEnergyPerformanceCertificateReason)
+    )
+    .add('upload-epc', 'energyPerformanceDocuments', documents(tenancy.energyPerformanceDocuments))
+    .add(
+      'gas-safety-available',
+      'hasGasSafetyReport',
+      withDetail(yesNo(t, tenancy.hasGasSafetyReport), tenancy.noGasSafetyReportReason)
+    )
+    .add('upload-gas-safety', 'gasSafetyReportDocuments', documents(tenancy.gasSafetyReportDocuments))
+    .add(
+      'eicr-available',
+      'hasElectricalInstallationConditionReport',
+      withDetail(
+        yesNo(t, tenancy.hasElectricalInstallationConditionReport),
+        tenancy.noElectricalInstallationConditionReason
+      )
+    )
+    .add('upload-eicr', 'electricalInstallationDocuments', documents(tenancy.electricalInstallationDocuments))
+    .add('excluded-grounds-claim', 'hasExcludedGrounds', yesNo(t, grounds.hasExcludedGrounds))
+    .add('excluded-grounds', 'excludedGrounds', [
+      ...(grounds.excludedGrounds ?? []).map(g => t(`makeAClaim:summary.values.excludedGround.${g}`)),
+      ...(grounds.excludedOtherGroundDetails ? [grounds.excludedOtherGroundDetails] : []),
+    ])
+    .add('excluded-reason', 'excludedReason', grounds.excludedReason)
+    .add('rent-arrears-claim', 'hasRentArrearsGrounds', yesNo(t, grounds.hasRentArrearsGrounds))
+    .add(
+      'rent-arrears-grounds',
+      'rentArrearsGrounds',
+      (grounds.rentArrearsGrounds ?? []).map(g => t(`makeAClaim:grounds.${g}`))
+    )
+    .add('other-grounds-claim', 'hasOtherGrounds', yesNo(t, grounds.hasOtherGrounds))
+    .add('wales-grounds', 'walesGrounds', [
+      ...[...(grounds.walesDiscretionaryGrounds ?? []), ...(grounds.walesMandatoryGrounds ?? [])].map(g =>
+        t(`makeAClaim:grounds.${g}`)
+      ),
+      ...(grounds.otherGrounds?.includes(OTHER_GROUND)
+        ? [t('makeAClaim:grounds.WALES_OTHER'), grounds.otherGroundsDetails ?? '']
+        : []),
+    ])
+    .add('other-grounds', 'otherGrounds', [
+      ...(grounds.otherGrounds ?? []).map(g =>
+        t(`makeAClaim:${g in GROUNDS_ON_LIST ? 'groundsOnList' : 'grounds'}.${g}`)
+      ),
+      ...(grounds.otherGroundsDetails ? [grounds.otherGroundsDetails] : []),
+    ]);
+  if (isStepShown(req, 'ground-reason')) {
+    for (const ground of groundsNeedingReasons(claim)) {
+      const label = t('makeAClaim:summary.labels.groundReason', { ground: t(`makeAClaim:grounds.${ground}`) });
+      const reason = groundReasonsOf(claim).find(item => item.value.ground === ground)?.value.reason;
+      builder.add('ground-reason', 'groundReason', reason, `?ground=${ground}`, label);
+    }
+  }
+  const rows = builder.build();
+  return { id: 'tenancy', title: t('makeAClaim:summary.cards.tenancy'), rows };
+}
+
+export function noticeCard(req: Request): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const notice = readClaim(req).notice ?? {};
+  const details = notice as Record<string, string | undefined>;
+  const builder = new CardBuilder(req, t)
+    .add('notice-served', 'noticeServed', withDetail(yesNo(t, notice.noticeServed), notice.noNoticeReason))
+    .add(
+      'notice-type',
+      'noticeType',
+      notice.noticeType === 'OTHER'
+        ? [valueOf(t, 'noticeType', 'OTHER') ?? '', notice.noticeTypeOther ?? '']
+        : valueOf(t, 'noticeType', notice.noticeType)
+    )
+    .add(
+      'notice-method',
+      'noticeMethods',
+      (notice.noticeMethods ?? []).map(method => valueOf(t, 'noticeMethod', method) ?? '')
+    );
+  for (const method of NOTICE_METHODS) {
+    if (!notice.noticeMethods?.includes(method)) {
+      continue;
+    }
+    const { date, details: detail } = NOTICE_METHOD_DETAILS[method];
+    if (detail) {
+      builder.add('notice-method', detail, details[detail]);
+    }
+    builder.add('notice-method', date, formatClaimDate(details[date], req));
+  }
+  const rows = builder
+    .add(
+      'notice-available',
+      'noticeAvailable',
+      withDetail(yesNo(t, notice.noticeAvailable), notice.noticeUnavailableReason)
+    )
+    .add('upload-notice', 'noticeDocuments', documents(notice.noticeDocuments))
+    .build();
+  return { id: 'notice', title: t('makeAClaim:summary.cards.notice'), rows };
+}
+
+export function rentArrearsCard(req: Request): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const rentArrears = readClaim(req).rentArrears ?? {};
+  const rows = new CardBuilder(req, t)
+    .add('arrears-at-notice', 'arrearsAtNoticeDate', money(rentArrears.arrearsAtNoticeDate))
+    .add('current-arrears', 'currentArrears', money(rentArrears.currentArrears))
+    .add('rent-amount', 'rentAmount', money(rentArrears.rentAmount))
+    .add(
+      'rent-frequency',
+      'rentFrequency',
+      rentArrears.rentFrequency === 'OTHER'
+        ? [valueOf(t, 'rentFrequency', 'OTHER') ?? '', rentArrears.otherFrequencyDetails ?? '']
+        : valueOf(t, 'rentFrequency', rentArrears.rentFrequency)
+    )
+    .add('rent-due-day', 'rentDueDay', rentArrears.rentDueDay?.toString())
+    .add('arrears-proof', 'proofType', valueOf(t, 'proofType', rentArrears.proofType))
+    .add('upload-rent-statement', 'rentStatementDocuments', documents(rentArrears.rentStatementDocuments))
+    .add('money-judgment', 'moneyJudgmentWanted', yesNo(t, rentArrears.moneyJudgmentWanted))
+    .add('recovery-steps', 'recoverySteps', rentArrears.recoverySteps)
+    .build();
+  const caseId = req.res?.locals.validatedCase?.id;
+  const card: SummaryCard = { id: 'rentArrears', title: t('makeAClaim:summary.cards.rentArrears'), rows };
+  if (usesTable(req) && rentArrears.rentHistoryTable?.length) {
+    card.table = rentStatementTable(req, false);
+    card.tableChange = {
+      href: getStepUrl('rent-statement', flowConfig, caseId),
+      text: t('makeAClaim:summary.changeStatement'),
+    };
+  }
+  return card;
+}
+
+export function circumstancesCard(req: Request): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const circumstances = readClaim(req).circumstances ?? {};
+  const rows = new CardBuilder(req, t)
+    .add('defendant-circumstances', 'defendantCircumstances', circumstances.defendantCircumstances)
+    .add('claimant-circumstances', 'claimantCircumstances', circumstances.claimantCircumstances)
+    .build();
+  return { id: 'circumstances', title: t('makeAClaim:summary.cards.circumstances'), rows };
+}
+
+function uploadDocumentsCard(req: Request): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const otherInformation = readClaim(req).otherInformation ?? {};
+  const rows = new CardBuilder(req, t)
+    .add('upload-other-documents', 'otherDocuments', documents(otherInformation.otherDocuments))
+    .build();
+  return { id: 'uploadDocuments', title: t('makeAClaim:summary.cards.uploadDocuments'), rows };
+}
+
+function otherInformationCard(req: Request): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const otherInformation = readClaim(req).otherInformation ?? {};
+  const rows = new CardBuilder(req, t)
+    .add(
+      'other-reasons',
+      'hasOtherReasons',
+      otherInformation.hasOtherReasons === 'YES'
+        ? [yesNo(t, 'YES') ?? '', otherInformation.otherReasonsDetail ?? '']
+        : yesNo(t, otherInformation.hasOtherReasons)
+    )
+    .add('general-application', 'generalApplicationIntent', yesNo(t, otherInformation.generalApplicationIntent))
+    .build();
+  return { id: 'otherInformation', title: t('makeAClaim:summary.cards.otherInformation'), rows };
+}
+
+/** The support the claimant asked for through Your Support, one line for each request. */
+function supportCard(req: Request): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const requests = (readClaim(req).otherInformation?.supportFlags?.details ?? [])
+    .map(detail => detail.value)
+    .filter(flag => flag.status?.toLowerCase() !== 'inactive')
+    .map(flag => flag.subTypeValue || flag.name);
+  const rows = new CardBuilder(req, t)
+    .add('your-support', 'supportRequests', requests.length ? requests : [t('makeAClaim:summary.noSupportRequested')])
+    .build();
+  return { id: 'yourSupport', title: t('makeAClaim:summary.cards.yourSupport'), rows };
+}
+
+/** Whether the claimant answered the equality and diversity questions, which pcs-api never shows them back. */
+function equalityCard(req: Request): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const answered = readClaim(req).otherInformation?.equalityQuestionsChoice === 'CONTINUE';
+  const rows = new CardBuilder(req, t)
+    .add(
+      'equality-and-diversity',
+      'equalityQuestions',
+      t(`makeAClaim:summary.${answered ? 'provided' : 'notProvided'}`)
+    )
+    .build();
+  return { id: 'equality', title: t('makeAClaim:summary.cards.equality'), rows };
+}
+
+function languageUsedCard(req: Request): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const otherInformation = readClaim(req).otherInformation ?? {};
+  const rows = new CardBuilder(req, t)
+    .add('language-used', 'languageUsed', valueOf(t, 'languageUsed', otherInformation.languageUsed))
+    .build();
+  return { id: 'languageUsed', title: t('makeAClaim:summary.cards.languageUsed'), rows };
+}
+
+/** The property, which cannot be changed once the claim exists. */
+function propertyCard(req: Request): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+
+  return {
+    id: 'property',
+    title: t('makeAClaim:summary.cards.property'),
+    rows: [
+      {
+        key: { text: t('makeAClaim:summary.labels.propertyAddress') },
+        value: {
+          html: `${linesHtml(address(propertyAddressOf(req)))}<p class="govuk-hint govuk-!-margin-top-2 govuk-!-margin-bottom-0">${escapeHtml(
+            t('makeAClaim:summary.propertyCannotChange')
+          )}</p>`,
+        },
+      },
+    ],
+  };
+}
+
+/** The cards each task list section adds to the final check your answers page, in order. */
+const SECTION_CARDS: Record<string, readonly ((req: Request) => SummaryCard | SummaryCard[])[]> = {
+  aboutYou: [aboutYouCard, additionalClaimantCards],
+  defendants: [req => defendantsCard(req, true)],
+  tenancyAndGrounds: [req => tenancyCard(req)],
+  notice: [noticeCard],
+  rentArrears: [rentArrearsCard],
+  circumstances: [circumstancesCard],
+  uploadDocuments: [uploadDocumentsCard],
+  checkAndSubmit: [otherInformationCard, supportCard, equalityCard, languageUsedCard],
+};
+
+/** Every card the final check your answers page shows: the property, then a card for each task list section. */
+export async function allCards(req: Request): Promise<SummaryCard[]> {
+  const cards = [propertyCard(req)];
+  for (const section of makeAClaimSections) {
+    if (section.isApplicable && !(await section.isApplicable(req))) {
+      continue;
+    }
+    cards.push(...(SECTION_CARDS[section.id] ?? []).flatMap(card => card(req)));
+  }
+  return cards;
+}

@@ -1,0 +1,37 @@
+{
+  "pageTitle": "cyWhat period of time do you want the rent statement to cover?",
+  "heading": "cyWhat period of time do you want the rent statement to cover?",
+  "paragraphs": ["cyIt must cover the time period of either:"],
+  "bullets": [
+    "cyfrom the first date the defendants missed a payment",
+    "cythe last two years of payments, if the first date of their missed payment was more than two years ago"
+  ],
+  "labels": {
+    "statementStart": "cyStart date",
+    "statementEnd": "cyEnd date"
+  },
+  "hints": {
+    "statementStart": "cyFor example, 27 9 2022",
+    "statementEnd": "cyFor example, 27 11 2022"
+  },
+  "errors": {
+    "statementEnd": "cyThe end date must be the same as or after the start date",
+    "date": {
+      "required": "cyEnter the date",
+      "notRealDate": "cyThe date must be a real date",
+      "invalidValue": "cyThe date must be a real date",
+      "futureDate": "cyThe date must be today or in the past",
+      "missingOne": "cyThe date must include a {{missingField}}",
+      "missingTwo": "cyThe date must include a {{first}} and {{second}}",
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear"
+    },
+    "tooManyPeriods": "cyThe statement period is too long. Choose dates that cover no more than {{limit}} rent periods"
+  },
+  "dateErrors": {
+    "statementEnd": {
+      "futureDate": "cyThe end date must be today or in the past"
+    }
+  }
+}

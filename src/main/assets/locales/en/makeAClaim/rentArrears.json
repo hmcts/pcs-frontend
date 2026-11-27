@@ -1,0 +1,21 @@
+{
+  "pageTitle": "Proof of rent arrears",
+  "heading": "Proof of rent arrears",
+  "paragraphs": ["As your claim is on the grounds of rent arrears, you must now answer questions about:"],
+  "bullets": [
+    "how much the arrears were on the date you served notice, if you served notice",
+    "how much the rent arrears are on today’s date",
+    "how much the rent is and how frequently it should be paid"
+  ],
+  "contentBlocks": [
+    {
+      "text": "You must also provide proof of how the rent arrears have built up over time. You can either:"
+    },
+    {
+      "bullets": ["upload a rent statement that follows specific guidelines", "create your own rent statement"]
+    },
+    {
+      "text": "The defendant will be able to see your answers and any documents you upload."
+    }
+  ]
+}

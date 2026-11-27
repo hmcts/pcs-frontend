@@ -1,0 +1,10 @@
+{
+  "pageTitle": "What is their company or organisation’s name?",
+  "heading": "What is their company or organisation’s name?",
+  "labels": {
+    "organisationName": "Company or organisation’s name"
+  },
+  "errors": {
+    "organisationName": "Enter their company or organisation’s name"
+  }
+}

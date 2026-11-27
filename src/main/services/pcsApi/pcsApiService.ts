@@ -1,7 +1,8 @@
 import config from 'config';
 
 import { http } from '@modules/http';
-import type { ClaimSummary } from '@services/ccdCase.interface';
+import type { ClaimSummary, ClaimantClaimSummary } from '@services/ccdCase.interface';
+import type { LegislativeCountry } from '@services/citizenPossessionClaim.interface';
 
 function getBaseUrl(): string {
   return config.get('api.url');
@@ -62,6 +63,49 @@ export const validateAccessCode = async (
   }
 };
 
+/** Whether pcs-api can take a private landlord's claim for a property, by its postcode. */
+export type PropertyEligibilityStatus =
+  'ELIGIBLE' | 'NOT_ENGLAND_OR_WALES' | 'NO_COURT' | 'LEGISLATIVE_COUNTRY_REQUIRED';
+
+const PROPERTY_ELIGIBILITY_STATUSES: PropertyEligibilityStatus[] = [
+  'ELIGIBLE',
+  'NOT_ENGLAND_OR_WALES',
+  'NO_COURT',
+  'LEGISLATIVE_COUNTRY_REQUIRED',
+];
+
+export interface PropertyEligibility {
+  status: PropertyEligibilityStatus;
+  /** The country an eligible property is in. */
+  legislativeCountry?: LegislativeCountry;
+}
+
+const LEGISLATIVE_COUNTRIES: LegislativeCountry[] = ['England', 'Wales'];
+
+export const getPropertyEligibility = async (
+  accessToken: string,
+  postcode: string,
+  legislativeCountry?: LegislativeCountry
+): Promise<PropertyEligibility> => {
+  const response = await http.get<{ status?: PropertyEligibilityStatus; legislativeCountry?: LegislativeCountry }>(
+    `${getBaseUrl()}/cases/citizen-claims/property-eligibility`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      params: { postcode, ...(legislativeCountry ? { legislativeCountry } : {}) },
+    }
+  );
+  const status = response.data?.status;
+  const country = response.data?.legislativeCountry;
+  if (
+    !status ||
+    !PROPERTY_ELIGIBILITY_STATUSES.includes(status) ||
+    (status === 'ELIGIBLE' && (!country || !LEGISLATIVE_COUNTRIES.includes(country)))
+  ) {
+    throw new Error('Unexpected response from property-eligibility endpoint');
+  }
+  return status === 'ELIGIBLE' ? { status, legislativeCountry: country } : { status };
+};
+
 export const getCitizenClaims = async (accessToken: string): Promise<ClaimSummary[]> => {
   const response = await http.get<ClaimSummary[]>(`${getBaseUrl()}/cases/citizen-claims`, {
     headers: { Authorization: `Bearer ${accessToken}` },
@@ -70,4 +114,32 @@ export const getCitizenClaims = async (accessToken: string): Promise<ClaimSummar
     throw new Error('Unexpected response from citizen-claims endpoint');
   }
   return response.data;
+};
+
+export const getClaimantClaims = async (accessToken: string): Promise<ClaimantClaimSummary[]> => {
+  const response = await http.get<ClaimantClaimSummary[]>(`${getBaseUrl()}/cases/citizen-claims/as-claimant`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!Array.isArray(response.data)) {
+    throw new Error('Unexpected response from citizen-claims as-claimant endpoint');
+  }
+  return response.data;
+};
+
+/** The fee to issue a possession claim, as the fees register holds it. */
+export interface ClaimIssueFee {
+  /** Pounds with two decimal places, e.g. 404.00. */
+  amount: string;
+  code: string;
+  version: number;
+}
+
+/** Needs only the service token, so it works before the citizen signs in. */
+export const getClaimIssueFee = async (): Promise<ClaimIssueFee> => {
+  const response = await http.get<Partial<ClaimIssueFee>>(`${getBaseUrl()}/fees/claim-issue`);
+  const { amount, code, version } = response.data ?? {};
+  if (typeof amount !== 'string' || !/^\d+(\.\d+)?$/.test(amount) || typeof code !== 'string') {
+    throw new Error('Unexpected response from claim-issue fee endpoint');
+  }
+  return { amount, code, version: Number(version) };
 };

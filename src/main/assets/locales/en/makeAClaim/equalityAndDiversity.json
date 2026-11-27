@@ -1,0 +1,13 @@
+{
+  "pageTitle": "Equality and diversity questions",
+  "heading": "Equality and diversity questions",
+  "continueButton": "Continue to the questions",
+  "skipButton": "I do not want to answer these questions",
+  "paragraphs": [
+    "These are optional questions about you",
+    "Your answers won’t affect your application",
+    "They won’t be shared with anyone involved in your case",
+    "Your answers will help us check we are treating people fairly and equally.",
+    "Find out how we use this information in our <a class=\"govuk-link\" href=\"/privacy-policy\" target=\"_blank\" rel=\"noopener noreferrer\">privacy policy (opens in new tab)</a>"
+  ]
+}
