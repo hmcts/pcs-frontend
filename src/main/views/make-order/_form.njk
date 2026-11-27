@@ -73,6 +73,10 @@
   { id: "tab-strike-out", type: "STRIKE_OUT_DISMISSAL", label: "Strike out/dismiss", template: "make-order/tabs/_strike-out.njk" },
   { id: "tab-free-form", type: "FREE_FORM", label: "Free form", template: "make-order/tabs/_free-form.njk" }
 ] %}
+{# The parties' filed drafts, newest first, which the judge can use as a free form order. Not an order type. #}
+{% if drafts | length %}
+  {% set orderTypeTabs = orderTypeTabs.concat([{ id: "tab-drafts", label: "Drafts", template: "make-order/tabs/_drafts.njk" }]) %}
+{% endif %}
 {% set openOrderType = draftOrderType if draftOrderType != "NO_ORDER_ON_CLAIM" else ("ADJOURNMENT" if withoutHearing else "OUTRIGHT_POSSESSION") %}
 
 {# The macro hardcodes an h2 tab-list heading, so use its markup directly to preserve heading order. #}
@@ -82,7 +86,7 @@
   <ul class="govuk-tabs__list">
     {% for tab in orderTypeTabs %}
       <li class="govuk-tabs__list-item {%- if tab.type == openOrderType %} govuk-tabs__list-item--selected{% endif %}">
-        <a class="govuk-tabs__tab" href="#{{ tab.id }}" data-order-type="{{ tab.type }}">{{ tab.label }}</a>
+        <a class="govuk-tabs__tab" href="#{{ tab.id }}" {%- if tab.type %} data-order-type="{{ tab.type }}"{% endif %}>{{ tab.label }}</a>
       </li>
     {% endfor %}
   </ul>

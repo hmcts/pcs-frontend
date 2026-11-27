@@ -28,6 +28,8 @@ export interface OrderCaseContext {
   openCounterclaim: boolean;
   /** The case's open applications, any of which the order can decide, oldest first. */
   applications: OrderApplication[];
+  /** The draft orders the parties have filed, newest first; none from a pcs-api that does not send them. */
+  drafts?: OrderDraft[];
   /** The case bundle, every document on the case in one PDF, for a judge once one has been made. */
   caseBundle?: OrderCaseBundle | null;
   /** The case's hearings that have not been cancelled, earliest first, which a judge can make the order at. */
@@ -64,6 +66,16 @@ export interface OrderApplication {
   /** The applicant's draft order as rich text (HTML), cleaned by pcs-api when stored. */
   draftOrderWording?: string | null;
   documents: { id: string; fileName: string }[];
+}
+
+/** A draft order a party filed: the order they propose, as rich text (HTML) cleaned by pcs-api when stored. */
+export interface OrderDraft {
+  id: string;
+  /** Who filed it, as "Jane Doe (Defendant 1)". */
+  party: string;
+  /** When it was filed (ISO instant). */
+  submittedAt: string;
+  wording: string;
 }
 
 /** A judicial note on the case, with the hearing it was made at, if any. */

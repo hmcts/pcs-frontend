@@ -350,13 +350,19 @@ export function initMakeOrder(): void {
   // One document whatever the order type: switching type changes the generated clauses in place, so wording the
   // judge inserted stays, but their edits to a type's own clauses go with them.
   const render = (): void => editor.render(buildOrderDocument(form));
+  // The claim's order type last chosen, for when the open tab is the parties' drafts, which is not an order type.
+  let claimType: OrderType | undefined;
   const selectOrderType = (type: OrderType): void => {
     orderTypeField.value = type;
+    if (type !== 'NO_ORDER_ON_CLAIM') {
+      claimType = type;
+    }
     syncSuspendedOnlyCosts(form, type);
     render();
   };
 
-  // GOV.UK tabs record the open tab in the fragment for clicks, arrow keys and history.
+  // GOV.UK tabs record the open tab in the fragment for clicks, arrow keys and history. Only an order type's tab has
+  // one; the drafts tab leaves the order type as it was.
   const tabs = Array.from(form.querySelectorAll<HTMLAnchorElement>('[data-order-type]'));
   const savedTab = tabs.find(tab => tab.dataset.orderType === orderTypeField.value);
   const tabType = (): OrderType | undefined =>
@@ -369,6 +375,7 @@ export function initMakeOrder(): void {
   const openTabType = (): OrderType =>
     (tabType() ??
       form.querySelector<HTMLAnchorElement>('.govuk-tabs__list-item--selected [data-order-type]')?.dataset.orderType ??
+      claimType ??
       tabs[0]?.dataset.orderType) as OrderType;
   const followTab = (): void => {
     if (!orderingOnClaim()) {
@@ -402,14 +409,31 @@ export function initMakeOrder(): void {
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   form.addEventListener('submit', followTab);
-  // The applicant's draft order goes in as the judge's own clauses, after "IT IS ORDERED THAT:", which no decision
+  // A party's filed draft makes the order a free form one on the claim, chosen before the draft goes in, so the order
+  // is regenerated for free form first. Naming the free form tab in the fragment opens it, as for a saved tab.
+  const useFreeForm = (): void => {
+    if (claimOrder && !claimOrder.checked) {
+      claimOrder.click();
+    }
+    window.history.replaceState(window.history.state, '', '#tab-free-form');
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  };
+  // A draft order goes in as the judge's own clauses, after "IT IS ORDERED THAT:", which no decision or order type
   // takes away.
   form.addEventListener('click', ({ target }) => {
     const button = (target as Element).closest<HTMLElement>('[data-draft-order]');
-    if (button && editor.insertHtml(button.dataset.draftOrder!, { at: { after: 'paragraph:ordered-that' } })) {
-      const reference = button.closest<HTMLElement>('[data-application]')!.dataset.applicationReference;
-      form.querySelector('#order-editor [role="status"]')!.textContent =
-        `The draft order from application ${reference} is added.`;
+    if (!button) {
+      return;
+    }
+    const filed = button.closest<HTMLElement>('[data-filed-draft]');
+    if (filed) {
+      useFreeForm();
+    }
+    if (editor.insertHtml(button.dataset.draftOrder!, { at: { after: 'paragraph:ordered-that' } })) {
+      const reference = button.closest<HTMLElement>('[data-application]')?.dataset.applicationReference;
+      form.querySelector('#order-editor [role="status"]')!.textContent = filed
+        ? `The draft from ${filed.dataset.party} is added.`
+        : `The draft order from application ${reference} is added.`;
     }
   });
   selectOrderType(orderingOnClaim() ? (tabType() ?? (orderTypeField.value as OrderType)) : 'NO_ORDER_ON_CLAIM');
