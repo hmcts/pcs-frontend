@@ -40,7 +40,7 @@ function addHearingAdjournment(list: OrderedListBuilder, data: OrderData, prefix
 
 /**
  * The clauses the decision on an application generates; none says it is granted, as the order says what it grants.
- * A freeform decision generates none, for the judge's own wording. Listing it for a new hearing says when, as an
+ * Freeform and applicant-wording decisions are written in the editor. Listing it for a new hearing says when, as an
  * adjournment does, and whether the other parties are given notice; listing it at one of the case's hearings says
  * which. Adjourning an application to adjourn adjourns the hearing as the adjournment tab adjourns the claim.
  * Suspending enforcement sets the suspension's conditions as a suspended possession order does.

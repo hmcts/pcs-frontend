@@ -6,8 +6,7 @@
   The details are folded away, as the judge has the file, but for the application the judge's task asked them to
   decide, which is open and which the order must decide. Any other may be left as it is.
 
-  Each decision but freeform puts its own wording in the order, which says what was decided: there is no bare
-  "granted"; a freeform decision leaves the wording to the judge. Adjourning, offered on an application to adjourn a
+  The applicant’s wording can be inserted when supplied. A freeform decision leaves the wording to the judge. Adjourning, offered on an application to adjourn a
   hearing, adjourns it to a further hearing or generally, as the adjournment tab does. Suspending
   enforcement, offered on an application to suspend it, does so on the conditions a suspended possession order has.
   Listing it for a hearing asks when, as the adjournment tab does, and leaves the application open, as not dealing with
@@ -90,9 +89,12 @@
     }]) %}
   {% endif %}
   {% set items = items.concat([
-    { value: "list", text: "Listed for a hearing" },
-    { value: "freeform", text: "Freeform" }
+    { value: "list", text: "Listed for a hearing" }
   ]) %}
+  {% if (application.draftOrderWording or "") | trim %}
+    {% set items = items.concat([{ value: "applicant-wording", text: "Use the applicant’s wording" }]) %}
+  {% endif %}
+  {% set items = items.concat([{ value: "freeform", text: "Freeform" }]) %}
   {{ compact.radios(name, {
     legend: "What do you decide about application " + application.reference + "?",
     classes: "govuk-radios--small govuk-radios--inline",
@@ -100,9 +102,11 @@
     items: items
   }) }}
   {% if (application.draftOrderWording or "") | trim %}
-    <div data-decision-shows="freeform" {%- if not draftChecked(name, "freeform") %} hidden{% endif %}>
+    <div data-decision-shows="applicant-wording" {%- if not draftChecked(name, "applicant-wording") %} hidden{% endif %}>
+      <input type="hidden" name="{{ prefix }}-applicant-wording-inserted"
+             value="{{ 'yes' if draftChecked(prefix + '-applicant-wording-inserted', 'yes') else '' }}">
       {{ govukButton({
-        html: "Add the applicant's draft order to the order<span class=\"govuk-visually-hidden\"> from application " + (application.reference | escape) + "</span>",
+        html: "Insert the applicant’s wording<span class=\"govuk-visually-hidden\"> from application " + (application.reference | escape) + "</span>",
         type: "button",
         classes: "govuk-button--secondary govuk-!-margin-bottom-3",
         attributes: { "data-draft-order": application.draftOrderWording }

@@ -39,7 +39,7 @@ describe('make an order: attendance', () => {
     check('defendant-defendant-id-attendance', 'letter-only');
     // The name of whoever attended is optional; the order then names their role alone.
     expect(page.orderText()).toContain(
-      'The Court heard from the housing officer on behalf of the Claimant and read a letter from Alex Example.'
+      'The Court heard from the housing officer on behalf of the Claimant and read a letter from the Defendant.'
     );
 
     type('claimant-claimant-id-name', 'x'.repeat(121));
@@ -50,7 +50,7 @@ describe('make an order: attendance', () => {
 
     type('claimant-claimant-id-name', 'Harriet Officer');
     expect(page.orderText()).toContain(
-      'The Court heard from Harriet Officer, the housing officer on behalf of the Claimant and read a letter from Alex Example.'
+      'The Court heard from Harriet Officer, the housing officer on behalf of the Claimant and read a letter from the Defendant.'
     );
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
@@ -59,7 +59,7 @@ describe('make an order: attendance', () => {
     expect(submitted.location).toBe(`${PAGE}/sent-for-review`);
   });
 
-  it('identifies multiple defendants by position and gives non-attendance its own sentence', async () => {
+  it('identifies multiple defendants by position and appends non-attendance to the same sentence', async () => {
     await app.close();
     app = await bootApp({
       defendants: [
@@ -72,16 +72,15 @@ describe('make an order: attendance', () => {
     check('defendant-first-attendance', 'litigant-in-person');
     check('defendant-second-attendance', 'not-present');
 
-    expect(page.orderText().split('\n').slice(0, 2)).toEqual([
-      'The Court heard from the solicitor for the Claimant and the First Defendant in person.',
-      'The Second Defendant did not attend.',
-    ]);
+    expect(page.orderText().split('\n')[0]).toBe(
+      'The Court heard from the solicitor for the Claimant and the First Defendant in person and the Second Defendant did not attend.'
+    );
 
     type('claimant-claimant-id-name', 'Sam Solicitor');
-    expect(page.orderText().split('\n').slice(0, 2)).toEqual([
-      'The Court heard from Sam Solicitor, solicitor for the Claimant, and the First Defendant in person.',
-      'The Second Defendant did not attend.',
-    ]);
+    expect(page.orderText().split('\n')[0]).toBe(
+      'The Court heard from Sam Solicitor, solicitor for the Claimant, and the First Defendant in person and the Second Defendant did not attend.'
+    );
+    expect(page.orderText()).not.toMatch(/Alex Example|Blake Example|proceed in their absence/);
   });
 
   it('only accepts the attendance a party can have', async () => {

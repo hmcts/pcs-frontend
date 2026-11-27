@@ -30,7 +30,7 @@
     <fieldset class="govuk-fieldset">
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ legend }}</legend>
       {% call compact.row({ classes: "govuk-!-margin-bottom-4" }) %}
-        {{ compact.copy("Payment of current rent plus arrears of") }}
+        {{ compact.copy("Arrears for the money judgment, if ordered" if prefix == "suspended" else "Payment of current rent plus arrears of") }}
         {{ compact.money({
           id: prefix + "-arrears",
           label: "Arrears",

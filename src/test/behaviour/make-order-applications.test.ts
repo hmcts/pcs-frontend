@@ -288,20 +288,25 @@ describe('make an order: deciding applications', () => {
       expect(clauseLists()).toEqual([1, 1]);
     });
 
-    it("offers the applicant's draft wording for a freeform decision", async () => {
+    it('requires the supplied draft wording for the separate applicant-wording decision', async () => {
       await app.close();
       app = await bootApp({
         application: { ...ADJOURN, draftOrderWording: '<p>The hearing is adjourned to 2 November 2026.</p>' },
       });
       const page = await openPage((await app.get(TASK_PAGE)).text);
       check('order-notice', 'none');
-      const draft = control<HTMLElement>('[data-decision-shows="freeform"]');
+      const draft = control<HTMLElement>('[data-decision-shows="applicant-wording"]');
       const button = control<HTMLButtonElement>('[data-draft-order]');
-      check(`${P}-decision`, 'dismiss');
-      expect(draft.hidden).toBe(true);
-
       check(`${P}-decision`, 'freeform');
+      expect(draft.hidden).toBe(true);
+      expect(ordered(page.documentText())).toEqual(['IT IS ORDERED THAT:']);
+
+      check(`${P}-decision`, 'applicant-wording');
       expect(draft.hidden).toBe(false);
+      const rejected = await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'));
+      expect(rejected.status).toBe(400);
+      expect(rejected.text).toContain('Insert the applicant’s wording for application GA1 into the order');
+
       button.click();
       expect(ordered(page.documentText())).toEqual([
         'IT IS ORDERED THAT:',

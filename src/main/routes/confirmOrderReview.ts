@@ -8,7 +8,7 @@ import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
 import { applicationsToDecide, caseBundleModel, upcomingHearings } from '@utils/makeOrderForm';
-import { validateFreeformWording, validateStillCurrent } from '@utils/makeOrderValidation';
+import { validateApplicationWording, validateStillCurrent } from '@utils/makeOrderValidation';
 import {
   COSTS,
   FREQUENCIES,
@@ -433,7 +433,7 @@ function atOrderEditor(message: string): ValidationIssue {
 
 /**
  * What stops the edited order being issued: the judge's answers were checked when they sent it, so only what time
- * has overtaken since, and wording a freeform decision needs.
+ * has overtaken since, and wording the selected application decisions need.
  */
 function orderIssues(review: OrderReviewSession): ValidationIssue[] {
   const { formData } = review.order;
@@ -452,7 +452,7 @@ function orderIssues(review: OrderReviewSession): ValidationIssue[] {
       applications,
       upcomingHearings(review).map(({ id }) => id)
     ).map(({ message }) => atOrderEditor(`${message}. ${RETURN_FOR_CORRECTION}`)),
-    ...validateFreeformWording(formData, applications, postedSnapshot(orderDocumentJson)).map(({ message }) =>
+    ...validateApplicationWording(formData, applications, postedSnapshot(orderDocumentJson)).map(({ message }) =>
       atOrderEditor(message)
     ),
   ];

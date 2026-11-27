@@ -407,7 +407,9 @@ export function initMakeOrder(): void {
   form.addEventListener('click', ({ target }) => {
     const button = (target as Element).closest<HTMLElement>('[data-draft-order]');
     if (button && editor.insertHtml(button.dataset.draftOrder!, { at: { after: 'paragraph:ordered-that' } })) {
-      const reference = button.closest<HTMLElement>('[data-application]')!.dataset.applicationReference;
+      const application = button.closest<HTMLElement>('[data-application]')!;
+      application.querySelector<HTMLInputElement>('input[name$="-applicant-wording-inserted"]')!.value = 'yes';
+      const reference = application.dataset.applicationReference;
       form.querySelector('#order-editor [role="status"]')!.textContent =
         `The draft order from application ${reference} is added.`;
     }

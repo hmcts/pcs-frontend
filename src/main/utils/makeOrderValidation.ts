@@ -159,11 +159,15 @@ function validateCosts(formData: Record<string, unknown>, suspended: boolean): M
 }
 
 /** The arrears a suspension is conditional on and how they are paid, asked with ids that start with the prefix. */
-function validatePaymentConditions(formData: Record<string, unknown>, prefix: string): MakeOrderValidationIssue[] {
-  const { issues, add, money, date, frequency } = validation(formData);
+function validatePaymentConditions(
+  formData: Record<string, unknown>,
+  prefix: string,
+  requiresArrears = true
+): MakeOrderValidationIssue[] {
+  const { issues, add, money, optionalMoney, date, frequency } = validation(formData);
   const terms = values(formData, `${prefix}-payment-terms`);
 
-  money(`${prefix}-arrears`, 'Enter valid arrears');
+  (requiresArrears ? money : optionalMoney)(`${prefix}-arrears`, 'Enter valid arrears');
   add(
     terms.includes('one-off') || terms.includes('instalments'),
     `${prefix}-payment-terms`,
@@ -191,7 +195,12 @@ function validateSuspended(formData: Record<string, unknown>): MakeOrderValidati
   const { issues, date } = validation(formData);
   date('suspended-by-date', 'Enter a valid possession date');
   issues.push(...possessionTime(formData, 'suspended-by-time'));
-  return [...issues, ...validatePaymentConditions(formData, 'suspended'), ...validateCosts(formData, true)];
+  const ordersMoneyJudgment = values(formData, 'suspended-options').includes('money-judgment-arrears');
+  return [
+    ...issues,
+    ...validatePaymentConditions(formData, 'suspended', ordersMoneyJudgment),
+    ...validateCosts(formData, true),
+  ];
 }
 
 function validateOutright(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
@@ -379,6 +388,7 @@ export const APPLICATION_DECISIONS = [
   'dismiss',
   'strike-out',
   'list',
+  'applicant-wording',
   'freeform',
 ] as const;
 
@@ -388,6 +398,7 @@ export interface ApplicationToDecide {
   reference: string;
   enforcementSuspension?: boolean;
   adjournment?: boolean;
+  draftOrderWording?: string | null;
   /** The application the judge's task asked them to decide, which the order may not leave as it is. */
   required?: boolean;
 }
@@ -433,6 +444,7 @@ function validateApplications(
     const allowed =
       (APPLICATION_DECISIONS as readonly string[]).includes(decision) &&
       !(application.required && decision === 'none') &&
+      !(decision === 'applicant-wording' && !application.draftOrderWording?.trim()) &&
       // Only enforcement is suspended on conditions, and only a hearing adjourned on an application to adjourn it.
       !(decision === 'suspend' && !application.enforcementSuspension) &&
       !(decision === 'adjourn' && !application.adjournment) &&
@@ -468,24 +480,34 @@ function validateApplications(
   return issues;
 }
 
-/**
- * A freeform decision generates no wording, leaving the judge to write it: an order deciding an application that way
- * needs a clause someone wrote, or it would dispose of the application without saying how.
- */
-export function validateFreeformWording(
+/** Decisions that rely on wording in the editor must have that wording before review or issue. */
+export function validateApplicationWording(
   formData: Record<string, unknown>,
   applications: readonly ApplicationToDecide[],
   snapshot: DocWeaveSnapshot | null
 ): MakeOrderValidationIssue[] {
-  if (!snapshot || describeChanges(snapshot).inserted > 0) {
+  if (!snapshot) {
     return [];
   }
-  return applications
-    .filter(application => value(formData, `${applicationPrefix(application)}-decision`) === 'freeform')
-    .map(application => ({
-      id: `${applicationPrefix(application)}-decision`,
-      message: `Write the decision on application ${application.reference} in the order`,
-    }));
+  const hasInsertedWording = describeChanges(snapshot).inserted > 0;
+  return applications.flatMap(application => {
+    const prefix = applicationPrefix(application);
+    const id = `${prefix}-decision`;
+    const decision = value(formData, id);
+    if (
+      decision === 'applicant-wording' &&
+      application.draftOrderWording?.trim() &&
+      (!hasInsertedWording || value(formData, `${prefix}-applicant-wording-inserted`) !== 'yes')
+    ) {
+      return [
+        { id, message: `Insert the applicant’s wording for application ${application.reference} into the order` },
+      ];
+    }
+    if (decision === 'freeform' && !hasInsertedWording) {
+      return [{ id, message: `Write the decision on application ${application.reference} in the order` }];
+    }
+    return [];
+  });
 }
 
 /**

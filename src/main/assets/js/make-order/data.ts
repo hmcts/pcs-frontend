@@ -10,7 +10,6 @@ export interface AttendanceEntry {
   rowIndex: number;
   partyKind: 'claimant' | 'defendant';
   partyId: string;
-  partyName: string;
   choice: string;
   representativeName: string;
 }
@@ -86,7 +85,6 @@ export function readOrderData(form: HTMLFormElement): OrderData {
   const attendance: AttendanceEntry[] = [];
   form.querySelectorAll<HTMLElement>(hearing ? '[data-attendance-row]' : ':not(*)').forEach((row, rowIndex) => {
     const partyKind = row.dataset.partyKind === 'claimant' ? 'claimant' : 'defendant';
-    const partyName = row.dataset.partyName;
 
     const choice = row.querySelector<HTMLInputElement>('input[type="radio"]:checked')?.value;
     if (!choice) {
@@ -97,7 +95,6 @@ export function readOrderData(form: HTMLFormElement): OrderData {
       rowIndex,
       partyKind,
       partyId: row.dataset.partyId ?? '',
-      partyName: partyName || `the ${partyKind}`,
       choice,
       representativeName: row.querySelector<HTMLInputElement>('input[type="text"]')?.value.trim() ?? '',
     });

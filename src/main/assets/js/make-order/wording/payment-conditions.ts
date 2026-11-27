@@ -13,17 +13,20 @@ export function addPaymentConditions(
   list: OrderedListBuilder,
   data: OrderData,
   prefix: string,
-  suspended: string
+  suspended: string,
+  { fixedIntroduction = false } = {}
 ): void {
   const { claimant, defendant, defendantVerb } = partyLabels(data);
   const paymentTerms = values(data, `${prefix}-payment-terms`);
+  // Existing drafts may have an arrears fact and inline payment terms. Give the new structure its own clause IDs.
+  const clausePrefix = fixedIntroduction ? `${prefix}-rent` : prefix;
   const terms: Record<string, PaymentTerm> = {
     'one-off': {
       kind: 'one-off',
       lead: 'payment of £',
       afterAmount: ` to ${claimant}`,
       fields: { amount: `${prefix}-oneoff-amount`, date: `${prefix}-oneoff-date` },
-      facts: `${prefix}-one-off`,
+      facts: `${clausePrefix}-one-off`,
     },
     instalments: {
       kind: 'instalments',
@@ -34,7 +37,7 @@ export function addPaymentConditions(
         frequency: `${prefix}-instalment-frequency`,
         date: `${prefix}-instalment-date`,
       },
-      facts: `${prefix}-instalment`,
+      facts: `${clausePrefix}-instalment`,
     },
   };
   const condition = (content: InlineBuilder, ending: string): void => {
@@ -46,26 +49,26 @@ export function addPaymentConditions(
       .text(ending);
   };
 
-  if (paymentTerms.length === 1) {
-    list.item(`${prefix}-condition`, content => {
+  if (!fixedIntroduction && paymentTerms.length === 1) {
+    list.item(`${clausePrefix}-condition`, content => {
       condition(content, ' by ');
       addPaymentTerm(content, data, terms[paymentTerms[0]]);
       content.text('.');
     });
   } else {
     list.item(
-      `${prefix}-condition`,
-      content => condition(content, ' by:'),
+      `${clausePrefix}-condition`,
+      fixedIntroduction ? suspended : content => condition(content, ' by:'),
       item => {
-        item.orderedList(`${prefix}-payment-terms`, subList => {
+        item.orderedList(`${clausePrefix}-payment-terms`, subList => {
           for (const key of ['one-off', 'instalments'].filter(term => paymentTerms.includes(term))) {
-            subList.item(`${prefix}-${key}`, content => {
+            subList.item(`${clausePrefix}-${key}`, content => {
               addPaymentTerm(content, data, terms[key]);
               content.text(';');
             });
           }
           if (!paymentTerms.length) {
-            subList.item(`${prefix}-missing-payment-term`, content => {
+            subList.item(`${clausePrefix}-missing-payment-term`, content => {
               content.fact('missing', '[select a payment term]', { sourceId: `${prefix}-payment-terms` }).text(';');
             });
           }
@@ -74,8 +77,10 @@ export function addPaymentConditions(
     );
   }
 
-  list.item(
-    `${prefix}-payment-priority`,
-    `Payment of the above instalments made to ${claimant} shall be applied first to any arrears prior to any order for costs.`
-  );
+  if (!fixedIntroduction) {
+    list.item(
+      `${prefix}-payment-priority`,
+      `Payment of the above instalments made to ${claimant} shall be applied first to any arrears prior to any order for costs.`
+    );
+  }
 }

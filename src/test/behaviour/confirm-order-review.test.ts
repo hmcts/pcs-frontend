@@ -395,7 +395,8 @@ describe('confirm order review', () => {
       );
       expect(editor.querySelector('.docweave-clause--modified')?.textContent).toContain('Wording the judge rewrote');
       expect(document.querySelector('input[name$="-attendance"]')).toBeNull();
-      expect(page.documentText()).toContain('The Defendant did not attend.');
+      // The judge replaced the whole attendance sentence, including its non-attendance wording.
+      expect(page.documentText()).not.toContain('the Defendant did not attend.');
       expect(page.documentText()).toContain('Wording the judge rewrote');
     });
 

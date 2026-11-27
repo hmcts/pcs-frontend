@@ -147,8 +147,15 @@ function addAttendance(order: DocBuilder, data: OrderData): void {
     if (name) {
       return `${name}, ${description}`;
     }
-    return choice === 'solicitor' ? `the ${description}` : description;
+    return choice === 'solicitor'
+      ? `the ${description}`
+      : choice === 'counsel'
+        ? sentenceCase(description)
+        : description;
   });
+  const firstAbsent = absent[0];
+  const absentParties = joinList(absent.map(entry => attendanceParty(entry, data)));
+  const absence = `${absentParties} did not attend`;
   if (spoken.length || letters.length) {
     const speakers =
       spoken.length > 1 && spoken.some(speaker => speaker.includes(','))
@@ -157,24 +164,22 @@ function addAttendance(order: DocBuilder, data: OrderData): void {
     const heardFrom = spoken.length ? `heard from ${speakers}` : '';
     const readFrom = letters.length
       ? `read ${letters.length === 1 ? 'a letter' : 'letters'} from ${joinList(
-          letters.map(entry => entry.representativeName || entry.partyName)
+          letters.map(entry => attendanceParty(entry, data))
         )}`
       : '';
-    const wording = `The Court ${joinList([heardFrom, readFrom].filter(Boolean))}.`;
+    const attendance = joinList([heardFrom, readFrom].filter(Boolean));
+    const wording = `The Court ${attendance}${firstAbsent ? ` and ${absence}` : ''}.`;
     if (spoken.length) {
       order.paragraph('attendance-heard', wording);
     } else {
-      const first = letters[0];
-      order.paragraph(`attendance-letter-${first.rowIndex}`, content => {
-        content.fact('attendance', wording, { sourceId: first.sourceId });
+      const firstLetter = letters[0];
+      order.paragraph(`attendance-letter-${firstLetter.rowIndex}`, content => {
+        content.fact('attendance', wording, { sourceId: firstLetter.sourceId });
       });
     }
-  }
-  if (absent.length) {
-    const first = absent[0];
-    const parties = joinList(absent.map(entry => attendanceParty(entry, data)));
-    order.paragraph(`attendance-absent-${first.rowIndex}`, content => {
-      content.fact('attendance', `${sentenceCase(parties)} did not attend.`, { sourceId: first.sourceId });
+  } else if (firstAbsent) {
+    order.paragraph(`attendance-absent-${firstAbsent.rowIndex}`, content => {
+      content.fact('attendance', `${sentenceCase(absence)}.`, { sourceId: firstAbsent.sourceId });
     });
   }
 }

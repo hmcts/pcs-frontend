@@ -24,7 +24,7 @@ import {
 } from '@utils/makeOrderForm';
 import {
   type MakeOrderValidationIssue,
-  validateFreeformWording,
+  validateApplicationWording,
   validateHearingRecord,
   validateMakeOrder,
 } from '@utils/makeOrderValidation';
@@ -242,7 +242,7 @@ export default function makeOrderRoutes(app: Application): void {
             )
           : []),
         ...(action === 'SUBMIT_FOR_REVIEW'
-          ? validateFreeformWording(answers, applicationsToDecide(started.envelope), postedSnapshot(orderDocument))
+          ? validateApplicationWording(answers, applicationsToDecide(started.envelope), postedSnapshot(orderDocument))
           : []),
       ];
       if (validationIssues.length) {
