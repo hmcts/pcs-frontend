@@ -11,3 +11,4 @@ export * from './claimantCreateGenAppAPI.action';
 export * from './respondPossessionClaimAPI.action';
 export * from './documents.action';
 export * from './launchDarkly.action';
+export * from './defendantNameDivergenceAPI.action';

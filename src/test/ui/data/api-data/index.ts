@@ -9,3 +9,4 @@ export * from '../../data/api-data/citizenCreateGenAppEventToken.api.data';
 export * from '../../data/api-data/citizenCreateGenApp.api.data';
 export * from '../../data/api-data/respondPossessionClaimEventToken.api.data';
 export * from '../../data/api-data/respondPossessionClaim.api.data';
+export * from '../../data/api-data/defendantNameDivergence.api.data';
