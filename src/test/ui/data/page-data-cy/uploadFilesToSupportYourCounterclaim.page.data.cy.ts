@@ -1,0 +1,16 @@
+export const uploadFilesToSupportYourCounterclaim = {
+  mainHeader: `Uwchlwytho ffeiliau i gefnogi eich gwrth-hawliad`,
+  youShouldOnlyParagraph: `Dim ond ffeiliau sy'n berthnasol i'ch gwrth-hawliad y dylech eu huwchlwytho`,
+  theClaimantWillBeParagraph: `Bydd yr hawlydd yn gallu gweld unrhyw ffeiliau rydych yn eu huwchlwytho`,
+  beforeYouUploadParagraph: `Cyn i chi uwchlwytho'r ffeiliau, rhowch enw iddynt sy'n dweud wrth y llys beth ydynt, er enghraifft ‘Llythyr cynnig swydd’`,
+  eachFileMustBeParagraph: `Rhaid i bob ffeil fod yn llai na 100MB. Gallwch uwchlwytho'r mathau canlynol o ffeiliau: DOC/DOCX (Word), XLS/XLSX (Excel), PPT/PPTX (PowerPoint), PDF, RTF, TXT, CSV, JPG/JPEG, PNG, BMP, TIF/TIFF.`,
+  uploadFileParagraph: `Uwchlwytho ffeil`,
+  chooseFileButton: `Dewis ffeiliau`,
+  saveAndContinueButton: `Cadw a pharhau`,
+  saveForLaterButton: `Cadw am nes ymlaen`,
+  thereIsAProblemErrorMessageHeader: `Mae problem`,
+  selectAFileErrorMessage: `Dewiswch ffeil i gefnogi eich gwrth-hawliad`,
+  feedbackLink: `adborth (yn agor mewn tab newydd)`,
+  pageSlug: `counter-claim-upload-files`,
+  backLink: `Yn ôl`,
+};
